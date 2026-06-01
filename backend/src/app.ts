@@ -1,0 +1,47 @@
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import authRoutes from './modules/auth/auth.routes';
+import workspaceRoutes from './modules/workspaces/worspace.routes';
+import boardRoutes from './modules/boards/board.routes';
+import columnRoutes from './modules/columns/column.routes';
+import taskRoutes from './modules/tasks/task.routes';
+import commentRoutes from './modules/comments/comment.routes';
+import { errorMiddleware } from './middleware/error.middleware';
+
+const app = express();
+
+app.use(
+  cors({
+    origin: ['http://localhost:4200'],
+    credentials: true
+  })
+);
+
+app.use(express.json());
+app.use(cookieParser());
+
+app.get('/', (_req, res) => {
+  res.json({
+    success: true,
+    message: 'Welcome to Taskflow API'
+  });
+});
+
+app.get('/api/health', (_req, res) => {
+  res.json({
+    success: true,
+    message: 'Taskflow API is running'
+  });
+});
+
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/workspaces', workspaceRoutes);
+app.use('/api/v1/boards', boardRoutes);
+app.use('/api/v1', columnRoutes);
+app.use('/api/v1', taskRoutes);
+app.use('/api/v1', commentRoutes);
+
+app.use(errorMiddleware);
+
+export default app;
