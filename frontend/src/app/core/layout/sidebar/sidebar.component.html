@@ -1,0 +1,62 @@
+<nav class="h-full p-4 flex flex-col gap-1 bg-gray-50 text-gray-500 rounded-xl">
+  <a
+    #dashboardRla="routerLinkActive"
+    class="flex items-center gap-2 rounded p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-900 [&[active]]:bg-gray-300 [&[active]]:text-gray-900 [&[active]]:font-medium"
+    [attr.active]="dashboardRla.isActive ? '' : null"
+    routerLink="/dashboard"
+    routerLinkActive
+    [routerLinkActiveOptions]="{ exact: true }"
+    (click)="navigate.emit()"
+  >
+    <mat-icon>dashboard</mat-icon>
+    <span>Dashboard</span>
+  </a>
+
+  <a
+    #workspacesRla="routerLinkActive"
+    class="flex items-center gap-2 rounded p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-900 [&[active]]:bg-gray-300 [&[active]]:text-gray-900 [&[active]]:font-medium"
+    [attr.active]="workspacesRla.isActive ? '' : null"
+    routerLink="/workspaces"
+    routerLinkActive
+    (click)="navigate.emit()"
+  >
+    <mat-icon>workspaces</mat-icon>
+    <span>Workspaces</span>
+  </a>
+
+  <a
+    #boardsRla="routerLinkActive"
+    class="flex items-center gap-2 rounded p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-900 [&[active]]:bg-gray-300 [&[active]]:text-gray-900 [&[active]]:font-medium"
+    [attr.active]="boardsRla.isActive ? '' : null"
+    routerLink="/boards"
+    routerLinkActive
+    (click)="navigate.emit()"
+  >
+    <mat-icon>view_kanban</mat-icon>
+    <span>Boards</span>
+  </a>
+
+  <a
+    #activityRla="routerLinkActive"
+    class="flex items-center gap-2 rounded p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-900 [&[active]]:bg-gray-300 [&[active]]:text-gray-900 [&[active]]:font-medium"
+    [attr.active]="activityRla.isActive ? '' : null"
+    routerLink="/activity"
+    routerLinkActive
+    (click)="navigate.emit()"
+  >
+    <mat-icon>history</mat-icon>
+    <span>Activity</span>
+  </a>
+
+  <a
+    #settingsRla="routerLinkActive"
+    class="flex items-center gap-2 rounded p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-900 [&[active]]:bg-gray-300 [&[active]]:text-gray-900 [&[active]]:font-medium"
+    [attr.active]="settingsRla.isActive ? '' : null"
+    routerLink="/settings"
+    routerLinkActive
+    (click)="navigate.emit()"
+  >
+    <mat-icon>settings</mat-icon>
+    <span>Settings</span>
+  </a>
+</nav>
