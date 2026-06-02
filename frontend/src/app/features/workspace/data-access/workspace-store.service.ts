@@ -9,12 +9,14 @@ import { filter, switchMap, take } from 'rxjs/operators';
 interface WorkspaceState {
   workspaces: Workspace[];
   loading: boolean;
+  loaded: boolean;
   error: string | null;
 }
 
 const initialWorkspaceState: WorkspaceState = {
   workspaces: [],
   loading: false,
+  loaded: false,
   error: null
 };
 
@@ -27,7 +29,15 @@ export class WorkspaceStoreService {
 
   readonly state$ = this.stateSubject.asObservable();
 
-  loadWorkspaces(): void {
+  loadWorkspaces(force = false): void {
+    if (this.stateSubject.value.loading) {
+      return;
+    }
+
+    if (this.stateSubject.value.loaded && !force) {
+      return;
+    }
+
     this.stateSubject.next({
       ...this.stateSubject.value,
       loading: true,
@@ -43,6 +53,7 @@ export class WorkspaceStoreService {
             this.stateSubject.next({
               ...this.stateSubject.value,
               loading: false,
+              loaded: true,
               error: 'Unauthorized'
             });
             return EMPTY;
@@ -59,6 +70,7 @@ export class WorkspaceStoreService {
             ...this.stateSubject.value,
             workspaces,
             loading: false,
+            loaded: true,
             error: null
           });
         },
@@ -66,6 +78,7 @@ export class WorkspaceStoreService {
           this.stateSubject.next({
             ...this.stateSubject.value,
             loading: false,
+            loaded: true,
             error: error?.message ?? 'Failed to load workspaces'
           });
         }

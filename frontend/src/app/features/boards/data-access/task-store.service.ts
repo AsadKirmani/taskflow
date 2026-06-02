@@ -13,6 +13,8 @@ export class TaskStoreService {
   private readonly api = inject(BoardApiService);
   private readonly notificationService = inject(NotificationService);
   private currentBoardId: string | null = null;
+  private readonly loadedTaskBoardIds = new Set<string>();
+  private readonly loadingTaskBoardIds = new Set<string>();
   private readonly filterTrigger$ = new Subject<string>();
 
   private readonly stateSubject = new BehaviorSubject<TaskState>(initialTaskState);
@@ -36,13 +38,22 @@ export class TaskStoreService {
     }))
   );
 
-  getTasksInBoard(boardId: string, columns: BoardColumn[] = []): void {
+  getTasksInBoard(boardId: string, columns: BoardColumn[] = [], force = false): void {
     if (!boardId?.trim()) {
       this.notificationService.error('Board ID is missing');
       return;
     }
 
+    if (this.loadingTaskBoardIds.has(boardId)) {
+      return;
+    }
+
+    if (this.loadedTaskBoardIds.has(boardId) && !force) {
+      return;
+    }
+
     this.currentBoardId = boardId;
+    this.loadingTaskBoardIds.add(boardId);
     this.patchState({ loading: true, error: null });
 
     this.api
@@ -82,10 +93,13 @@ export class TaskStoreService {
             }
           }
 
+          this.loadedTaskBoardIds.add(boardId);
+          this.loadingTaskBoardIds.delete(boardId);
           this.patchState({ tasksById, taskIdsByColumn, loading: false, error: null });
           this.notificationService.success('Board tasks loaded successfully');
         }),
         catchError(() => {
+          this.loadingTaskBoardIds.delete(boardId);
           this.patchState({ loading: false, error: 'Failed to load board tasks' });
           this.notificationService.error('Failed to load board tasks');
           return of([]);

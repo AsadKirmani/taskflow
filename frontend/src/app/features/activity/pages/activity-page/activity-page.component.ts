@@ -1,7 +1,7 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, combineLatest, map, of, switchMap } from 'rxjs';
+import { catchError, combineLatest, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { ActivityApiService } from '../../data-access/activity-api.service';
 import { WorkspaceStoreService } from '../../../workspace/data-access/workspace-store.service';
 import { ActivityItem, ActivityRef } from '../../models/activity.model';
@@ -79,17 +79,36 @@ export class ActivityPageComponent {
     this.workspaceStore.state$,
     this.route.queryParamMap
   ]).pipe(
-    switchMap(([workspaceState, query]) => {
+    map(([workspaceState, query]) => {
       let workspaceId = query.get('workspaceId') ?? undefined;
       const boardId = query.get('boardId') ?? undefined;
 
       if (!workspaceId) {
-        if (!workspaceState.workspaces.length && !workspaceState.loading) {
+        if (!workspaceState.workspaces.length && !workspaceState.loading && !workspaceState.loaded) {
           this.workspaceStore.loadWorkspaces();
         }
 
         workspaceId = workspaceState.workspaces[0]?.id;
       }
+
+      return {
+        workspaceState,
+        workspaceId,
+        boardId
+      };
+    }),
+    distinctUntilChanged((previous, current) => {
+      if (!previous.workspaceId && !current.workspaceId) {
+        return (
+          previous.workspaceState.loading === current.workspaceState.loading &&
+          previous.workspaceState.error === current.workspaceState.error &&
+          previous.workspaceState.workspaces.length === current.workspaceState.workspaces.length
+        );
+      }
+
+      return previous.workspaceId === current.workspaceId && previous.boardId === current.boardId;
+    }),
+    switchMap(({ workspaceState, workspaceId, boardId }) => {
 
       if (!workspaceId) {
         return of({

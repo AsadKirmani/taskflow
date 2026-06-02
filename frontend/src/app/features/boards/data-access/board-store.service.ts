@@ -11,6 +11,10 @@ import { BoardColumn } from '../../../core/models/column.model';
 export class BoardStoreService {
   private readonly api = inject(BoardApiService);
   private readonly notificationService = inject(NotificationService);
+  private boardsLoaded = false;
+  private readonly loadedBoardIds = new Set<string>();
+  private readonly loadedColumnBoardIds = new Set<string>();
+  private readonly loadingColumnBoardIds = new Set<string>();
 
   private readonly stateSubject = new BehaviorSubject<BoardState>(initialBoardState);
   readonly state$ = this.stateSubject.asObservable();
@@ -34,7 +38,15 @@ export class BoardStoreService {
     }))
   );
 
-  loadBoards(): void {
+  loadBoards(force = false): void {
+    if (this.getState().loading) {
+      return;
+    }
+
+    if (this.boardsLoaded && !force) {
+      return;
+    }
+
     this.patchState({ loading: true, error: null });
     this.api
       .getBoards()
@@ -45,10 +57,12 @@ export class BoardStoreService {
           )
         ),
         tap(boards => {
+          this.boardsLoaded = true;
           this.notificationService.success('Boards loaded successfully');
           this.patchState({ boards, loading: false, error: null });
         }),
         catchError(() => {
+          this.boardsLoaded = true;
           this.patchState({ boards: [], loading: false, error: 'Failed to load boards' });
           this.notificationService.error('Failed to load boards');
           return of([]);
@@ -57,10 +71,14 @@ export class BoardStoreService {
       .subscribe();
   }
 
-  loadBoard(boardId: string): void {
+  loadBoard(boardId: string, force = false): void {
     if (!boardId?.trim()) {
       this.patchState({ loading: false, error: 'Board ID is missing' });
       this.notificationService.error('Board ID is missing');
+      return;
+    }
+
+    if (this.loadedBoardIds.has(boardId) && !force) {
       return;
     }
 
@@ -85,6 +103,8 @@ export class BoardStoreService {
           );
           const columns = this.normalizeColumns((payload as { columns?: (BoardColumn & { _id?: string })[] })?.columns ?? []);
 
+          this.loadedBoardIds.add(boardId);
+
           this.patchState({
             board,
             columns,
@@ -104,11 +124,21 @@ export class BoardStoreService {
       .subscribe();
   }
 
-  getBoardColumns(boardId: string): void {
+  getBoardColumns(boardId: string, force = false): void {
     if (!boardId?.trim()) {
       this.notificationService.error('Board ID is missing');
       return;
     }
+
+    if (this.loadingColumnBoardIds.has(boardId)) {
+      return;
+    }
+
+    if (this.loadedColumnBoardIds.has(boardId) && !force) {
+      return;
+    }
+
+    this.loadingColumnBoardIds.add(boardId);
 
     this.api
       .getBoardColumns(boardId)
@@ -119,9 +149,12 @@ export class BoardStoreService {
           )
         ),
         tap(columns => {
+          this.loadedColumnBoardIds.add(boardId);
+          this.loadingColumnBoardIds.delete(boardId);
           this.patchState({ columns });
         }),
         catchError(() => {
+          this.loadingColumnBoardIds.delete(boardId);
           this.notificationService.error('Failed to load board columns');
           return of([]);
         })
