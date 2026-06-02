@@ -1,9 +1,10 @@
+import { Model } from 'mongoose';
 import { BoardModel } from '../../models/board.model';
 import { ColumnModel } from '../../models/column.model';
 import { TaskModel } from '../../models/task.model';
 import { ArchiveModel } from '../../models/archive.model';
 
-const getEntityModel = (entityType: 'board' | 'column' | 'task') => {
+const getEntityModel = (entityType: 'board' | 'column' | 'task'): Model<any> => {
   if (entityType === 'board') return BoardModel;
   if (entityType === 'column') return ColumnModel;
   return TaskModel;
