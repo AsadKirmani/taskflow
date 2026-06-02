@@ -7,6 +7,8 @@ import boardRoutes from './modules/boards/board.routes';
 import columnRoutes from './modules/columns/column.routes';
 import taskRoutes from './modules/tasks/task.routes';
 import commentRoutes from './modules/comments/comment.routes';
+import activityRoutes from './modules/activity/activity.routes';
+import archiveRoutes from './modules/archive/archive.routes';
 import { errorMiddleware } from './middleware/error.middleware';
 
 const app = express();
@@ -41,6 +43,8 @@ app.use('/api/v1/boards', boardRoutes);
 app.use('/api/v1', columnRoutes);
 app.use('/api/v1', taskRoutes);
 app.use('/api/v1', commentRoutes);
+app.use('/api/v1', activityRoutes);
+app.use('/api/v1', archiveRoutes);
 
 app.use(errorMiddleware);
 

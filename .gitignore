@@ -6,6 +6,9 @@
 /out-tsc
 /bazel-out
 .env
+.env.*
+!.env.example
+!.env.sample
 
 # Node
 /node_modules

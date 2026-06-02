@@ -36,7 +36,7 @@ export const commentController = {
         const updatedComment = await commentService.updateComment(commentId, {
             content,
             archived,
-        });
+        }, req.auth.userId);
         res.json(updatedComment);
     },
 };

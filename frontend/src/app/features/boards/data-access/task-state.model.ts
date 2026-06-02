@@ -17,8 +17,12 @@ export const initialTaskState: TaskState = {
     search: '',
     priorities: [],
     assigneeIds: [],
+    currentUserId: null,
+    memberScope: 'all',
+    completion: 'all',
     labels: [],
-    dueType: 'all'
+    dueType: 'all',
+    activity: []
   },
   loading: false,
   saving: false,

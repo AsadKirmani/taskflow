@@ -32,7 +32,7 @@ export const columnController = {
     const updatedColumn = await columnService.updateColumn(columnId, {
       name,
       archived,
-    });
+    }, req.auth.userId);
     res.json(updatedColumn);
   },
   async reorderTasks(req: Request, res: Response) {

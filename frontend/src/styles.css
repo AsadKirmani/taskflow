@@ -110,17 +110,28 @@ body {
 }
 
 .kanban-column {
-  min-width: 280px;
+  min-width: 256px;
   background: #e2e8f0;
   border-radius: 12px;
   padding: 1rem;
+}
+
+@media (max-width: 640px) {
+  .kanban-board__columns {
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .kanban-column {
+    min-width: 85vw;
+    padding: 0.75rem;
+  }
 }
 
 .kanban-column__task-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  min-height: 100px;
 }
 
 .task-card {

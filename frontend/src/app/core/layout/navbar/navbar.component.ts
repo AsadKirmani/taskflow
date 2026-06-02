@@ -7,19 +7,20 @@ import { AuthStoreService } from '../../../features/auth/data-access/auth-store.
   standalone: true,
   imports: [MatIconModule],
   template: `
-    <header class="flex items-center justify-between p-4 bg-gray-50 text-white sticky top-0 mt-4 mx-4 z-10 rounded-2xl">
-    <div class="flex items-center gap-2">
-      <button type="button" aria-label="Toggle sidebar" (click)="menuToggle.emit()" class="flex items-center justify-center text-gray-800 hover:bg-gray-200 rounded p-1">
+    <header class="sticky top-0 z-10 mt-3 mx-2 sm:mt-4 sm:mx-4 rounded-2xl bg-gray-50 p-3 sm:p-4 text-white">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex w-full items-center gap-2 sm:w-auto">
+      <button type="button" aria-label="Toggle sidebar" (click)="menuToggle.emit()" class="flex items-center justify-center text-gray-800 hover:bg-gray-200 rounded p-1 shrink-0">
         <mat-icon style="">dock_to_right</mat-icon>
       </button>
-      <span class="text-gray-200"> | </span>
-      <div class="relative bg-white rounded-full text-gray-200">
+      <span class="hidden text-gray-200 sm:inline"> | </span>
+      <div class="relative rounded-full bg-white text-gray-200 flex-1 sm:flex-none">
         <mat-icon class="absolute left-2 top-1/2 transform -translate-y-1/2">search</mat-icon>
-        <input type="text" placeholder="Search tasks..." class="pl-8 pr-4 py-2 rounded-full placeholder:text-gray-500 placeholder:italic border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input type="text" placeholder="Search tasks..." class="w-full sm:w-64 md:w-80 pl-8 pr-4 py-2 rounded-full placeholder:text-gray-500 placeholder:italic border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
     </div>
     
-    <div class="flex items-center gap-2">
+    <div class="flex items-center justify-end gap-2">
     <button type="button" aria-label="Notifications" class="flex items-center justify-center bg-white text-gray-600 w-10 h-10 rounded-full hover:bg-gray-200">
         <mat-icon>notifications</mat-icon>
         </button>
@@ -33,6 +34,7 @@ import { AuthStoreService } from '../../../features/auth/data-access/auth-store.
           <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" (click)="logout()">Logout</a>
         </div>
       </div>
+    </div>
     </div>
     </header>
   `,

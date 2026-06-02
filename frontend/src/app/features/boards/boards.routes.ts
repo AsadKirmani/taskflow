@@ -8,6 +8,10 @@ export const BOARD_ROUTES: Routes = [
     component: BoardsPageComponent
   },
   {
+    path: ':boardId/:boardSlug',
+    component: BoardDetailPageComponent
+  },
+  {
     path: ':boardId',
     component: BoardDetailPageComponent
   }

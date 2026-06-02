@@ -5,5 +5,9 @@ export const WORKSPACE_ROUTES: Routes = [
   {
     path: '',
     component: WorkspaceListPageComponent
+  },
+  {
+    path: ':workspaceId/:workspaceSlug',
+    component: WorkspaceListPageComponent
   }
 ];

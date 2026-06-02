@@ -10,21 +10,36 @@ import {
   CdkDropList,
   CdkDragDrop,
   CdkDragHandle,
+  DragStartDelay,
 } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
 import { Board } from '../../../../core/models/board.model';
 import { BoardColumn } from '../../../../core/models/column.model';
 import { Task } from '../../../../core/models/task.model';
 import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, UpdateTaskEventPayload, ToggleTaskCompletionEventPayload } from '../../models/drag-drop.model';
+import { BoardFilterSelection, FilterComponent } from '../filters/filter.component';
+import { CommonModule } from '@angular/common';
+import { TaskStoreService } from '../../data-access/task-store.service';
+import { AuthStoreService } from '../../../auth/data-access/auth-store.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DestroyRef, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  imports: [CdkDropList, CdkDrag, CdkDragHandle, MatIconModule],
+  imports: [CdkDropList, CdkDrag, CdkDragHandle, MatIconModule, FilterComponent, CommonModule],
   templateUrl: './kanban-board.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class KanbanBoardComponent {
+  private readonly taskStore = inject(TaskStoreService);
+  private readonly authStore = inject(AuthStoreService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  view: 'board' | 'filter' = 'board';
+  private currentUserId: string | null = null;
   @Input() board: Board | null = null;
   @Input() columns: BoardColumn[] = [];
   @Input() tasksByColumn: Record<string, Task[] | undefined> = {};
@@ -32,6 +47,7 @@ export class KanbanBoardComponent {
 
   activeTaskInputColumnId: string | null = null;
   taskInputValues: Record<string, string | undefined> = {};
+  activeTaskOverlayId: string | null = null;
 
   @Output() taskMoved = new EventEmitter<TaskDropEventPayload>();
   @Output() columnMoved = new EventEmitter<ColumnDropEventPayload>();
@@ -41,6 +57,25 @@ export class KanbanBoardComponent {
 
   activeEditTaskId: string | null = null;
   editTaskTitle = '';
+  readonly dragStartDelay: DragStartDelay = { touch: 220, mouse: 200 };
+
+  constructor() {
+    this.authStore.user$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(user => {
+        this.currentUserId = user?.id ?? null;
+      });
+
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.activeTaskOverlayId = params.get('taskId');
+      });
+  }
+
+  get isFilterOpen(): boolean {
+    return this.view === 'filter';
+  }
 
   get connectedDropListIds(): string[] {
     return this.columns.map(column => column.id);
@@ -137,5 +172,98 @@ export class KanbanBoardComponent {
     this.taskUpdated.emit({ taskId: task.id, title });
     this.cancelTaskEdit();
   }
+
+  openTaskOverlay(task: Task, event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { taskId: task.id, taskTitle: this.toSlug(task.title) },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  closeTaskOverlay(event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { taskId: null, taskTitle: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  get activeTaskOverlay(): Task | null {
+    if (!this.activeTaskOverlayId) {
+      return null;
+    }
+
+    for (const tasks of Object.values(this.tasksByColumn)) {
+      const match = tasks?.find(task => task.id === this.activeTaskOverlayId);
+      if (match) {
+        return match;
+      }
+    }
+
+    return null;
+  }
+
+  archiveColumn(columnId: string): void {
+    // Implement column archiving logic here
+  }
+  toggleFilterView(): void {
+    this.view = this.isFilterOpen ? 'board' : 'filter';
+  }
+
+  closeFilterView(): void {
+    this.view = 'board';
+  }
+
+  onFiltersChanged(selection: BoardFilterSelection): void {
+    const memberScope = selection.noMembers
+      ? 'no_members'
+      : selection.me
+        ? 'me'
+        : 'all';
+
+    const completion = selection.completed && selection.incomplete
+      ? 'all'
+      : selection.completed
+        ? 'completed'
+        : selection.incomplete
+          ? 'incomplete'
+          : 'all';
+
+    this.taskStore.updateFilters({
+      currentUserId: this.currentUserId,
+      memberScope,
+      completion,
+      dueType: selection.dueDate,
+      labels: selection.labels,
+      activity: selection.activity
+    });
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        memberScope: memberScope === 'all' ? null : memberScope,
+        completion: completion === 'all' ? null : completion,
+        dueType: selection.dueDate === 'all' ? null : selection.dueDate,
+        labels: selection.labels.length ? selection.labels.join(',') : null,
+        activity: selection.activity.length ? selection.activity.join(',') : null
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  private toSlug(value: string): string {
+    return value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'task';
+  }
+ 
   
 }

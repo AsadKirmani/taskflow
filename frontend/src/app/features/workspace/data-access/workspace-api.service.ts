@@ -11,6 +11,8 @@ export class WorkspaceApiService {
   private readonly http = inject(HttpClient);
 
   getWorkspaces(): Observable<ApiResponse<Workspace[]>> {
-    return this.http.get<ApiResponse<Workspace[]>>(this.baseUrl);
+    return this.http.get<ApiResponse<Workspace[]>>(this.baseUrl, {
+      withCredentials: true
+    });
   }
 }

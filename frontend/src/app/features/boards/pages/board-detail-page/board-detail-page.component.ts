@@ -16,6 +16,7 @@ import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, Upda
   template: `
     @if (vm$ | async; as vm) {
       <app-kanban-board
+        class="block h-full min-h-0"
         [board]="vm.board"
         [columns]="vm.columns"
         [tasksByColumn]="vm.tasksByColumn"
@@ -28,6 +29,13 @@ import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, Upda
       />
     }
   `,
+  styles: [`
+    :host {
+      display: block;
+      height: 100%;
+      min-height: 0;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BoardDetailPageComponent {

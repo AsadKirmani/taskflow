@@ -3,6 +3,7 @@ import { workspaceRepository, } from './workspace.repository';
 import { sendInvitationEmail } from '../../config/mailer';
 import { authService } from '../auth/auth.service';
 import { AppError } from '../../shared/errors/app-error';
+import { activityService } from '../activity/activity.service';
 
 const createSlug = (value: string) => {
   const slug = value
@@ -48,6 +49,19 @@ export const workspaceService = {
       slug,
       ownerId: userId
     });
+
+    await activityService.logActivity({
+      workspaceId: workspace._id.toString(),
+      userId,
+      actionType: 'workspace_created',
+      entityType: 'workspace',
+      entityId: workspace._id.toString(),
+      metadata: {
+        name: workspace.name,
+        slug: workspace.slug
+      }
+    });
+
     return workspace;
   },
   async getWorkspaceDetail(workspaceId: string, userId: string) {
@@ -66,6 +80,18 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
       throw new AppError('Unauthorized', 403, 'FORBIDDEN');
     }
     const updatedWorkspace = await workspaceRepository.updateWorkspace(workspaceId, data);
+    if (updatedWorkspace) {
+      await activityService.logActivity({
+        workspaceId,
+        userId,
+        actionType: 'workspace_updated',
+        entityType: 'workspace',
+        entityId: workspaceId,
+        metadata: {
+          updatedFields: Object.keys(data)
+        }
+      });
+    }
     // Update logic here (e.g., update name, description)
     // For simplicity, we will just return the existing workspace
     return updatedWorkspace;
@@ -81,6 +107,20 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
     }
     await workspaceRepository.workspaceInvitation(workspaceId, email, role, inviteeId, status, tokenHash, expiresAt);
     await sendInvitationEmail(email, workspace.name, inviteeName.name, role);
+
+    await activityService.logActivity({
+      workspaceId,
+      userId,
+      actionType: 'workspace_member_invited',
+      entityType: 'workspace',
+      entityId: workspaceId,
+      metadata: {
+        email,
+        role,
+        status: status ?? 'pending'
+      }
+    });
+
     return { success: true, message: `Invitation sent to ${email} from ${inviteeName.name}` };
   },
   async updateWorkspaceMemberRole(workspaceId: string, memberId: string, newRole: string, userId: string) {

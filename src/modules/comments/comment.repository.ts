@@ -22,4 +22,7 @@ export const commentRepository = {
     const updatedComment = await CommentModel.findByIdAndUpdate(commentId, data, { new: true });
     return updatedComment;
   },
+  async getCommentById(commentId: string) {
+    return CommentModel.findById(commentId);
+  },
 };

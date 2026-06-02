@@ -43,7 +43,7 @@ export const boardController = {
       throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
     }
     const { boardId } = req.params as { boardId: string };
-    const updatedBoard = await boardService.updateBoard(boardId, req.body);
+    const updatedBoard = await boardService.updateBoard(boardId, req.body, req.auth.userId);
     res.json({ success: true, data: updatedBoard });
   },
   async getBoards(req: Request, res: Response) {

@@ -32,6 +32,17 @@ export interface UpdateTaskPayload {
   isCompleted?: boolean;
 }
 
+export interface TaskQueryFilters {
+  search?: string;
+  priorities?: string[];
+  assigneeIds?: string[];
+  labels?: string[];
+  activity?: string[];
+  memberScope?: 'all' | 'no_members' | 'me';
+  completion?: 'all' | 'completed' | 'incomplete';
+  dueType?: 'all' | 'none' | 'overdue' | 'today' | 'this_week';
+}
+
 @Injectable({ providedIn: 'root' })
 export class BoardApiService {
   private readonly baseUrl = `${environment.apiUrl}`;
@@ -57,8 +68,20 @@ export class BoardApiService {
       withCredentials: true
     });
   }
-  getTasksInBoard(boardId: string): Observable<ApiResponse<{ items: Task[] }>> {
+  getTasksInBoard(boardId: string, filters?: TaskQueryFilters): Observable<ApiResponse<{ items: Task[] }>> {
+    const params: Record<string, string> = {};
+
+    if (filters?.search) params['search'] = filters.search;
+    if (filters?.priorities?.length) params['priorities'] = filters.priorities.join(',');
+    if (filters?.assigneeIds?.length) params['assigneeIds'] = filters.assigneeIds.join(',');
+    if (filters?.labels?.length) params['labels'] = filters.labels.join(',');
+    if (filters?.activity?.length) params['activity'] = filters.activity.join(',');
+    if (filters?.memberScope && filters.memberScope !== 'all') params['memberScope'] = filters.memberScope;
+    if (filters?.completion && filters.completion !== 'all') params['completion'] = filters.completion;
+    if (filters?.dueType && filters.dueType !== 'all') params['dueType'] = filters.dueType;
+
     return this.http.get<ApiResponse<{ items: Task[] }>>(`${this.baseUrl}/boards/${boardId}/tasks`, {
+      params,
       withCredentials: true
     });
   }

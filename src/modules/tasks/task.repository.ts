@@ -1,6 +1,7 @@
 import { ColumnModel } from "../../models/column.model";
 import { TaskModel } from "../../models/task.model";
 import { Types } from "mongoose";
+import { TaskFilters } from "./task.service";
 
 export const taskRepository = {
   async createTask(data: {
@@ -18,8 +19,125 @@ export const taskRepository = {
     });
     return newTask;
   },
-  async getTasksInBoard(boardId: string) {
-    const tasks = await TaskModel.find({ boardId });
+  async getTasksInBoard(boardId: string, filters?: TaskFilters) {
+    const andConditions: Record<string, unknown>[] = [];
+    const now = new Date();
+
+    if (filters?.search) {
+      andConditions.push({
+        $or: [
+          { title: { $regex: filters.search, $options: 'i' } },
+          { description: { $regex: filters.search, $options: 'i' } }
+        ]
+      });
+    }
+
+    if (filters?.priorities?.length) {
+      andConditions.push({ priority: { $in: filters.priorities } });
+    }
+
+    if (filters?.assigneeIds?.length) {
+      andConditions.push({ assigneeIds: { $in: filters.assigneeIds } });
+    }
+
+    if (filters?.memberScope === 'no_members') {
+      andConditions.push({ assigneeIds: { $size: 0 } });
+    }
+
+    if (filters?.memberScope === 'me' && filters.currentUserId) {
+      andConditions.push({ assigneeIds: filters.currentUserId });
+    }
+
+    if (filters?.completion === 'completed') {
+      andConditions.push({ isCompleted: true });
+    }
+
+    if (filters?.completion === 'incomplete') {
+      andConditions.push({ isCompleted: false });
+    }
+
+    if (filters?.dueType === 'none') {
+      andConditions.push({ dueDate: null });
+    }
+
+    if (filters?.dueType === 'overdue') {
+      andConditions.push({ dueDate: { $lt: now } });
+    }
+
+    if (filters?.dueType === 'today') {
+      const start = new Date(now);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 1);
+      andConditions.push({ dueDate: { $gte: start, $lt: end } });
+    }
+
+    if (filters?.dueType === 'this_week') {
+      const start = new Date(now);
+      const day = start.getDay();
+      const diffToMonday = day === 0 ? -6 : 1 - day;
+      start.setDate(start.getDate() + diffToMonday);
+      start.setHours(0, 0, 0, 0);
+
+      const end = new Date(start);
+      end.setDate(end.getDate() + 7);
+      andConditions.push({ dueDate: { $gte: start, $lt: end } });
+    }
+
+    if (filters?.labels?.length) {
+      const labelConditions = filters.labels.map(label => {
+        if (label === 'no_color') {
+          return { labels: { $size: 0 } };
+        }
+
+        return {
+          $or: [
+            { labels: { $elemMatch: { name: new RegExp(`^${label}$`, 'i') } } },
+            { labels: { $elemMatch: { color: new RegExp(label, 'i') } } }
+          ]
+        };
+      });
+
+      andConditions.push({ $or: labelConditions });
+    }
+
+    if (filters?.activity?.length) {
+      const activityConditions: Record<string, unknown>[] = [];
+
+      for (const type of filters.activity) {
+        if (type === 'recentlyupdated') {
+          const since = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          activityConditions.push({ updatedAt: { $gte: since } });
+        }
+
+        if (type === 'recentlycreated') {
+          const since = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          activityConditions.push({ createdAt: { $gte: since } });
+        }
+
+        if (type === 'activeinlastweek') {
+          const since = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          activityConditions.push({ updatedAt: { $gte: since } });
+          activityConditions.push({ createdAt: { $gte: since } });
+        }
+
+        if (type === 'activeinlastmonth') {
+          const since = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          activityConditions.push({ updatedAt: { $gte: since } });
+          activityConditions.push({ createdAt: { $gte: since } });
+        }
+      }
+
+      if (activityConditions.length) {
+        andConditions.push({ $or: activityConditions });
+      }
+    }
+
+    const query = andConditions.length
+      ? { boardId, $and: andConditions }
+      : { boardId };
+
+    const tasks = await TaskModel.find(query).sort({ position: 1, createdAt: 1 });
     return tasks;
   },
   async getTaskById(taskId: string) {

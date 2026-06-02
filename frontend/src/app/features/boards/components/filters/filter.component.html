@@ -1,0 +1,121 @@
+<div class="filter-menu absolute right-5 z-20 w-80 rounded-xl bg-white shadow-lg border border-gray-100">
+    <header class="relative border-b border-gray-200 px-4 py-3">
+        <h2 class="text-center font-semibold text-gray-800">Filter</h2>
+        <button
+            type="button"
+            class="close-button absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-gray-200"
+            (click)="close.emit()"
+            aria-label="Close filters"
+        >
+            <mat-icon>close</mat-icon>
+        </button>
+    </header>
+
+    <div class="filter-options max-h-[70vh] overflow-y-auto px-4 py-3 space-y-4">
+        <section>
+            <p class="text-sm font-semibold text-gray-700 mb-2">Members</p>
+            <ul class="space-y-2">
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="nomembers" name="nomembers" value="nomembers" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.noMembers" (change)="toggleFlag('noMembers', $any($event.target).checked)">
+                    <label for="nomembers">No Members</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="me" name="me" value="me" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.me" (change)="toggleFlag('me', $any($event.target).checked)">
+                    <label for="me">Me</label>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <p class="text-sm font-semibold text-gray-700 mb-2">Task Status</p>
+            <ul class="space-y-2">
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="completed" name="completed" value="completed" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.completed" (change)="toggleFlag('completed', $any($event.target).checked)">
+                    <label for="completed">Completed</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="incomplete" name="incomplete" value="incomplete" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.incomplete" (change)="toggleFlag('incomplete', $any($event.target).checked)">
+                    <label for="incomplete">Incomplete</label>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <p class="text-sm font-semibold text-gray-700 mb-2">Due Date</p>
+            <ul class="space-y-2">
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="noduedate" name="noduedate" value="noduedate" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.dueDate === 'none'" (change)="selectDueDate('none', $any($event.target).checked)">
+                    <label for="noduedate">No Due Date</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="overdue" name="overdue" value="overdue" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.dueDate === 'overdue'" (change)="selectDueDate('overdue', $any($event.target).checked)">
+                    <label for="overdue">Overdue</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="today" name="today" value="today" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.dueDate === 'today'" (change)="selectDueDate('today', $any($event.target).checked)">
+                    <label for="today">Due Today</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="week" name="week" value="week" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.dueDate === 'this_week'" (change)="selectDueDate('this_week', $any($event.target).checked)">
+                    <label for="week">Due This Week</label>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <p class="text-sm font-semibold text-gray-700 mb-2">Labels</p>
+            <ul class="space-y-2">
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="nocolor" name="nocolor" value="nocolor" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.labels.includes('no_color')" (change)="toggleLabel('no_color', $any($event.target).checked)">
+                    <label for="nocolor">No Color</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="red" name="red" value="red" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.labels.includes('red')" (change)="toggleLabel('red', $any($event.target).checked)">
+                    <label for="red">Red</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="orange" name="orange" value="orange" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.labels.includes('orange')" (change)="toggleLabel('orange', $any($event.target).checked)">
+                    <label for="orange">Orange</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="yellow" name="yellow" value="yellow" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.labels.includes('yellow')" (change)="toggleLabel('yellow', $any($event.target).checked)">
+                    <label for="yellow">Yellow</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="green" name="green" value="green" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.labels.includes('green')" (change)="toggleLabel('green', $any($event.target).checked)">
+                    <label for="green">Green</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="blue" name="blue" value="blue" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.labels.includes('blue')" (change)="toggleLabel('blue', $any($event.target).checked)">
+                    <label for="blue">Blue</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="purple" name="purple" value="purple" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.labels.includes('purple')" (change)="toggleLabel('purple', $any($event.target).checked)">
+                    <label for="purple">Purple</label>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <p class="text-sm font-semibold text-gray-700 mb-2">Activity</p>
+            <ul class="space-y-2">
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="recentlyupdated" name="recentlyupdated" value="recentlyupdated" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.activity.includes('recentlyupdated')" (change)="toggleActivity('recentlyupdated', $any($event.target).checked)">
+                    <label for="recentlyupdated">Recently Updated</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="recentlycreated" name="recentlycreated" value="recentlycreated" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.activity.includes('recentlycreated')" (change)="toggleActivity('recentlycreated', $any($event.target).checked)">
+                    <label for="recentlycreated">Recently Created</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="activeinlastweek" name="activeinlastweek" value="activeinlastweek" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.activity.includes('activeinlastweek')" (change)="toggleActivity('activeinlastweek', $any($event.target).checked)">
+                    <label for="activeinlastweek">Active in Last Week</label>
+                </li>
+                <li class="flex items-center gap-2">
+                    <input type="checkbox" id="activeinlastmonth" name="activeinlastmonth" value="activeinlastmonth" class="w-4 h-4 rounded-sm bg-white focus:outline-none" [checked]="filter.activity.includes('activeinlastmonth')" (change)="toggleActivity('activeinlastmonth', $any($event.target).checked)">
+                    <label for="activeinlastmonth">Active in Last Month</label>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>

@@ -49,6 +49,14 @@ export class BoardsPageComponent {
       return;
     }
 
-    this.router.navigate(['/boards', boardId]);
+    this.router.navigate(['/boards', boardId, this.toSlug(board.name)]);
   };
+
+  private toSlug(value: string): string {
+    return value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'board';
+  }
 }
