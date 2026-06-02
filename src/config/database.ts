@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME;
 
 let connectionPromise: Promise<typeof mongoose> | null = null;
 
@@ -17,10 +18,12 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
   }
 
   if (!connectionPromise) {
-    connectionPromise = mongoose.connect(MONGODB_URI).catch((error) => {
-      connectionPromise = null;
-      throw error;
-    });
+    connectionPromise = mongoose
+      .connect(MONGODB_URI, { dbName: MONGODB_DB_NAME })
+      .catch((error) => {
+        connectionPromise = null;
+        throw error;
+      });
   }
 
   return connectionPromise;
