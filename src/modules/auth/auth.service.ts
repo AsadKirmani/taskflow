@@ -25,7 +25,8 @@ const sanitizeUser = (user: any) => ({
 
 export const authService = {
   async register(input: { name: string; email: string; password: string }, meta?: { ip?: string; userAgent?: string }) {
-    const existingUser = await authRepository.findUserByEmail(input.email);
+    const normalizedEmail = input.email.trim().toLowerCase();
+    const existingUser = await authRepository.findUserByEmail(normalizedEmail);
 
     if (existingUser) {
       throw new AppError('Email already in use', 409, 'EMAIL_ALREADY_EXISTS');
@@ -33,11 +34,22 @@ export const authService = {
 
     const passwordHash = await hashPassword(input.password);
 
-    const user = await authRepository.createUser({
-      name: input.name,
-      email: input.email,
-      passwordHash
-    });
+    let user;
+
+    try {
+      user = await authRepository.createUser({
+        name: input.name,
+        email: normalizedEmail,
+        passwordHash
+      });
+    } catch (error: any) {
+      // Guard against race conditions where two signups hit the same unique email.
+      if (error?.code === 11000 && error?.keyPattern?.email) {
+        throw new AppError('Email already in use', 409, 'EMAIL_ALREADY_EXISTS');
+      }
+
+      throw error;
+    }
 
     const accessToken = signAccessToken({
       sub: user._id.toString(),

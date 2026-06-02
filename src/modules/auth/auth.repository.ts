@@ -3,7 +3,7 @@ import { RefreshTokenModel } from '../../models/refresh-token.model';
 
 export const authRepository = {
   findUserByEmail(email: string) {
-    return UserModel.findOne({ email }).select('+passwordHash');
+    return UserModel.findOne({ email: email.trim().toLowerCase() }).select('+passwordHash');
   },
 
   findUserById(userId: string) {
