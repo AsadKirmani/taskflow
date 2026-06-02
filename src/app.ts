@@ -17,11 +17,30 @@ const app = express();
 const corsOrigins = (process.env.CORS_ORIGINS || '')
   .split(',')
   .map((origin) => origin.trim())
-  .filter(Boolean);
+  .filter(Boolean)
+  .map((origin) => origin.replace(/\/$/, ''));
+
+const corsOriginSet = new Set(corsOrigins);
 
 app.use(
   cors({
-    origin: corsOrigins,
+    origin: (origin, callback) => {
+      // Allow non-browser requests and same-origin requests with no Origin header.
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      const normalizedOrigin = origin.replace(/\/$/, '');
+
+      // Fail open only when CORS_ORIGINS is not configured to avoid unexpected production outages.
+      if (corsOriginSet.size === 0 || corsOriginSet.has(normalizedOrigin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true
   })
 );
