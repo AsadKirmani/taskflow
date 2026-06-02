@@ -9,6 +9,7 @@ import taskRoutes from './modules/tasks/task.routes';
 import commentRoutes from './modules/comments/comment.routes';
 import activityRoutes from './modules/activity/activity.routes';
 import archiveRoutes from './modules/archive/archive.routes';
+import { connectToDatabase } from './config/database';
 import { errorMiddleware } from './middleware/error.middleware';
 
 const app = express();
@@ -35,6 +36,15 @@ app.get('/api/health', (_req, res) => {
     success: true,
     message: 'Taskflow API is running'
   });
+});
+
+app.use('/api/v1', async (_req, _res, next) => {
+  try {
+    await connectToDatabase();
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.use('/api/v1/auth', authRoutes);
