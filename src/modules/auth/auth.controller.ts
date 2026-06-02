@@ -1,13 +1,20 @@
 import { Request, Response } from 'express';
+import { CookieOptions } from 'express';
 import { jwtConfig } from '../../config/jwt.config';
 import { AppError } from '../../shared/errors/app-error';
 import { authService } from './auth.service';
 
-const cookieOptions = {
+const isProduction = process.env.NODE_ENV === 'production';
+
+const baseCookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict' as const,
-  path: '/api/v1/auth',
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'lax',
+  path: '/'
+};
+
+const cookieOptions: CookieOptions = {
+  ...baseCookieOptions,
   maxAge: jwtConfig.refreshTokenExpiresInDays * 24 * 60 * 60 * 1000
 };
 
@@ -91,7 +98,7 @@ export const authController = {
       await authService.logout(refreshToken);
     }
 
-    res.clearCookie(jwtConfig.refreshCookieName, cookieOptions);
+    res.clearCookie(jwtConfig.refreshCookieName, baseCookieOptions);
 
     res.json({
       success: true,
@@ -106,7 +113,7 @@ export const authController = {
     }
 
     await authService.logoutAll(req.auth.userId);
-    res.clearCookie(jwtConfig.refreshCookieName, cookieOptions);
+    res.clearCookie(jwtConfig.refreshCookieName, baseCookieOptions);
 
     res.json({
       success: true,
