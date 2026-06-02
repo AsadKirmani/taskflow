@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { SessionState, LoginRequest, RegisterRequest } from '../../../core/models/auth.model';
 import { AuthApiService } from './auth-api.service';
@@ -18,6 +18,7 @@ export class AuthStoreService {
   private readonly authApi = inject(AuthApiService);
   private readonly tokenService = inject(TokenService);
   private readonly router = inject(Router);
+  private refreshRequest$: Observable<unknown> | null = null;
 
   private readonly stateSubject = new BehaviorSubject<SessionState>(initialSessionState);
   readonly state$ = this.stateSubject.asObservable();
@@ -70,7 +71,11 @@ export class AuthStoreService {
   }
 
   refreshAccessToken() {
-    return this.authApi.refreshToken().pipe(
+    if (this.refreshRequest$) {
+      return this.refreshRequest$;
+    }
+
+    this.refreshRequest$ = this.authApi.refreshToken().pipe(
       tap(response => {
         const token = response.data.accessToken;
         this.tokenService.setAccessToken(token);
@@ -78,8 +83,14 @@ export class AuthStoreService {
           accessToken: token,
           isAuthenticated: true
         });
-      })
+      }),
+      finalize(() => {
+        this.refreshRequest$ = null;
+      }),
+      shareReplay({ bufferSize: 1, refCount: true })
     );
+
+    return this.refreshRequest$;
   }
 
   logout(navigate = true): void {
