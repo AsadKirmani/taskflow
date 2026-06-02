@@ -14,9 +14,14 @@ import { errorMiddleware } from './middleware/error.middleware';
 
 const app = express();
 
+const corsOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: ['http://localhost:4200', 'https://taskflow-sandy-nine.vercel.app'],
+    origin: corsOrigins,
     credentials: true
   })
 );
