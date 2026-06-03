@@ -38,6 +38,21 @@ export class BoardStoreService {
     }))
   );
 
+  createBoard(name: string, workspaceName: string, workspaceId: string, visibility: 'private' | 'workspace'): void {
+    this.api.createBoard(name, workspaceName, workspaceId, visibility).pipe(
+      tap(response => {
+        const newBoard = response.data;
+        const currentBoards = this.getState().boards;
+        this.patchState({ boards: [...currentBoards, newBoard] });
+        this.notificationService.success('Board created successfully');
+      }),
+      catchError(() => {
+        this.notificationService.error('Failed to create board');
+        return of(null);
+      })
+    ).subscribe();
+  }
+
   loadBoards(force = false): void {
     if (this.getState().loading) {
       return;

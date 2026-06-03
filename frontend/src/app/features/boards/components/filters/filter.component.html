@@ -1,9 +1,9 @@
-<div class="filter-menu absolute right-5 z-20 w-80 rounded-xl bg-white shadow-lg border border-gray-100">
-    <header class="relative border-b border-gray-200 px-4 py-3">
+<div class="filter-menu absolute right-5 z-20 w-80 rounded-xl bg-gray-50 shadow-lg border border-gray-100">
+    <header class="border-b border-gray-200 p-2 h-[3rem] relative">
         <h2 class="text-center font-semibold text-gray-800">Filter</h2>
         <button
-            type="button"
-            class="close-button absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-gray-200"
+            mat-icon-button
+            class="absolute translate-x-65 -translate-y-8 rounded-full hover:bg-gray-200"
             (click)="close.emit()"
             aria-label="Close filters"
         >

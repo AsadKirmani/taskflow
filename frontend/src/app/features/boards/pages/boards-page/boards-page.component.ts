@@ -1,17 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { map } from 'rxjs';
 import { BoardStoreService } from '../../data-access/board-store.service';
 import { MatIconModule } from '@angular/material/icon';
 import { Board } from '../../../../core/models/board.model';
+import { BoardModalComponent } from '../../components/board-modal.component';
 
 
 
 @Component({
   selector: 'app-board-page',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, BoardModalComponent],
   templateUrl: './boards-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -19,6 +20,7 @@ export class BoardsPageComponent {
   private readonly boardStore = inject(BoardStoreService);
   private readonly router = inject(Router);
   readonly state$ = this.boardStore.state$;
+  isBoardModalOpen = false;
   readonly workSpaceName$ = this.state$.pipe(
     map(state => {
       const uniqueWorkspaceNames = [
@@ -59,4 +61,9 @@ export class BoardsPageComponent {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '') || 'board';
   }
+  createBoardModal(event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.isBoardModalOpen = !this.isBoardModalOpen;
+  }
+ 
 }

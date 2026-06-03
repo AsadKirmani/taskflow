@@ -48,6 +48,14 @@ export class BoardApiService {
   private readonly baseUrl = `${environment.apiUrl}`;
   private readonly http = inject(HttpClient);
 
+  createBoard(name: string, workspaceName: string, workspaceId: string, visibility: 'private' | 'workspace'): Observable<ApiResponse<Board>> {
+    return this.http.post<ApiResponse<Board>>(
+      `${this.baseUrl}/boards`,
+      { name, workspaceName, workspaceId, visibility },
+      { withCredentials: true }
+    );
+  }
+
   getBoards(): Observable<ApiResponse<BoardListResponse>> {
     return this.http.get<ApiResponse<BoardListResponse>>(`${this.baseUrl}/boards`);
   }

@@ -39,10 +39,11 @@
           </a>
             <div class="emptycards">
                 <div class="add-board-card rounded-xl bg-white shadow w-full flex items-center justify-center h-full min-h-24">
-                    <button class="btn btn-dashed border-gray-400 text-gray-400 p-2 rounded flex items-center gap-1">
+                    <button class="btn btn-dashed border-gray-400 text-gray-400 p-2 rounded flex items-center gap-1" (click)="createBoardModal($event)">
                       <mat-icon>add</mat-icon> Create New Board
                     </button>
                 </div>
+                <app-board-modal *ngIf="isBoardModalOpen"></app-board-modal>
             </div>
         </div>
      </div>

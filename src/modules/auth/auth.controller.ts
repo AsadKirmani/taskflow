@@ -6,12 +6,22 @@ import { authService } from './auth.service';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-const baseCookieOptions: CookieOptions = {
+const prodCookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: isProduction,
-  sameSite: isProduction ? 'none' : 'lax',
+  secure: true,
+  sameSite: 'none',
   path: '/'
 };
+
+const devCookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: false,
+  sameSite: 'lax',
+  path: '/'
+};
+
+const baseCookieOptions = isProduction ? prodCookieOptions : devCookieOptions;
+console.log(`AuthController: Running in ${isProduction ? 'production' : 'development'} mode. Cookie options:`, isProduction ? prodCookieOptions : devCookieOptions);
 
 const cookieOptions: CookieOptions = {
   ...baseCookieOptions,

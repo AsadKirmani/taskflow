@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
+import { MatIconButton } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 export interface BoardFilterSelection {
@@ -15,7 +16,7 @@ export interface BoardFilterSelection {
 @Component({
   selector: 'app-apply-filter',
   standalone: true,
-    imports: [MatIconModule, CommonModule],
+    imports: [MatIconModule, CommonModule, MatIconButton],
     templateUrl: './filter.component.html',
 })
 export class FilterComponent {
