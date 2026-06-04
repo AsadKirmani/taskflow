@@ -13,7 +13,7 @@ export const boardController = {
       req.auth.userId,
       workspaceId,
     );
-    res.status(201).json(board);
+    res.status(201).json({ success: true, data: board });
   },
   async getBoardById(req: Request, res: Response) {
     if (!req.auth?.userId) {

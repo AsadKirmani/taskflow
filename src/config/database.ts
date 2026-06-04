@@ -10,7 +10,7 @@ const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME;
 let connectionPromise: Promise<typeof mongoose> | null = null;
 
 export async function connectToDatabase(): Promise<typeof mongoose> {
-  const connectionUri = MONGODB_URI;
+  const connectionUri = process.env.MONGODB_URI_LOCAL;
 
   if (!connectionUri) {
     throw new Error('MONGODB_URI is not set');

@@ -74,9 +74,7 @@ export class WorkspaceStoreService {
         next: response => {
           const payload = response.data as Workspace[] | { items?: Workspace[] };
           const workspaces = Array.isArray(payload) ? payload : (payload.items ?? []);
-          this.workspaceName$.subscribe(names => {
-            console.log('Workspace names:', names);
-          });
+          
           this.stateSubject.next({
             ...this.stateSubject.value,
             workspaces,

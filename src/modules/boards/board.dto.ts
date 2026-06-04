@@ -2,10 +2,14 @@ import { z } from "zod";
 
 export const createBoardDto = z.object({
   name: z.string().min(2).max(120),
-  workSpaceName: z.string().min(2).max(120),
+  workspaceName: z.string().min(2).max(120).optional(),
+  workSpaceName: z.string().min(2).max(120).optional(),
   description: z.string().max(1000).optional().default(""),
   visibility: z.enum(["private", "workspace"]).optional().default("workspace"),
-});
+}).transform((data) => ({
+  ...data,
+  workSpaceName: data.workSpaceName ?? data.workspaceName ?? ''
+}));
 
 export const updateBoardDto = z.object({
   name: z.string().min(2).max(120).optional(),

@@ -7,7 +7,7 @@ import { BoardStoreService } from '../../data-access/board-store.service';
 import { TaskStoreService } from '../../data-access/task-store.service';
 import { KanbanDndFacade } from '../../data-access/kanban-dnd.facade';
 import { KanbanBoardComponent } from '../../components/kanban-board/kanban-board.component';
-import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, UpdateTaskEventPayload, ToggleTaskCompletionEventPayload } from '../../models/drag-drop.model';
+import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, AddColumnEventPayload, UpdateTaskEventPayload, ToggleTaskCompletionEventPayload } from '../../models/drag-drop.model';
 
 @Component({
   selector: 'app-board-detail-page',
@@ -24,6 +24,7 @@ import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, Upda
         (taskMoved)="onTaskMoved($event)"
         (columnMoved)="onColumnMoved($event)"
         (taskAdded)="onTaskAdded($event)"
+        (columnAdded)="onColumnAdded($event)"
         (taskUpdated)="onTaskUpdated($event)"
         (taskCompletionToggled)="onTaskCompletionToggled($event)"
       />
@@ -84,6 +85,15 @@ export class BoardDetailPageComponent {
     }
 
     this.taskStore.addTask(board.id, event.columnId, event.title, board.workspaceId);
+  }
+
+  onColumnAdded(event: AddColumnEventPayload): void {
+    const board = this.boardStore.currentBoard;
+    if (!board) {
+      return;
+    }
+
+    this.boardStore.createColumn(board.id, board.workspaceId, event.title);
   }
 
   onTaskUpdated(event: UpdateTaskEventPayload): void {

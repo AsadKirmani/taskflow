@@ -36,6 +36,11 @@ export const appRoutes: Routes = [
           import('./features/boards/boards.routes').then(m => m.BOARD_ROUTES)
       },
       {
+        path: 'w/:workspaceId/boards',
+        loadChildren: () =>
+          import('./features/boards/boards.routes').then(m => m.BOARD_ROUTES)
+      },
+      {
         path: 'activity',
         loadChildren: () =>
           import('./features/activity/activity.routes').then(m => m.ACTIVITY_ROUTES)

@@ -16,7 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Board } from '../../../../core/models/board.model';
 import { BoardColumn } from '../../../../core/models/column.model';
 import { Task } from '../../../../core/models/task.model';
-import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, UpdateTaskEventPayload, ToggleTaskCompletionEventPayload } from '../../models/drag-drop.model';
+import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, AddColumnEventPayload, UpdateTaskEventPayload, ToggleTaskCompletionEventPayload } from '../../models/drag-drop.model';
 import { BoardFilterSelection, FilterComponent } from '../filters/filter.component';
 import { CommonModule } from '@angular/common';
 import { TaskStoreService } from '../../data-access/task-store.service';
@@ -48,10 +48,13 @@ export class KanbanBoardComponent {
   activeTaskInputColumnId: string | null = null;
   taskInputValues: Record<string, string | undefined> = {};
   activeTaskOverlayId: string | null = null;
+  isColumnInputOpen = false;
+  columnInputValue = '';
 
   @Output() taskMoved = new EventEmitter<TaskDropEventPayload>();
   @Output() columnMoved = new EventEmitter<ColumnDropEventPayload>();
   @Output() taskAdded = new EventEmitter<AddTaskEventPayload>();
+  @Output() columnAdded = new EventEmitter<AddColumnEventPayload>();
   @Output() taskUpdated = new EventEmitter<UpdateTaskEventPayload>();
   @Output() taskCompletionToggled = new EventEmitter<ToggleTaskCompletionEventPayload>();
 
@@ -139,6 +142,31 @@ export class KanbanBoardComponent {
     };
     this.closeTaskInput(columnId);
   }
+
+  openColumnInput(): void {
+    this.isColumnInputOpen = true;
+  }
+
+  closeColumnInput(): void {
+    this.isColumnInputOpen = false;
+    this.columnInputValue = '';
+  }
+
+  onColumnInputChange(value: string): void {
+    this.columnInputValue = value;
+  }
+
+  submitColumnInput(): void {
+    const title = this.columnInputValue.trim();
+    if (!title) {
+      this.closeColumnInput();
+      return;
+    }
+
+    this.columnAdded.emit({ title });
+    this.closeColumnInput();
+  }
+
   startTaskEdit(task: Task, event?: MouseEvent): void {
     event?.stopPropagation();
     this.activeEditTaskId = task.id;

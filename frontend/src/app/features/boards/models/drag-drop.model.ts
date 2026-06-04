@@ -16,6 +16,10 @@ export interface AddTaskEventPayload {
   title: string;
 }
 
+export interface AddColumnEventPayload {
+  title: string;
+}
+
 export interface UpdateTaskEventPayload {
   taskId: string;
   title: string;

@@ -50,14 +50,16 @@ export class BoardApiService {
 
   createBoard(name: string, workspaceName: string, workspaceId: string, visibility: 'private' | 'workspace'): Observable<ApiResponse<Board>> {
     return this.http.post<ApiResponse<Board>>(
-      `${this.baseUrl}/boards`,
+      `${this.baseUrl}/workspaces/${workspaceId}/boards`,
       { name, workspaceName, workspaceId, visibility },
       { withCredentials: true }
     );
   }
 
   getBoards(): Observable<ApiResponse<BoardListResponse>> {
-    return this.http.get<ApiResponse<BoardListResponse>>(`${this.baseUrl}/boards`);
+    return this.http.get<ApiResponse<BoardListResponse>>(`${this.baseUrl}/boards`, {
+      withCredentials: true
+    });
   }
 
   getBoardById(boardId: string): Observable<ApiResponse<BoardDetailResponse>> {
@@ -76,6 +78,15 @@ export class BoardApiService {
       withCredentials: true
     });
   }
+
+  createColumn(boardId: string, workspaceId: string, name: string): Observable<ApiResponse<BoardColumn>> {
+    return this.http.post<ApiResponse<BoardColumn>>(
+      `${this.baseUrl}/workspaces/${workspaceId}/boards/${boardId}/columns`,
+      { name },
+      { withCredentials: true }
+    );
+  }
+
   getTasksInBoard(boardId: string, filters?: TaskQueryFilters): Observable<ApiResponse<{ items: Task[] }>> {
     const params: Record<string, string> = {};
 
