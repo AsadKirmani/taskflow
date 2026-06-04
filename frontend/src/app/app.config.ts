@@ -14,9 +14,9 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([
         loadingInterceptor,
-        authInterceptor,
         refreshTokenInterceptor,
-        errorInterceptor
+        errorInterceptor,
+        authInterceptor
       ])
     ),
     provideAppInitializer(initializeApp)
