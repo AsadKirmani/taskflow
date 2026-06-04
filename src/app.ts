@@ -11,7 +11,7 @@ import activityRoutes from './modules/activity/activity.routes';
 import archiveRoutes from './modules/archive/archive.routes';
 import { connectToDatabase } from './config/database';
 import { errorMiddleware } from './middleware/error.middleware';
-
+console.log('Server started', new Date().toISOString());
 const app = express();
 
 const corsOrigins = (process.env.CORS_ORIGINS || '')
@@ -58,13 +58,20 @@ app.get('/', (_req, res) => {
 app.get('/api/health', (_req, res) => {
   res.json({
     success: true,
-    message: 'Taskflow API is running'
+    message: 'Taskflow API is running',
+    health: {
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString()
+    }
   });
+  console.log('Health check endpoint was called. Uptime:', process.uptime());
 });
 
 app.use('/api/v1', async (_req, _res, next) => {
   try {
+    console.time("dbConnection");
     await connectToDatabase();
+    console.timeEnd("dbConnection");
     next();
   } catch (error) {
     next(error);

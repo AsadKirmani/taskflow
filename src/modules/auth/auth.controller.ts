@@ -63,6 +63,7 @@ export const authController = {
         accessToken: result.accessToken
       }
     });
+    
   },
 
   async me(req: Request, res: Response) {

@@ -80,29 +80,32 @@ export const authService = {
 
   async login(input: { email: string; password: string }, meta?: { ip?: string; userAgent?: string }) {
     const user = await authRepository.findUserByEmail(input.email);
+    console.time("login");
+    console.timeLog("login", "findUser");
 
     if (!user) {
       throw new AppError('Invalid credentials', 401, 'INVALID_CREDENTIALS');
     }
 
     const isPasswordValid = await comparePassword(input.password, user.passwordHash);
-
+    console.timeLog("login", "bcrypt");
+    
     if (!isPasswordValid) {
       throw new AppError('Invalid credentials', 401, 'INVALID_CREDENTIALS');
     }
-
+    
     const accessToken = signAccessToken({
       sub: user._id.toString(),
       email: user.email,
       type: 'access'
     });
-
+    
     const refreshToken = signRefreshTokenJwt({
       sub: user._id.toString(),
       sessionTokenId: cryptoRandomId(),
       type: 'refresh'
     });
-
+    
     await authRepository.createRefreshToken({
       userId: user._id.toString(),
       tokenHash: hashToken(refreshToken),
@@ -110,7 +113,9 @@ export const authService = {
       createdByIp: meta?.ip ?? null,
       userAgent: meta?.userAgent ?? null
     });
+    console.timeLog("login", "createRefreshToken");
 
+    console.timeEnd("login");
     return {
       user: sanitizeUser(user),
       accessToken,
