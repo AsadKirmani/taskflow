@@ -1,17 +1,16 @@
-<div class="filter-menu absolute right-5 z-20 w-80 rounded-xl bg-gray-50 shadow-lg border border-gray-100">
-    <header class="border-b border-gray-200 p-2 h-[3rem] relative">
+<div class="filter-menu absolute right-5 z-20 w-64 rounded-xl bg-gray-50 shadow-lg border border-gray-100">
+    <header class="border-b border-gray-200 p-2 relative h-12">
         <h2 class="text-center font-semibold text-gray-800">Filter</h2>
         <button
-            mat-icon-button
-            class="absolute translate-x-65 -translate-y-8 rounded-full hover:bg-gray-200"
-            (click)="close.emit()"
+            class="absolute translate-x-50 -translate-y-7 rounded-full hover:bg-gray-200 flex items-center justify-center p-1"
+            (click)="close()"
             aria-label="Close filters"
         >
             <mat-icon>close</mat-icon>
         </button>
     </header>
 
-    <div class="filter-options max-h-[70vh] overflow-y-auto px-4 py-3 space-y-4">
+    <div class="filter-options max-h-[70vh] overflow-y-auto p-2 space-y-4">
         <section>
             <p class="text-sm font-semibold text-gray-700 mb-2">Members</p>
             <ul class="space-y-2">

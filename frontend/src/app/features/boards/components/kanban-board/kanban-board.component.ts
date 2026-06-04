@@ -17,18 +17,21 @@ import { Board } from '../../../../core/models/board.model';
 import { BoardColumn } from '../../../../core/models/column.model';
 import { Task } from '../../../../core/models/task.model';
 import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, AddColumnEventPayload, UpdateTaskEventPayload, ToggleTaskCompletionEventPayload } from '../../models/drag-drop.model';
-import { BoardFilterSelection, FilterComponent } from '../filters/filter.component';
 import { CommonModule } from '@angular/common';
 import { TaskStoreService } from '../../data-access/task-store.service';
 import { AuthStoreService } from '../../../auth/data-access/auth-store.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ApplyFilterComponent } from '../filters/filter.component';
+import type { BoardFilterSelection } from '../filters/filter-selection.model';
+import { TaskOverlayComponent } from '../task-overlay/task-overlay.component';
+
 
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  imports: [CdkDropList, CdkDrag, CdkDragHandle, MatIconModule, FilterComponent, CommonModule],
+  imports: [CdkDropList, CdkDrag, CdkDragHandle, ApplyFilterComponent, MatIconModule, CommonModule, TaskOverlayComponent],
   templateUrl: './kanban-board.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -38,46 +41,50 @@ export class KanbanBoardComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  view: 'board' | 'filter' = 'board';
   private currentUserId: string | null = null;
   @Input() board: Board | null = null;
   @Input() columns: BoardColumn[] = [];
   @Input() tasksByColumn: Record<string, Task[] | undefined> = {};
   @Input() loading = false;
-
+  
   activeTaskInputColumnId: string | null = null;
   taskInputValues: Record<string, string | undefined> = {};
   activeTaskOverlayId: string | null = null;
   isColumnInputOpen = false;
   columnInputValue = '';
-
+  
   @Output() taskMoved = new EventEmitter<TaskDropEventPayload>();
   @Output() columnMoved = new EventEmitter<ColumnDropEventPayload>();
   @Output() taskAdded = new EventEmitter<AddTaskEventPayload>();
   @Output() columnAdded = new EventEmitter<AddColumnEventPayload>();
   @Output() taskUpdated = new EventEmitter<UpdateTaskEventPayload>();
   @Output() taskCompletionToggled = new EventEmitter<ToggleTaskCompletionEventPayload>();
-
+  
   activeEditTaskId: string | null = null;
   editTaskTitle = '';
   readonly dragStartDelay: DragStartDelay = { touch: 220, mouse: 200 };
-
+  
   constructor() {
     this.authStore.user$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(user => {
-        this.currentUserId = user?.id ?? null;
-      });
-
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe(user => {
+      this.currentUserId = user?.id ?? null;
+    });
+    
     this.route.queryParamMap
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(params => {
-        this.activeTaskOverlayId = params.get('taskId');
-      });
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe(params => {
+      this.activeTaskOverlayId = params.get('taskId');
+    });
   }
-
-  get isFilterOpen(): boolean {
-    return this.view === 'filter';
+  
+  isFilterOpen = false;
+  toggleFilterView(event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.isFilterOpen = !this.isFilterOpen;
+  }
+  closeFilterView(): void {
+    this.isFilterOpen = false;
   }
 
   get connectedDropListIds(): string[] {
@@ -238,13 +245,6 @@ export class KanbanBoardComponent {
 
   archiveColumn(columnId: string): void {
     // Implement column archiving logic here
-  }
-  toggleFilterView(): void {
-    this.view = this.isFilterOpen ? 'board' : 'filter';
-  }
-
-  closeFilterView(): void {
-    this.view = 'board';
   }
 
   onFiltersChanged(selection: BoardFilterSelection): void {
