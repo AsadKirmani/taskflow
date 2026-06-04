@@ -38,7 +38,43 @@ export class BoardStoreService {
     }))
   );
 
-  loadBoards(force = false): void {
+  createBoard(name: string, workspaceName: string, workspaceId: string, visibility: 'private' | 'workspace'): void {
+    this.api.createBoard(name, workspaceName, workspaceId, visibility).pipe(
+      tap(response => {
+        const newBoard = response.data;
+        const currentBoards = this.getState().boards;
+        this.patchState({ boards: [...currentBoards, newBoard] });
+        this.notificationService.success('Board created successfully');
+      }),
+      catchError(() => {
+        this.notificationService.error('Failed to create board');
+        return of(null);
+      })
+    ).subscribe();
+  }
+
+  createColumn(boardId: string, workspaceId: string, name: string): void {
+    if (!boardId?.trim() || !workspaceId?.trim() || !name?.trim()) {
+      this.notificationService.error('Board, workspace, and column name are required');
+      return;
+    }
+
+    this.api.createColumn(boardId, workspaceId, name.trim()).pipe(
+      tap(response => {
+        const newColumn = this.normalizeColumn(response.data as BoardColumn & { _id?: string });
+        const currentColumns = this.getState().columns;
+        this.loadedColumnBoardIds.add(boardId);
+        this.patchState({ columns: [...currentColumns, newColumn] });
+        this.notificationService.success('Column created successfully');
+      }),
+      catchError(() => {
+        this.notificationService.error('Failed to create column');
+        return of(null);
+      })
+    ).subscribe();
+  }
+
+  getAllBoards(force = false): void {
     if (this.getState().loading) {
       return;
     }
@@ -55,6 +91,39 @@ export class BoardStoreService {
           (response.data?.items ?? []).map(board =>
             this.normalizeBoard(board as Board & { _id?: string })
           )
+        ),
+        tap(boards => {
+          this.boardsLoaded = true;
+          this.notificationService.success('Boards loaded successfully');
+          this.patchState({ boards, loading: false, error: null });
+        }),
+        catchError(() => {
+          this.boardsLoaded = true;
+          this.patchState({ boards: [], loading: false, error: 'Failed to load boards' });
+          this.notificationService.error('Failed to load boards');
+          return of([]);
+        })
+      )
+      .subscribe();
+  }
+
+  getBoardsbyWorkspace(workspaceId: string, force = false): void {
+    if (this.getState().loading) {
+      return;
+    }
+
+    if (this.boardsLoaded && !force) {
+      return;
+    }
+
+    this.patchState({ loading: true, error: null });
+    this.api
+      .getBoards()
+      .pipe(
+        map(response =>
+          (response.data?.items ?? [])
+            .filter(board => board.workspaceId === workspaceId)
+            .map(board => this.normalizeBoard(board as Board & { _id?: string }))
         ),
         tap(boards => {
           this.boardsLoaded = true;
@@ -208,9 +277,13 @@ export class BoardStoreService {
   }
 
   private normalizeColumns(columns: (BoardColumn & { _id?: string })[]): BoardColumn[] {
-    return columns.map(column => ({
+    return columns.map(column => this.normalizeColumn(column));
+  }
+
+  private normalizeColumn(column: BoardColumn & { _id?: string }): BoardColumn {
+    return {
       ...column,
       id: column.id ?? column._id ?? ''
-    }));
+    };
   }
 }

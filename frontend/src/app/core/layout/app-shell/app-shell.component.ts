@@ -16,9 +16,9 @@ import { filter } from 'rxjs';
         [opened]="isSidebarOpen()"
         [mode]="isMobile() ? 'over' : 'side'"
         (openedChange)="isSidebarOpen.set($event)"
-        class="p-4 pr-0"
+        class=""
       >
-        <app-sidebar (navigate)="handleSidebarNavigate()"></app-sidebar>
+        <app-sidebar (navigate)="handleSidebarNavigate()" class="app-sidebar"></app-sidebar>
       </mat-sidenav>
 
       <mat-sidenav-content class="app-shell-content">
@@ -39,6 +39,9 @@ import { filter } from 'rxjs';
     .app-shell-container {
       height: 100%;
     }
+      mat-sidenav {
+  --mat-sidenav-container-width: 250px;
+}
 
     .app-shell-content {
       display: flex;

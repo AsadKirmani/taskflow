@@ -18,7 +18,7 @@ export const columnController = {
       workspaceId,
       req.auth.userId,
     );
-    res.status(201).json(column);
+    res.status(201).json({ success: true, data: column });
   },
   async updateColumn(req: Request, res: Response) {
     if (!req.auth?.userId) {

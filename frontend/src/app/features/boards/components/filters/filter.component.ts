@@ -1,24 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, model } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-
-export interface BoardFilterSelection {
-  noMembers: boolean;
-  me: boolean;
-  completed: boolean;
-  incomplete: boolean;
-  dueDate: 'all' | 'none' | 'overdue' | 'today' | 'this_week';
-  labels: string[];
-  activity: Array<'recentlyupdated' | 'recentlycreated' | 'activeinlastweek' | 'activeinlastmonth'>;
-}
+import { BoardFilterSelection } from './filter-selection.model';
 
 @Component({
   selector: 'app-apply-filter',
   standalone: true,
     imports: [MatIconModule, CommonModule],
     templateUrl: './filter.component.html',
+    host: {
+      'document:click': 'close()'
+    }
 })
-export class FilterComponent {
+export class ApplyFilterComponent {
   readonly filter: BoardFilterSelection = {
     noMembers: false,
     me: false,
@@ -28,12 +22,13 @@ export class FilterComponent {
     labels: [],
     activity: []
   };
-
-  @Output() close = new EventEmitter<void>();
   @Output() filtersChanged = new EventEmitter<BoardFilterSelection>();
-
-  onClose(): void {
-    this.close.emit();
+  @Output() filterClose = new EventEmitter<void>();
+  
+  isOpen = model<boolean>(false);
+  close(): void {
+    this.isOpen.set(false);
+    console.log('Filter view closed');
   }
 
   toggleFlag(key: 'noMembers' | 'me' | 'completed' | 'incomplete', checked: boolean): void {

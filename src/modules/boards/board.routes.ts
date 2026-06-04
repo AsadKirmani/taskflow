@@ -39,17 +39,11 @@ router.patch(
   asyncHandler(boardController.updateBoard),
 );
 
-router.patch(
-  "/workspaces/:workspaceId/boards/:boardId/reorder-columns",
-  authMiddleware,
-  validate(reorderColumnsDto),
-  (_req, res) => {
-    res.json({
-      success: true,
-      message: "Reorder columns placeholder",
-      data: null,
-    });
-  },
-);
+// router.patch(
+//   "/workspaces/:workspaceId/boards/:boardId/reorder-columns",
+//   authMiddleware,
+//   validate(reorderColumnsDto),
+//   asyncHandler(boardController.reorderColumns),
+// );
 
 export default router;

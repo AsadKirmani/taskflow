@@ -7,6 +7,8 @@ import {
   updateWorkspaceDto,
   updateWorkspaceMemberRoleDto
 } from './workspace.dto';
+import { createBoardDto } from '../boards/board.dto';
+import { boardController } from '../boards/board.controller';
 import { asyncHandler } from '../../shared/utils/async-handler';
 import { workspaceController } from './workspace.controller';
 
@@ -19,6 +21,13 @@ router.post('/', authMiddleware, validate(createWorkspaceDto), asyncHandler(work
 router.get('/:workspaceId', authMiddleware, asyncHandler(workspaceController.getWorkspaceDetail));
 
 router.patch('/:workspaceId', authMiddleware, validate(updateWorkspaceDto), asyncHandler(workspaceController.updateWorkSpace));
+
+router.post(
+  '/:workspaceId/boards',
+  authMiddleware,
+  validate(createBoardDto),
+  asyncHandler(boardController.createBoard)
+);
 
 router.post(
   '/:workspaceId/invitations',

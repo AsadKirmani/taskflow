@@ -12,39 +12,76 @@
 
   <p>Board list placeholder page.</p> -->
   <div class="boards-page p-3 sm:p-4 flex flex-col bg-gray-50 rounded-xl gap-2">
-      <h1>Your Workspaces</h1>
-     <div>
-        <p *ngIf="state.loading">Loading boards...</p>
+    <h1>Your Workspaces</h1>
+    <div>
+      <p *ngIf="state.loading">Loading boards...</p>
 
-        <div class="gap-2 flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-xl">
-          <p class="p-2 flex items-center gap-2 min-w-0" *ngIf="workSpaceName$ | async as workspaceName">
-            <span class="p-2 rounded-full bg-red-900 text-white h-8 w-8 flex items-center justify-center" *ngIf="workSpaceName$ | async as workspaceName">{{ workspaceName.toUpperCase() | slice:0:1 }}</span>
-            <span class="truncate">{{ workspaceName || 'No workspace name found' }}</span>
-          </p>
-          <div class="buttons flex flex-wrap gap-2">
-            <button class="btn btn-primary bg-gray-200 p-2 rounded flex items-center gap-1 text-sm sm:text-base">
-              <mat-icon>dashboard</mat-icon> Boards</button>
-            <button class="btn btn-secondary bg-gray-200 p-2 rounded flex items-center gap-1 text-sm sm:text-base">
-              <mat-icon>group</mat-icon> Members</button>
-            <button class="btn btn-secondary bg-gray-200 p-2 rounded flex items-center gap-1 text-sm sm:text-base">
-              <mat-icon>settings</mat-icon>Settings</button>
+      <div class="gap-2 flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-xl">
+        <p
+          class="p-2 flex items-center gap-2 min-w-0"
+          *ngIf="workSpaceName$ | async as workspaceName"
+        >
+          <span
+            class="p-2 rounded-full bg-red-900 text-white h-8 w-8 flex items-center justify-center"
+            *ngIf="workSpaceName$ | async as workspaceName"
+            >{{ workspaceName.toUpperCase() | slice: 0 : 1 }}</span
+          >
+          <span class="truncate">{{ workspaceName || 'No workspace name found' }}</span>
+        </p>
+        <div class="buttons flex flex-wrap gap-2">
+          <button
+            class="btn btn-primary bg-gray-200 p-2 rounded flex items-center gap-1 text-sm sm:text-base"
+          >
+            <mat-icon>dashboard</mat-icon> Boards
+          </button>
+          <button
+            class="btn btn-secondary bg-gray-200 p-2 rounded flex items-center gap-1 text-sm sm:text-base"
+          >
+            <mat-icon>group</mat-icon> Members
+          </button>
+          <button
+            class="btn btn-secondary bg-gray-200 p-2 rounded flex items-center gap-1 text-sm sm:text-base"
+          >
+            <mat-icon>settings</mat-icon>Settings
+          </button>
+        </div>
+      </div>
+      <div class="boards-list mt-4 gap-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+        <a
+          class="board-card rounded-xl bg-white shadow w-full h-full cursor-pointer"
+          *ngFor="let board of state.boards"
+          (click)="openBoard(board)"
+        >
+          <img
+            src="https://img.magnific.com/free-photo/abstract-3d-geometric-square-shape_23-2150832953.jpg?t=st=1779796177~exp=1779799777~hmac=7db7aae5ab742199d5ca3534c2a5fb5cef14f811ab8119c435a8ac670bd03fa9&w=2000"
+            alt="{{ board.name }}"
+            class="w-full h-20 sm:h-16 object-cover rounded-t-xl"
+          />
+          <div class="p-2">
+            <h2 class="font-semibold">{{ board.name }}</h2>
           </div>
+        </a>
+        <div class="emptycards">
+          <div
+            class="add-board-card rounded-xl bg-white shadow w-full flex items-center justify-center h-full min-h-24"
+          >
+            <button
+              class="btn btn-dashed border-gray-400 text-gray-400 p-2 rounded flex items-center gap-1"
+              (click)="createBoardModal($event)"
+            >
+              <mat-icon>add</mat-icon> Create New Board
+            </button>
+          </div>
+          <app-board-modal
+            *ngIf="isBoardModalOpen"
+            [selectedWorkspaceId]="selectedWorkspaceId()"
+            [selectedWorkspaceName]="selectedWorkspaceName()"
+            [availableWorkspaces]="(availableWorkspaces$ | async) ?? []"
+            (modalClosed)="isBoardModalOpen = false"
+          >
+          </app-board-modal>
         </div>
-        <div class="boards-list mt-4 gap-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-          <a class="board-card rounded-xl bg-white shadow w-full h-full cursor-pointer" *ngFor="let board of state.boards" (click)="openBoard(board)">
-            <img src="https://img.magnific.com/free-photo/abstract-3d-geometric-square-shape_23-2150832953.jpg?t=st=1779796177~exp=1779799777~hmac=7db7aae5ab742199d5ca3534c2a5fb5cef14f811ab8119c435a8ac670bd03fa9&w=2000" alt="{{ board.name }}" class="w-full h-20 sm:h-16 object-cover rounded-t-xl">
-            <div class="p-2">
-              <h2 class="font-semibold">{{ board.name }}</h2>
-            </div>
-          </a>
-            <div class="emptycards">
-                <div class="add-board-card rounded-xl bg-white shadow w-full flex items-center justify-center h-full min-h-24">
-                    <button class="btn btn-dashed border-gray-400 text-gray-400 p-2 rounded flex items-center gap-1">
-                      <mat-icon>add</mat-icon> Create New Board
-                    </button>
-                </div>
-            </div>
-        </div>
-     </div>
+      </div>
+    </div>
   </div>
 </section>

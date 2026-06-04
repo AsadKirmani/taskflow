@@ -1,62 +1,120 @@
-<nav class="h-full p-4 flex flex-col gap-1 bg-gray-50 text-gray-500 rounded-xl">
-  <a
-    #dashboardRla="routerLinkActive"
-    class="flex items-center gap-2 rounded p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-900 [&[active]]:bg-gray-300 [&[active]]:text-gray-900 [&[active]]:font-medium"
-    [attr.active]="dashboardRla.isActive ? '' : null"
-    routerLink="/dashboard"
-    routerLinkActive
-    [routerLinkActiveOptions]="{ exact: true }"
-    (click)="navigate.emit()"
-  >
-    <mat-icon>dashboard</mat-icon>
-    <span>Dashboard</span>
-  </a>
+<nav class="h-full overflow-y-auto bg-stone-50 px-4 py-5 text-stone-600">
+  <div class="mb-5">
+    <h1 class="text-xl font-bold tracking-tight text-stone-900">TaskFlow</h1>
+    <p class="text-xs uppercase tracking-[0.24em] text-stone-400">Organize Your Work</p>
+  </div>
 
-  <a
-    #workspacesRla="routerLinkActive"
-    class="flex items-center gap-2 rounded p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-900 [&[active]]:bg-gray-300 [&[active]]:text-gray-900 [&[active]]:font-medium"
-    [attr.active]="workspacesRla.isActive ? '' : null"
-    routerLink="/workspaces"
-    routerLinkActive
-    (click)="navigate.emit()"
-  >
-    <mat-icon>workspaces</mat-icon>
-    <span>Workspaces</span>
-  </a>
+  <div class="space-y-1 border-t border-stone-200 pt-3">
+    <a
+      #dashboardRla="routerLinkActive"
+      class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-stone-200 hover:text-stone-900 [&[active]]:bg-stone-900 [&[active]]:text-white"
+      [attr.active]="dashboardRla.isActive ? '' : null"
+      routerLink="/dashboard"
+      routerLinkActive
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="navigate.emit()"
+    >
+      <mat-icon>dashboard</mat-icon>
+      <span>Dashboard</span>
+    </a>
 
-  <a
-    #boardsRla="routerLinkActive"
-    class="flex items-center gap-2 rounded p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-900 [&[active]]:bg-gray-300 [&[active]]:text-gray-900 [&[active]]:font-medium"
-    [attr.active]="boardsRla.isActive ? '' : null"
-    routerLink="/boards"
-    routerLinkActive
-    (click)="navigate.emit()"
-  >
-    <mat-icon>view_kanban</mat-icon>
-    <span>Boards</span>
-  </a>
+    <a
+      #boardsRla="routerLinkActive"
+      class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-stone-200 hover:text-stone-900 [&[active]]:bg-stone-900 [&[active]]:text-white"
+      [attr.active]="boardsRla.isActive ? '' : null"
+      routerLink="/boards"
+      routerLinkActive
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="navigate.emit()"
+    >
+      <mat-icon>view_kanban</mat-icon>
+      <span>Boards</span>
+    </a>
 
-  <a
-    #activityRla="routerLinkActive"
-    class="flex items-center gap-2 rounded p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-900 [&[active]]:bg-gray-300 [&[active]]:text-gray-900 [&[active]]:font-medium"
-    [attr.active]="activityRla.isActive ? '' : null"
-    routerLink="/activity"
-    routerLinkActive
-    (click)="navigate.emit()"
-  >
-    <mat-icon>history</mat-icon>
-    <span>Activity</span>
-  </a>
+    <a
+      #activityRla="routerLinkActive"
+      class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-stone-200 hover:text-stone-900 [&[active]]:bg-stone-900 [&[active]]:text-white"
+      [attr.active]="activityRla.isActive ? '' : null"
+      routerLink="/activity"
+      routerLinkActive
+      (click)="navigate.emit()"
+    >
+      <mat-icon>history</mat-icon>
+      <span>Activity</span>
+    </a>
 
-  <a
-    #settingsRla="routerLinkActive"
-    class="flex items-center gap-2 rounded p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-900 [&[active]]:bg-gray-300 [&[active]]:text-gray-900 [&[active]]:font-medium"
-    [attr.active]="settingsRla.isActive ? '' : null"
-    routerLink="/settings"
-    routerLinkActive
-    (click)="navigate.emit()"
-  >
-    <mat-icon>settings</mat-icon>
-    <span>Settings</span>
-  </a>
+    <a
+      #settingsRla="routerLinkActive"
+      class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-stone-200 hover:text-stone-900 [&[active]]:bg-stone-900 [&[active]]:text-white"
+      [attr.active]="settingsRla.isActive ? '' : null"
+      routerLink="/settings"
+      routerLinkActive
+      (click)="navigate.emit()"
+    >
+      <mat-icon>settings</mat-icon>
+      <span>Settings</span>
+    </a>
+  </div>
+
+  <section class="mt-6 border-t border-stone-200 pt-4">
+    <p class="mb-3 px-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-400">Workspaces</p>
+
+    <div class="space-y-2" *ngIf="workspaces$ | async as workspaces">
+      <article
+        *ngFor="let workspace of workspaces"
+        class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
+      >
+        <button
+          type="button"
+          class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left transition-colors hover:bg-stone-100"
+          (click)="toggleWorkspace(workspace.id)"
+        >
+          <span class="flex min-w-0 items-center gap-3">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold uppercase text-white">
+              {{ workspace.name | slice:0:1 }}
+            </span>
+            <span class="min-w-0">
+              <span class="block truncate text-sm font-semibold text-stone-900">{{ workspace.name }}</span>
+              <span class="block truncate text-xs text-stone-400">{{ workspace.slug }}</span>
+            </span>
+          </span>
+          <mat-icon class="text-stone-400 transition-transform" [class.rotate-180]="isWorkspaceOpen(workspace.id)">
+            expand_more
+          </mat-icon>
+        </button>
+
+        <div *ngIf="isWorkspaceOpen(workspace.id)" class="border-t border-stone-100 bg-stone-50 px-2 py-2">
+          <a
+            class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-white hover:text-stone-900"
+            [routerLink]="['/w', workspace.id, 'boards']"
+            routerLinkActive
+            (click)="navigate.emit()"
+          >
+            <mat-icon>view_kanban</mat-icon>
+            <span>Boards</span>
+          </a>
+          <a
+            class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-white hover:text-stone-900"
+            [routerLink]="['/workspaces/activity', workspace.id, workspace.slug]"
+            routerLinkActive
+            (click)="navigate.emit()"
+          >
+            <mat-icon>history</mat-icon>
+            <span>Activity</span>
+          </a>
+          <a
+            class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-white hover:text-stone-900"
+            [routerLink]="['/workspaces/settings', workspace.id, workspace.slug]"
+            routerLinkActive
+            (click)="navigate.emit()"
+          >
+            <mat-icon>settings</mat-icon>
+            <span>Settings</span>
+          </a>
+        </div>
+      </article>
+
+      <p *ngIf="workspaces.length === 0" class="px-2 text-sm text-stone-400">No workspaces yet.</p>
+    </div>
+  </section>
 </nav>

@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Input, inject } from '@angular/core';
 import { WorkspaceApiService } from './workspace-api.service';
 import { BehaviorSubject, EMPTY } from 'rxjs';
 import { Workspace } from '../../../core/models/workspace.model';
@@ -24,10 +24,18 @@ const initialWorkspaceState: WorkspaceState = {
 export class WorkspaceStoreService {
   private readonly authStore = inject(AuthStoreService);
   private readonly workspaceApi = inject(WorkspaceApiService);
-
+  
   private readonly stateSubject = new BehaviorSubject<WorkspaceState>(initialWorkspaceState);
-
+  
   readonly state$ = this.stateSubject.asObservable();
+  readonly workspaceName$ = this.state$.pipe(
+    filter(state => state.loaded),
+    switchMap(state => {
+      const names = state.workspaces.map(ws => ws.name);
+      return [names];
+    })
+  );
+  
 
   loadWorkspaces(force = false): void {
     if (this.stateSubject.value.loading) {
@@ -66,6 +74,7 @@ export class WorkspaceStoreService {
         next: response => {
           const payload = response.data as Workspace[] | { items?: Workspace[] };
           const workspaces = Array.isArray(payload) ? payload : (payload.items ?? []);
+          
           this.stateSubject.next({
             ...this.stateSubject.value,
             workspaces,
