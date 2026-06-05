@@ -27,6 +27,10 @@ const cookieOptions: CookieOptions = {
   ...baseCookieOptions,
   maxAge: jwtConfig.refreshTokenExpiresInDays * 24 * 60 * 60 * 1000
 };
+const accessTokenCookieOptions: CookieOptions = {
+  ...baseCookieOptions,
+  maxAge: 15 * 60 * 1000 // Locked strictly to 15 minutes!
+};
 
 export const authController = {
   async register(req: Request, res: Response) {
@@ -36,13 +40,12 @@ export const authController = {
     });
 
     res.cookie(jwtConfig.refreshCookieName, result.refreshToken, cookieOptions);
-
+    res.cookie('accessToken', result.accessToken, accessTokenCookieOptions);
     res.status(201).json({
       success: true,
       message: 'Registration successful',
       data: {
         user: result.user,
-        accessToken: result.accessToken
       }
     });
   },
@@ -54,13 +57,12 @@ export const authController = {
     });
 
     res.cookie(jwtConfig.refreshCookieName, result.refreshToken, cookieOptions);
-
+    res.cookie('accessToken', result.accessToken, accessTokenCookieOptions);
     res.json({
       success: true,
       message: 'Login successful',
       data: {
         user: result.user,
-        accessToken: result.accessToken
       }
     });
     
@@ -92,13 +94,12 @@ export const authController = {
     });
 
     res.cookie(jwtConfig.refreshCookieName, result.refreshToken, cookieOptions);
-
+    res.cookie('accessToken', result.accessToken, accessTokenCookieOptions);
     res.json({
       success: true,
       message: 'Token refreshed successfully',
       data: {
-        accessToken: result.accessToken
-      }
+        user: result.user
     });
   },
 
