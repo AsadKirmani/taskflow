@@ -1,76 +1,94 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, finalize, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
+import { inject, Injectable, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
+import { Observable, of, tap, finalize, switchMap, catchError, shareReplay } from 'rxjs';
 import { SessionState, LoginRequest, RegisterRequest } from '../../../core/models/auth.model';
 import { AuthApiService } from './auth-api.service';
 import { TokenService } from '../../../core/services/token.service';
-
-const initialSessionState: SessionState = {
-  user: null,
-  accessToken: null,
-  isAuthenticated: false,
-  loading: false,
-  initialized: false
-};
 
 @Injectable({ providedIn: 'root' })
 export class AuthStoreService {
   private readonly authApi = inject(AuthApiService);
   private readonly tokenService = inject(TokenService);
   private readonly router = inject(Router);
-  private refreshRequest$: Observable<unknown> | null = null;
+  
+  private refreshRequest$: Observable<any> | null = null;
 
-  private readonly stateSubject = new BehaviorSubject<SessionState>(initialSessionState);
-  readonly state$ = this.stateSubject.asObservable();
+  // ==========================================
+  // 1. THE ROOT STATE (Signals Core Vault)
+  // ==========================================
+  private readonly state = signal<SessionState>({
+    user: null,
+    accessToken: null,
+    isAuthenticated: false,
+    loading: false,
+    initialized: false
+  });
 
-  readonly user$ = this.state$.pipe(map(state => state.user));
-  readonly isAuthenticated$ = this.state$.pipe(map(state => state.isAuthenticated));
-  readonly initialized$ = this.state$.pipe(map(state => state.initialized));
-  readonly accessToken$ = this.state$.pipe(map(state => state.accessToken));
-  readonly loading$ = this.state$.pipe(map(state => state.loading));
+  // ==========================================
+  // 2. EXPOSED COMPUTED RE-SELECTORS
+  // ==========================================
+  // Components read these instantly as plain functions. Zero async overhead!
+  readonly currentUser = computed(() => this.state().user);
+  readonly isAuthenticated = computed(() => this.state().isAuthenticated);
+  readonly isInitialized = computed(() => this.state().initialized);
+  readonly isLoading = computed(() => this.state().loading);
+  readonly activeToken = computed(() => this.state().accessToken);
 
-  login(payload: LoginRequest) {
-    this.patchState({ loading: true });
+  login(payload: LoginRequest): Observable<any> {
+    this.updateState({ loading: true });
 
     return this.authApi.login(payload).pipe(
       tap(response => {
         this.setSession(response.data.user, response.data.accessToken);
       }),
-      finalize(() => this.patchState({ loading: false }))
+      finalize(() => this.updateState({ loading: false }))
     );
   }
 
-  register(payload: RegisterRequest) {
-    this.patchState({ loading: true });
+  register(payload: RegisterRequest): Observable<any> {
+    this.updateState({ loading: true });
 
     return this.authApi.register(payload).pipe(
       tap(response => {
         this.setSession(response.data.user, response.data.accessToken);
       }),
-      finalize(() => this.patchState({ loading: false }))
+      finalize(() => this.updateState({ loading: false }))
     );
   }
 
-  initializeSession(): Observable<unknown> {
+  /**
+   * 💡 FIXED CAPTURE GATEWAY
+   * This should be executed EXACTLY ONCE when the app boots up (inside app.config.ts APP_INITIALIZER).
+   * It should never be re-run inside standard routing guards.
+   */
+  initializeSession(): Observable<any> {
+    // If the app is already verified, bypass the network check completely!
+    if (this.state().initialized && this.state().isAuthenticated) {
+      return of(null);
+    }
+
     return this.refreshAccessToken().pipe(
       switchMap(() => this.authApi.me()),
       tap(response => {
-        this.patchState({
+        this.updateState({
           user: response.data.user,
           accessToken: this.tokenService.getAccessToken(),
           isAuthenticated: true,
           initialized: true
         });
       }),
-      catchError(() => {
+      catchError((err) => {
         this.clearSession(false);
-        this.patchState({ initialized: true });
+        this.updateState({ initialized: true });
         return of(null);
       })
     );
   }
 
-  refreshAccessToken() {
+  /**
+   * Safe, single-flight token rotation stream handler
+   */
+  refreshAccessToken(): Observable<any> {
     if (this.refreshRequest$) {
       return this.refreshRequest$;
     }
@@ -79,13 +97,14 @@ export class AuthStoreService {
       tap(response => {
         const token = response.data.accessToken;
         this.tokenService.setAccessToken(token);
-        this.patchState({
+        
+        this.updateState({
           accessToken: token,
           isAuthenticated: true
         });
       }),
       finalize(() => {
-        this.refreshRequest$ = null;
+        this.refreshRequest$ = null; // Free memory reference lock
       }),
       shareReplay({ bufferSize: 1, refCount: true })
     );
@@ -94,18 +113,20 @@ export class AuthStoreService {
   }
 
   logout(navigate = true): void {
-    this.authApi.logout().subscribe({
-      next: () => this.clearSession(navigate),
-      error: () => this.clearSession(navigate)
-    });
+    this.authApi.logout().pipe(
+      finalize(() => this.clearSession(navigate))
+    ).subscribe();
   }
 
   clearSession(navigate = true): void {
-    // Clear only the access token, not the refresh token
     this.tokenService.setAccessToken(null);
-    this.stateSubject.next({
-      ...initialSessionState,
-      initialized: true
+    
+    this.state.set({
+      user: null,
+      accessToken: null,
+      isAuthenticated: false,
+      loading: false,
+      initialized: true // Keep true so initialization loaders don't hang indefinitely
     });
 
     if (navigate) {
@@ -113,10 +134,10 @@ export class AuthStoreService {
     }
   }
 
-  private setSession(user: SessionState['user'], accessToken: string): void {
+  private setSession(user: any, accessToken: string): void {
     this.tokenService.setAccessToken(accessToken);
 
-    this.patchState({
+    this.updateState({
       user,
       accessToken,
       isAuthenticated: true,
@@ -124,10 +145,10 @@ export class AuthStoreService {
     });
   }
 
-  private patchState(partial: Partial<SessionState>): void {
-    this.stateSubject.next({
-      ...this.stateSubject.getValue(),
-      ...partial
-    });
+  /**
+   * Atomic Signal state tracking modifier method
+   */
+  private updateState(partial: Partial<SessionState>): void {
+    this.state.update(current => ({ ...current, ...partial }));
   }
 }
