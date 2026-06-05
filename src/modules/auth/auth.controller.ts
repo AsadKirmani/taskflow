@@ -9,7 +9,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 const prodCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
-  sameSite: 'none',
+  sameSite: 'lax',
   path: '/'
 };
 
