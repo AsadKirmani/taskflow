@@ -3,37 +3,34 @@ import { inject } from '@angular/core';
 import { catchError, switchMap, throwError, Subject, Observable } from 'rxjs';
 import { TokenService } from '../services/token.service';
 
-// Mutex-like flags to prevent parallel request spam
 let isRefreshing = false;
 const refreshTokenSubject = new Subject<string | null>();
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const tokenService = inject(TokenService);
 
-  // 1. Bypass authentication headers entirely for auth endpoints
-  const isAuthEndpoint =
-    req.url.includes('/auth/login') ||
-    req.url.includes('/auth/register') ||
-    req.url.includes('/auth/refresh-token');
+  // 💡 FIXED: Catch any route containing '/auth/' globally to protect the gateway 
+  // from accidental header tampering (login, register, refresh, logout)
+  const isAuthEndpoint = req.url.includes('/auth/');
 
   if (isAuthEndpoint) {
     return next(req);
   }
 
-  // 2. Clone the request to attach the current access token from memory
-  const token = tokenService.getAccessTokenRaw(); // Pure getter, NO side-effects!
+  // 2. Extract token cleanly from memory
+  const token = tokenService.getAccessTokenRaw();
   let authReq = req;
   
-  if (token) {
+  // 💡 FIXED: Strict defense against literal "undefined" or "null" strings breaking backend parsers
+  if (token && token !== 'undefined' && token !== 'null') {
     authReq = req.clone({
       setHeaders: { Authorization: `Bearer ${token}` }
     });
   }
 
-  // 3. Send the request and listen reactively for failures
+  // 3. Process request
   return next(authReq).pipe(
     catchError((error: any) => {
-      // Catch the explicit expired error code sent by your backend middleware
       if (
         error instanceof HttpErrorResponse && 
         error.status === 401 && 
@@ -48,15 +45,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 /**
- * Synchronizes and queues matching 401 requests into a single database refresh hook
+ * Syncs concurrent 401 streams into a single flight rotation call
  */
 function handle401Error(
   request: HttpRequest<unknown>,
   next: HttpHandlerFn,
   tokenService: TokenService
 ): Observable<any> {
-  
-  // Scenario A: A refresh operation is already in flight. Queue this request!
   if (isRefreshing) {
     return refreshTokenSubject.pipe(
       switchMap((newToken) => {
@@ -67,7 +62,6 @@ function handle401Error(
     );
   }
 
-  // Scenario B: This is the first request to fail. Trigger the token rotation!
   isRefreshing = true;
   refreshTokenSubject.next(null);
 
@@ -76,11 +70,10 @@ function handle401Error(
       isRefreshing = false;
       
       const newAccessToken = response.data?.accessToken;
-      tokenService.saveAccessTokenInMemory(newAccessToken); // Save the fresh token
+      tokenService.saveAccessTokenInMemory(newAccessToken);
       
-      refreshTokenSubject.next(newAccessToken); // Release all queued requests in the subject
+      refreshTokenSubject.next(newAccessToken);
 
-      // Replay the original request with the new access token attached
       return next(request.clone({
         setHeaders: { Authorization: `Bearer ${newAccessToken}` }
       }));
@@ -89,7 +82,6 @@ function handle401Error(
       isRefreshing = false;
       refreshTokenSubject.next(null);
       
-      // Critical Fallback: If the refresh token is also dead, clear session and force login
       tokenService.clearAllTokens();
       window.location.href = '/login';
       
