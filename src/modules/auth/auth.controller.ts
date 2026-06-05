@@ -100,6 +100,7 @@ export const authController = {
       message: 'Token refreshed successfully',
       data: {
         user: result.user
+  }
     });
   },
 
