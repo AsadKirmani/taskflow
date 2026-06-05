@@ -6,69 +6,55 @@ dotenv.config();
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME;
 
-let connectionPromise: Promise<typeof mongoose> | null = null;
+// Maintain a global memory reference across serverless execution cycles
+let cachedConnection: typeof mongoose | null = null;
 
-/**
- * Resolves the absolute correct connection string based on strict environmental isolation
- */
 function getConnectionString(): string {
-  // 💡 FIXED: In production, enforce the primary cloud cluster string strictly. 
-  // Never allow local machine fallback variables to leak into live cloud deployments.
   if (IS_PRODUCTION) {
-    if (!process.env.MONGODB_URI) throw new Error('CRITICAL: MONGODB_URI is not configured for production');
+    if (!process.env.MONGODB_URI) throw new Error('CRITICAL: MONGODB_URI is missing');
     return process.env.MONGODB_URI;
   }
-
   const localUri = process.env.MONGODB_URI_LOCAL || process.env.MONGODB_URI;
-  if (!localUri) throw new Error('DEVELOPMENT ERROR: Neither MONGODB_URI_LOCAL nor MONGODB_URI are configured');
+  if (!localUri) throw new Error('DEVELOPMENT ERROR: MONGODB_URI is missing');
   return localUri;
 }
 
 export async function connectToDatabase(): Promise<typeof mongoose> {
   if (!MONGODB_DB_NAME) {
-    throw new Error('DATABASE INITIALIZATION ERROR: MONGODB_DB_NAME environment variable is completely missing');
+    throw new Error('DATABASE ERROR: MONGODB_DB_NAME is completely missing');
   }
 
-  // 1. Check if an active connection pool is already open and ready
-  if (mongoose.connection.readyState === 1) {
-    return mongoose;
+  // 1. If we have an existing connection in memory, verify it's ACTUALLY alive
+  if (cachedConnection && mongoose.connection.readyState === 1) {
+    return cachedConnection;
   }
 
-  // 2. If a connection is already actively in-flight, return the existing promise chain
-  if (connectionPromise) {
-    return connectionPromise;
+  // 2. If the connection state is broken, disconnected, or uninitialized, force reset our references
+  if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
+    console.log('⚠️ Stale or disconnected socket detected. Wiping connection cache...');
+    cachedConnection = null;
   }
 
   const primaryUri = getConnectionString();
 
-  // 3. Initialize the connection sequence cleanly using readable async/await architecture
-  connectionPromise = (async () => {
-    try {
-      console.log('🔄 Initiating core database connection stream...');
-      return await mongoose.connect(primaryUri, { dbName: MONGODB_DB_NAME });
-    } catch (error: any) {
-      // Look for network issues or DNS resolution problems (SRV lookups)
-      const isSrvRefused =
-        error?.code === 'ECONNREFUSED' &&
-        error?.syscall === 'querySrv' &&
-        !!process.env.MONGODB_URI_FALLBACK;
+  try {
+    console.log('🔄 Opening fresh database pool connection sockets...');
+    
+    // 3. Optimize connection settings explicitly for serverless/high-frequency stability
+    cachedConnection = await mongoose.connect(primaryUri, {
+      dbName: MONGODB_DB_NAME,
+      // Sever connections quickly if the cloud infrastructure shifts out from under the runtime
+      serverSelectionTimeoutMS: 5000, 
+      socketTimeoutMS: 45000,
+    });
 
-      if (isSrvRefused) {
-        console.warn('⚠️ Primary MongoDB cluster lookup failed. Activating MONGODB_URI_FALLBACK channel...');
-        try {
-          return await mongoose.connect(process.env.MONGODB_URI_FALLBACK!, { dbName: MONGODB_DB_NAME });
-        } catch (fallbackError) {
-          // Clear memory reference immediately if fallback fails completely
-          connectionPromise = null;
-          throw fallbackError;
-        }
-      }
-
-      // Clear memory reference immediately on error so subsequent requests can try fresh
-      connectionPromise = null;
-      throw error;
-    }
-  })();
-
-  return connectionPromise;
+    const dbHost = mongoose.connection.host;
+    console.log(`✅ MongoDB Connected securely to: [${dbHost}]`);
+    
+    return cachedConnection;
+  } catch (error) {
+    cachedConnection = null; // Clear out on failure so the next invocation can retry cleanly
+    console.error('❌ MongoDB Connection failed during socket allocation:', error);
+    throw error;
+  }
 }
