@@ -98,9 +98,7 @@ export const authController = {
     res.json({
       success: true,
       message: 'Token refreshed successfully',
-      data: {
-        user: result.user
-  }
+      data: null
     });
   },
 
