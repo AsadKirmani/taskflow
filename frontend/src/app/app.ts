@@ -1,6 +1,7 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatIconRegistry } from '@angular/material/icon';
+import { ThemeService } from './core/services/theme.service'
 
 @Component({
   selector: 'app-root',
@@ -9,6 +10,7 @@ import { MatIconRegistry } from '@angular/material/icon';
 })
 export class App implements OnInit {
   protected readonly title = signal('Taskflow');
+  private themeService = inject(ThemeService);
   constructor(private matIconRegistry: MatIconRegistry) {}
 
   ngOnInit(): void {
