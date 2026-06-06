@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthStoreService } from '../../../features/auth/data-access/auth-store.service';
 import { UserMenuComponent } from './usermenu.component';
-import { ThemeService } from '../../core/services/theme.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-navbar',
