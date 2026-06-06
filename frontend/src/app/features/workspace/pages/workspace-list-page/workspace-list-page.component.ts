@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { WorkspaceStoreService } from '../../data-access/workspace-store.service';
@@ -8,39 +8,47 @@ import { WorkspaceStoreService } from '../../data-access/workspace-store.service
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <section *ngIf="state$ | async as state">
-      <h1>Workspaces</h1>
+    <section class="p-6 max-w-4xl mx-auto">
+      <h1 class="text-2xl font-bold mb-4">Workspaces</h1>
 
-      <p *ngIf="state.loading">Loading workspaces...</p>
+      @if (workspaceStore.isLoading()) {
+        <p class="text-gray-500">Loading workspaces...</p>
+      }
 
-      <ul *ngIf="!state.loading && state.workspaces.length > 0" class="space-y-2">
-        <li *ngFor="let workspace of state.workspaces">
-          <a
-            class="text-blue-600 hover:underline"
-            [routerLink]="['/workspaces', workspace.id, workspace.slug || toSlug(workspace.name)]"
-          >
-            {{ workspace.name }}
-          </a>
-        </li>
-      </ul>
+      @if (!workspaceStore.isLoading() && workspaceStore.workspaces().length > 0) {
+        <ul class="space-y-2">
+          @for (workspace of workspaceStore.workspaces(); track workspace.id) {
+            <li class="bg-white p-3 rounded shadow-sm border border-gray-100">
+              <a
+                class="text-blue-600 hover:underline font-medium"
+                [routerLink]="['/workspaces', workspace.id, workspace.slug || toSlug(workspace.name)]"
+              >
+                {{ workspace.name }}
+              </a>
+            </li>
+          }
+        </ul>
+      }
 
-      <p *ngIf="!state.loading && state.workspaces.length === 0">No workspaces found.</p>
-      <p *ngIf="state.error">{{ state.error }}</p>
+      @if (!workspaceStore.isLoading() && workspaceStore.workspaces().length === 0) {
+        <p class="text-gray-500">No workspaces found.</p>
+      }
 
-      <p>Workspace list placeholder page.</p>
+      @if (workspaceStore.currentError()) {
+        <p class="text-red-600 mt-2 p-2 bg-red-50 rounded border border-red-100">
+          {{ workspaceStore.currentError() }}
+        </p>
+      }
+
+      <p class="text-xs text-gray-400 mt-6">Workspace list placeholder page.</p>
     </section>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class WorkspaceListPageComponent {
-  private readonly workspaceStore = inject(WorkspaceStoreService);
-  readonly state$ = this.workspaceStore.state$;
+export class WorkspaceListPageComponent implements OnInit {
+  protected readonly workspaceStore = inject(WorkspaceStoreService);
 
-  constructor() {
-    this.loadWorkspaces();
-  }
-
-  private loadWorkspaces(): void {
+  ngOnInit(): void {
     this.workspaceStore.loadWorkspaces();
   }
 

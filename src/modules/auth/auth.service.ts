@@ -43,7 +43,6 @@ export const authService = {
         passwordHash
       });
     } catch (error: any) {
-      // Guard against race conditions where two signups hit the same unique email.
       if (error?.code === 11000 && error?.keyPattern?.email) {
         throw new AppError('Email already in use', 409, 'EMAIL_ALREADY_EXISTS');
       }

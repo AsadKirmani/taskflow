@@ -127,6 +127,6 @@ export class BoardModalComponent {
 
   close(): void {
     this.modalClosed.emit();
-    console.log('Board creation modal closed');
+
   }
 }

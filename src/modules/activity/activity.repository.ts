@@ -35,10 +35,26 @@ export const activityRepository = {
       metadata: data.metadata ?? {}
     });
   },
+  async getGlobalActivity(workspaceIds: string[], page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const query = { workspaceId: { $in: workspaceIds } };
+
+    const [items, total] = await Promise.all([
+      applyActivityPopulation(
+        ActivityLogModel.find(query)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+      ),
+      ActivityLogModel.countDocuments(query)
+    ]);
+
+    const enrichedItems = await enrichMoveColumnNames(items as Array<Record<string, unknown>>);
+    return { items: enrichedItems, total };
+  },
 
   async getWorkspaceActivity(workspaceId: string, page: number, limit: number) {
     const skip = (page - 1) * limit;
-
     const [items, total] = await Promise.all([
       applyActivityPopulation(
         ActivityLogModel.find({ workspaceId })

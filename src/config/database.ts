@@ -6,7 +6,6 @@ dotenv.config();
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME;
 
-// Maintain a global memory reference across serverless execution cycles
 let cachedConnection: typeof mongoose | null = null;
 
 function getConnectionString(): string {
@@ -24,12 +23,10 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
     throw new Error('DATABASE ERROR: MONGODB_DB_NAME is completely missing');
   }
 
-  // 1. If we have an existing connection in memory, verify it's ACTUALLY alive
   if (cachedConnection && mongoose.connection.readyState === 1) {
     return cachedConnection;
   }
 
-  // 2. If the connection state is broken, disconnected, or uninitialized, force reset our references
   if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
     console.log('⚠️ Stale or disconnected socket detected. Wiping connection cache...');
     cachedConnection = null;
@@ -40,10 +37,8 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
   try {
     console.log('🔄 Opening fresh database pool connection sockets...');
     
-    // 3. Optimize connection settings explicitly for serverless/high-frequency stability
     cachedConnection = await mongoose.connect(primaryUri, {
       dbName: MONGODB_DB_NAME,
-      // Sever connections quickly if the cloud infrastructure shifts out from under the runtime
       serverSelectionTimeoutMS: 5000, 
       socketTimeoutMS: 45000,
     });
@@ -53,7 +48,7 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
     
     return cachedConnection;
   } catch (error) {
-    cachedConnection = null; // Clear out on failure so the next invocation can retry cleanly
+    cachedConnection = null;
     console.error('❌ MongoDB Connection failed during socket allocation:', error);
     throw error;
   }

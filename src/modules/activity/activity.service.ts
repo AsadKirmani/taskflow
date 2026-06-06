@@ -1,3 +1,4 @@
+import { workspaceRepository } from '../workspaces/workspace.repository';
 import { activityRepository } from './activity.repository';
 
 export const activityService = {
@@ -13,6 +14,16 @@ export const activityService = {
     metadata?: Record<string, unknown>;
   }) {
     return activityRepository.logActivity(data);
+  },
+  async getGlobalActivity(userId: string, page: number, limit: number) {
+    const userWorkspaces = await workspaceRepository.listUserWorkspaces(userId);
+    const workspaceIds = userWorkspaces.map(ws => ws._id.toString());
+
+    if (workspaceIds.length === 0) {
+      return { items: [], total: 0 };
+    }
+
+    return activityRepository.getGlobalActivity(workspaceIds, page, limit);
   },
 
   async getWorkspaceActivity(workspaceId: string, page: number, limit: number) {

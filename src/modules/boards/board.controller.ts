@@ -31,7 +31,6 @@ export const boardController = {
       throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
     }
     const { workspaceId } = req.params as { workspaceId: string };
-    // Placeholder for fetching boards in a workspace
     const boards = await boardService.getBoardsInWorkspace(
       workspaceId,
       req.auth.userId,

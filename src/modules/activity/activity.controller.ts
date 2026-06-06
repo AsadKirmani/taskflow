@@ -15,6 +15,16 @@ const parsePagination = (req: Request) => {
 };
 
 export const activityController = {
+  async getGlobalActivity(req: Request, res: Response) {
+    if (!req.auth?.userId) {
+      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
+    }
+
+    const { page, limit } = parsePagination(req);
+
+    const result = await activityService.getGlobalActivity(req.auth.userId, page, limit);
+    res.json({ success: true, data: { ...result, page, limit } });
+  },
   async getWorkspaceActivity(req: Request, res: Response) {
     if (!req.auth?.userId) {
       throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');

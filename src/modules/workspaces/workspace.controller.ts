@@ -51,12 +51,9 @@ export const workspaceController = {
         }
 
         const { workspaceId } = req.params as { workspaceId: string };
-        const { email, role, tokenHash, expiresAt, status } = req.body as {
+        const { email, role } = req.body as {
             email: string;
             role: string;
-            tokenHash: string;
-            expiresAt: Date;
-            status?: string;
         };
 
         const result = await workspaceService.inviteWorkspaceMember(
@@ -64,11 +61,21 @@ export const workspaceController = {
             email,
             req.auth.userId,
             role,
-            tokenHash,
-            expiresAt,
-            status
         );
 
         res.status(201).json(result);
-    }
+    },
+
+  async acceptWorkspaceInvite(req: Request, res: Response) {
+      if (!req.auth?.userId) {
+          throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
+      }
+      const { token } = req.body as { token: string };
+      const result = await workspaceService.acceptWorkspaceInvitation(
+          token, 
+          req.auth.userId
+      );
+
+      res.status(200).json(result);
+  }
 };

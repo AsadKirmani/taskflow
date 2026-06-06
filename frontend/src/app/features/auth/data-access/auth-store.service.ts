@@ -1,6 +1,6 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, of, tap, finalize, switchMap, catchError, shareReplay } from 'rxjs';
+import { Observable, of, tap, switchMap, catchError, shareReplay, throwError } from 'rxjs';
 import { SessionState, LoginRequest, RegisterRequest } from '../../../core/models/auth.model';
 import { AuthApiService } from './auth-api.service';
 import { TokenService } from '../../../core/services/token.service';
@@ -13,9 +13,6 @@ export class AuthStoreService {
   
   private refreshRequest$: Observable<any> | null = null;
 
-  // ==========================================
-  // 1. THE ROOT STATE (Signals Core Vault)
-  // ==========================================
   private readonly state = signal<SessionState>({
     user: null,
     accessToken: null,
@@ -24,10 +21,6 @@ export class AuthStoreService {
     initialized: false
   });
 
-  // ==========================================
-  // 2. EXPOSED COMPUTED RE-SELECTORS
-  // ==========================================
-  // Components read these instantly as plain functions. Zero async overhead!
   readonly currentUser = computed(() => this.state().user);
   readonly isAuthenticated = computed(() => this.state().isAuthenticated);
   readonly isInitialized = computed(() => this.state().initialized);
@@ -40,8 +33,12 @@ export class AuthStoreService {
     return this.authApi.login(payload).pipe(
       tap(response => {
         this.setSession(response.data.user, response.data.accessToken);
+        this.updateState({ loading: false });
       }),
-      finalize(() => this.updateState({ loading: false }))
+      catchError(err => {
+        this.updateState({ loading: false });
+        return throwError(() => err);
+      })
     );
   }
 
@@ -51,43 +48,46 @@ export class AuthStoreService {
     return this.authApi.register(payload).pipe(
       tap(response => {
         this.setSession(response.data.user, response.data.accessToken);
+        this.updateState({ loading: false });
       }),
-      finalize(() => this.updateState({ loading: false }))
-    );
-  }
-
-  /**
-   * 💡 FIXED CAPTURE GATEWAY
-   * This should be executed EXACTLY ONCE when the app boots up (inside app.config.ts APP_INITIALIZER).
-   * It should never be re-run inside standard routing guards.
-   */
-  initializeSession(): Observable<any> {
-    // If the app is already verified, bypass the network check completely!
-    if (this.state().initialized && this.state().isAuthenticated) {
-      return of(null);
-    }
-
-    return this.refreshAccessToken().pipe(
-      switchMap(() => this.authApi.me()),
-      tap(response => {
-        this.updateState({
-          user: response.data.user,
-          accessToken: this.tokenService.getAccessToken(),
-          isAuthenticated: true,
-          initialized: true
-        });
-      }),
-      catchError((err) => {
-        this.clearSession(false);
-        this.updateState({ initialized: true });
-        return of(null);
+      catchError(err => {
+        this.updateState({ loading: false });
+        return throwError(() => err);
       })
     );
   }
 
-  /**
-   * Safe, single-flight token rotation stream handler
-   */
+  initializeSession(): Observable<any> {
+  if (this.state().initialized && this.state().isAuthenticated) {
+    return of(null);
+  }
+
+  return this.refreshAccessToken().pipe(
+    switchMap((refreshResponse) => {
+      const freshToken = refreshResponse?.data?.accessToken || this.tokenService.getAccessToken();
+      
+      if (!freshToken) {
+        throw new Error('No fresh token available');
+      }
+      return this.authApi.me();
+    }),
+    tap(response => {
+      this.updateState({
+        user: response.data.user,
+        accessToken: this.tokenService.getAccessToken(),
+        isAuthenticated: true,
+        initialized: true
+      });
+    }),
+    catchError((err) => {
+      console.error('Initialization failed:', err);
+      this.clearSession(false);
+      this.updateState({ initialized: true });
+      return of(null);
+    })
+  );
+}
+
   refreshAccessToken(): Observable<any> {
     if (this.refreshRequest$) {
       return this.refreshRequest$;
@@ -103,8 +103,15 @@ export class AuthStoreService {
           isAuthenticated: true
         });
       }),
-      finalize(() => {
-        this.refreshRequest$ = null; // Free memory reference lock
+      catchError(err => {
+        this.refreshRequest$ = null;
+        return throwError(() => err);
+      }),
+      tap({
+        subscribe: () => {},
+        finalize: () => {
+          this.refreshRequest$ = null;
+        }
       }),
       shareReplay({ bufferSize: 1, refCount: true })
     );
@@ -114,7 +121,10 @@ export class AuthStoreService {
 
   logout(navigate = true): void {
     this.authApi.logout().pipe(
-      finalize(() => this.clearSession(navigate))
+      tap({
+        next: () => this.clearSession(navigate),
+        error: () => this.clearSession(navigate)
+      })
     ).subscribe();
   }
 
@@ -126,7 +136,7 @@ export class AuthStoreService {
       accessToken: null,
       isAuthenticated: false,
       loading: false,
-      initialized: true // Keep true so initialization loaders don't hang indefinitely
+      initialized: true 
     });
 
     if (navigate) {
@@ -145,9 +155,6 @@ export class AuthStoreService {
     });
   }
 
-  /**
-   * Atomic Signal state tracking modifier method
-   */
   private updateState(partial: Partial<SessionState>): void {
     this.state.update(current => ({ ...current, ...partial }));
   }

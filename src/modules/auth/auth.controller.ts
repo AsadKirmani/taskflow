@@ -29,7 +29,7 @@ const cookieOptions: CookieOptions = {
 };
 const accessTokenCookieOptions: CookieOptions = {
   ...baseCookieOptions,
-  maxAge: 15 * 60 * 1000 // Locked strictly to 15 minutes!
+  maxAge: 15 * 60 * 1000
 };
 
 export const authController = {
@@ -98,7 +98,9 @@ export const authController = {
     res.json({
       success: true,
       message: 'Token refreshed successfully',
-      data: null
+      data: {
+        accessToken: result.accessToken
+        }
     });
   },
 
@@ -110,6 +112,7 @@ export const authController = {
     }
 
     res.clearCookie(jwtConfig.refreshCookieName, baseCookieOptions);
+    res.clearCookie('accessToken', baseCookieOptions);
 
     res.json({
       success: true,
@@ -125,6 +128,7 @@ export const authController = {
 
     await authService.logoutAll(req.auth.userId);
     res.clearCookie(jwtConfig.refreshCookieName, baseCookieOptions);
+    res.clearCookie('accessToken', baseCookieOptions);
 
     res.json({
       success: true,

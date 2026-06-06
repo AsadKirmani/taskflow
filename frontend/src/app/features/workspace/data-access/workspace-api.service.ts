@@ -15,4 +15,18 @@ export class WorkspaceApiService {
       withCredentials: true
     });
   }
+ 
+  inviteWorkspaceMember(workspaceId: string, email: string, role: string) {
+    return this.http.post<{ success: boolean; message: string }>(
+      `${this.baseUrl}/${workspaceId}/invites`,
+      { email, role }
+    );
+  }
+
+  acceptWorkspaceInvite(token: string) {
+    return this.http.post<{ success: boolean; message: string; workspaceId: string }>(
+      `${this.baseUrl}/invites/accept`, 
+      { token }
+    );
+  }
 }

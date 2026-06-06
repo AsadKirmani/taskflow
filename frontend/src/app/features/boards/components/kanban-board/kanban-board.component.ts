@@ -3,7 +3,9 @@ import {
   Component,
   EventEmitter,
   Input,
-  Output
+  Output,
+  DestroyRef,
+  inject
 } from '@angular/core';
 import {
   CdkDrag,
@@ -16,17 +18,22 @@ import { MatIconModule } from '@angular/material/icon';
 import { Board } from '../../../../core/models/board.model';
 import { BoardColumn } from '../../../../core/models/column.model';
 import { Task } from '../../../../core/models/task.model';
-import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, AddColumnEventPayload, UpdateTaskEventPayload, ToggleTaskCompletionEventPayload } from '../../models/drag-drop.model';
+import { 
+  TaskDropEventPayload, 
+  ColumnDropEventPayload, 
+  AddTaskEventPayload, 
+  AddColumnEventPayload, 
+  UpdateTaskEventPayload, 
+  ToggleTaskCompletionEventPayload 
+} from '../../models/drag-drop.model';
 import { CommonModule } from '@angular/common';
 import { TaskStoreService } from '../../data-access/task-store.service';
 import { AuthStoreService } from '../../../auth/data-access/auth-store.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DestroyRef, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApplyFilterComponent } from '../filters/filter.component';
 import type { BoardFilterSelection } from '../filters/filter-selection.model';
 import { TaskOverlayComponent } from '../task-overlay/task-overlay.component';
-
 
 @Component({
   selector: 'app-kanban-board',
@@ -37,11 +44,11 @@ import { TaskOverlayComponent } from '../task-overlay/task-overlay.component';
 })
 export class KanbanBoardComponent {
   private readonly taskStore = inject(TaskStoreService);
-  private readonly authStore = inject(AuthStoreService);
+  protected readonly authStore = inject(AuthStoreService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private currentUserId: string | null = null;
+
   @Input() board: Board | null = null;
   @Input() columns: BoardColumn[] = [];
   @Input() tasksByColumn: Record<string, Task[] | undefined> = {};
@@ -65,17 +72,11 @@ export class KanbanBoardComponent {
   readonly dragStartDelay: DragStartDelay = { touch: 220, mouse: 200 };
   
   constructor() {
-    this.authStore.user$
-    .pipe(takeUntilDestroyed(this.destroyRef))
-    .subscribe(user => {
-      this.currentUserId = user?.id ?? null;
-    });
-    
     this.route.queryParamMap
-    .pipe(takeUntilDestroyed(this.destroyRef))
-    .subscribe(params => {
-      this.activeTaskOverlayId = params.get('taskId');
-    });
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.activeTaskOverlayId = params.get('taskId');
+      });
   }
   
   isFilterOpen = false;
@@ -98,7 +99,6 @@ export class KanbanBoardComponent {
       toIndex: event.currentIndex
     });
   }
-
 
   onTaskDrop(event: CdkDragDrop<Task[]>, targetColumnId: string): void {
     const task = event.item.data as Task;
@@ -244,7 +244,7 @@ export class KanbanBoardComponent {
   }
 
   archiveColumn(columnId: string): void {
-    // Implement column archiving logic here
+    // we can implement this later when we have the archived property in our column model and API support for it
   }
 
   onFiltersChanged(selection: BoardFilterSelection): void {
@@ -262,8 +262,10 @@ export class KanbanBoardComponent {
           ? 'incomplete'
           : 'all';
 
+    const currentUserId = this.authStore.currentUser()?.id ?? null;
+
     this.taskStore.updateFilters({
-      currentUserId: this.currentUserId,
+      currentUserId,
       memberScope,
       completion,
       dueType: selection.dueDate,
@@ -292,6 +294,4 @@ export class KanbanBoardComponent {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '') || 'task';
   }
- 
-  
 }

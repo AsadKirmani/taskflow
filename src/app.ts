@@ -11,6 +11,7 @@ import activityRoutes from './modules/activity/activity.routes';
 import archiveRoutes from './modules/archive/archive.routes';
 import { errorMiddleware } from './middleware/error.middleware';
 console.log('Server started', new Date().toISOString());
+
 const app = express();
 
 const corsOrigins = (process.env.CORS_ORIGINS || '')
@@ -18,34 +19,30 @@ const corsOrigins = (process.env.CORS_ORIGINS || '')
   .map((origin) => origin.trim())
   .filter(Boolean)
   .map((origin) => origin.replace(/\/$/, ''));
-
+  
 const corsOriginSet = new Set(corsOrigins);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow non-browser requests and same-origin requests with no Origin header.
       if (!origin) {
         callback(null, true);
         return;
       }
-
       const normalizedOrigin = origin.replace(/\/$/, '');
-
-      // Fail open only when CORS_ORIGINS is not configured to avoid unexpected production outages.
       if (corsOriginSet.size === 0 || corsOriginSet.has(normalizedOrigin)) {
         callback(null, true);
         return;
       }
-
+      
       callback(new Error(`CORS blocked for origin: ${origin}`));
     },
     credentials: true
   })
 );
-
 app.use(express.json());
 app.use(cookieParser());
+
 
 app.get('/', (_req, res) => {
   res.json({
@@ -72,7 +69,7 @@ app.use('/api/v1/boards', boardRoutes);
 app.use('/api/v1', columnRoutes);
 app.use('/api/v1', taskRoutes);
 app.use('/api/v1', commentRoutes);
-app.use('/api/v1', activityRoutes);
+app.use('/api/v1/activity', activityRoutes);
 app.use('/api/v1', archiveRoutes);
 
 app.use(errorMiddleware);

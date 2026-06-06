@@ -34,7 +34,7 @@ export const boardService = {
     return board;
   },
   async getBoardsInWorkspace(workspaceId: string, userId: string) {
-    const boards = await boardRepository.getBoardsInWorkspace(workspaceId);
+    const boards = await boardRepository.getBoardsInWorkspace(workspaceId, userId);
     return boards;
   },
   async updateBoard(

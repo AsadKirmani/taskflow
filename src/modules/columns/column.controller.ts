@@ -41,7 +41,6 @@ export const columnController = {
     }
     const { columnId } = req.params as { columnId: string };
     const { taskIds } = req.body as { taskIds: string[] };
-    // Placeholder for reordering tasks logic
     res.json({
       success: true,
       message: "Tasks reordered successfully",

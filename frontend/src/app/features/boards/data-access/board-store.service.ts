@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, map, of, tap } from 'rxjs';
+import { inject, Injectable, signal, computed } from '@angular/core';
+import { catchError, map, of, tap } from 'rxjs';
 import { BoardApiService } from './board-api.service';
 import { BoardState, initialBoardState } from './board-state.model';
 import { ColumnDropEventPayload } from '../models/drag-drop.model';
@@ -9,15 +9,18 @@ import { BoardColumn } from '../../../core/models/column.model';
 
 @Injectable({ providedIn: 'root' })
 export class BoardStoreService {
-  private readonly api = inject(BoardApiService);
+  private readonly boardApi = inject(BoardApiService);
   private readonly notificationService = inject(NotificationService);
-  private boardsLoaded = false;
-  private readonly loadedBoardIds = new Set<string>();
-  private readonly loadedColumnBoardIds = new Set<string>();
-  private readonly loadingColumnBoardIds = new Set<string>();
 
-  private readonly stateSubject = new BehaviorSubject<BoardState>(initialBoardState);
-  readonly state$ = this.stateSubject.asObservable();
+  private isAllBoardsLoaded = false;
+  private readonly loadedBoardIdsCache = new Set<string>();
+  private readonly loadedColumnBoardIdsCache = new Set<string>();
+  private readonly loadingColumnBoardIdsCache = new Set<string>();
+
+
+  private readonly stateSignal = signal<BoardState>(initialBoardState);
+  
+  readonly state = this.stateSignal.asReadonly();
 
   get currentBoardId(): string | null {
     return this.getState().board?.id ?? null;
@@ -27,21 +30,30 @@ export class BoardStoreService {
     return this.getState().board;
   }
 
-  readonly vm$ = this.state$.pipe(
-    map(state => ({
-      boards: state.boards,
-      board: state.board,
-      columns: state.columns,
-      loading: state.loading,
-      saving: state.saving,
-      error: state.error
-    }))
-  );
+  get currentColumns(): BoardColumn[] {
+    return this.getState().columns;
+  }
+
+  readonly viewModel = computed(() => {
+    const s = this.stateSignal();
+    return {
+      boards: s.boards,
+      board: s.board,
+      columns: s.columns,
+      loading: s.loading,
+      saving: s.saving,
+      error: s.error
+    };
+  });
+
+  get allBoards(): Board[] {
+    return this.getState().boards;
+  }
 
   createBoard(name: string, workspaceName: string, workspaceId: string, visibility: 'private' | 'workspace'): void {
-    this.api.createBoard(name, workspaceName, workspaceId, visibility).pipe(
+    this.boardApi.createBoard(name, workspaceName, workspaceId, visibility).pipe(
       tap(response => {
-        const newBoard = response.data;
+        const newBoard = this.normalizeBoard(response.data as Board & { _id?: string });
         const currentBoards = this.getState().boards;
         this.patchState({ boards: [...currentBoards, newBoard] });
         this.notificationService.success('Board created successfully');
@@ -59,11 +71,11 @@ export class BoardStoreService {
       return;
     }
 
-    this.api.createColumn(boardId, workspaceId, name.trim()).pipe(
+    this.boardApi.createColumn(boardId, workspaceId, name.trim()).pipe(
       tap(response => {
         const newColumn = this.normalizeColumn(response.data as BoardColumn & { _id?: string });
         const currentColumns = this.getState().columns;
-        this.loadedColumnBoardIds.add(boardId);
+        this.loadedColumnBoardIdsCache.add(boardId);
         this.patchState({ columns: [...currentColumns, newColumn] });
         this.notificationService.success('Column created successfully');
       }),
@@ -74,17 +86,13 @@ export class BoardStoreService {
     ).subscribe();
   }
 
-  getAllBoards(force = false): void {
-    if (this.getState().loading) {
-      return;
-    }
-
-    if (this.boardsLoaded && !force) {
-      return;
-    }
+  loadAllBoards(forceUpdate = false): void {
+    if (this.getState().loading) return;
+    if (this.isAllBoardsLoaded && !forceUpdate) return;
 
     this.patchState({ loading: true, error: null });
-    this.api
+    
+    this.boardApi
       .getBoards()
       .pipe(
         map(response =>
@@ -93,12 +101,12 @@ export class BoardStoreService {
           )
         ),
         tap(boards => {
-          this.boardsLoaded = true;
-          this.notificationService.success('Boards loaded successfully');
+          this.isAllBoardsLoaded = true;
+          this.notificationService.success('All boards loaded successfully');
           this.patchState({ boards, loading: false, error: null });
         }),
         catchError(() => {
-          this.boardsLoaded = true;
+          this.isAllBoardsLoaded = true;
           this.patchState({ boards: [], loading: false, error: 'Failed to load boards' });
           this.notificationService.error('Failed to load boards');
           return of([]);
@@ -107,17 +115,16 @@ export class BoardStoreService {
       .subscribe();
   }
 
-  getBoardsbyWorkspace(workspaceId: string, force = false): void {
-    if (this.getState().loading) {
-      return;
-    }
-
-    if (this.boardsLoaded && !force) {
+  loadBoardsByWorkspace(workspaceId: string, forceUpdate = false): void {
+    if (this.getState().loading) return;
+    
+    if (this.isAllBoardsLoaded && !forceUpdate) {
       return;
     }
 
     this.patchState({ loading: true, error: null });
-    this.api
+    
+    this.boardApi
       .getBoards()
       .pipe(
         map(response =>
@@ -126,34 +133,30 @@ export class BoardStoreService {
             .map(board => this.normalizeBoard(board as Board & { _id?: string }))
         ),
         tap(boards => {
-          this.boardsLoaded = true;
-          this.notificationService.success('Boards loaded successfully');
+          this.notificationService.success('Workspace boards synced successfully');
           this.patchState({ boards, loading: false, error: null });
         }),
         catchError(() => {
-          this.boardsLoaded = true;
-          this.patchState({ boards: [], loading: false, error: 'Failed to load boards' });
-          this.notificationService.error('Failed to load boards');
+          this.patchState({ boards: [], loading: false, error: 'Failed to load workspace boards' });
+          this.notificationService.error('Failed to load workspace boards');
           return of([]);
         })
       )
       .subscribe();
   }
 
-  loadBoard(boardId: string, force = false): void {
+  loadBoard(boardId: string, forceUpdate = false): void {
     if (!boardId?.trim()) {
       this.patchState({ loading: false, error: 'Board ID is missing' });
       this.notificationService.error('Board ID is missing');
       return;
     }
 
-    if (this.loadedBoardIds.has(boardId) && !force) {
-      return;
-    }
+    if (this.loadedBoardIdsCache.has(boardId) && !forceUpdate) return;
 
     this.patchState({ loading: true, error: null });
 
-    this.api
+    this.boardApi
       .getBoardById(boardId)
       .pipe(
         tap(response => {
@@ -172,7 +175,7 @@ export class BoardStoreService {
           );
           const columns = this.normalizeColumns((payload as { columns?: (BoardColumn & { _id?: string })[] })?.columns ?? []);
 
-          this.loadedBoardIds.add(boardId);
+          this.loadedBoardIdsCache.add(boardId);
 
           this.patchState({
             board,
@@ -184,32 +187,27 @@ export class BoardStoreService {
         catchError(() => {
           this.patchState({
             loading: false,
-            error: 'Failed to load board'
+            error: 'Failed to load board details'
           });
-          this.notificationService.error('Failed to load board');
+          this.notificationService.error('Failed to load board details');
           return of(null);
         })
       )
       .subscribe();
   }
 
-  getBoardColumns(boardId: string, force = false): void {
+  loadBoardColumns(boardId: string, forceUpdate = false): void {
     if (!boardId?.trim()) {
       this.notificationService.error('Board ID is missing');
       return;
     }
 
-    if (this.loadingColumnBoardIds.has(boardId)) {
-      return;
-    }
+    if (this.loadingColumnBoardIdsCache.has(boardId)) return;
+    if (this.loadedColumnBoardIdsCache.has(boardId) && !forceUpdate) return;
 
-    if (this.loadedColumnBoardIds.has(boardId) && !force) {
-      return;
-    }
+    this.loadingColumnBoardIdsCache.add(boardId);
 
-    this.loadingColumnBoardIds.add(boardId);
-
-    this.api
+    this.boardApi
       .getBoardColumns(boardId)
       .pipe(
         map(response =>
@@ -218,12 +216,12 @@ export class BoardStoreService {
           )
         ),
         tap(columns => {
-          this.loadedColumnBoardIds.add(boardId);
-          this.loadingColumnBoardIds.delete(boardId);
+          this.loadedColumnBoardIdsCache.add(boardId);
+          this.loadingColumnBoardIdsCache.delete(boardId);
           this.patchState({ columns });
         }),
         catchError(() => {
-          this.loadingColumnBoardIds.delete(boardId);
+          this.loadingColumnBoardIdsCache.delete(boardId);
           this.notificationService.error('Failed to load board columns');
           return of([]);
         })
@@ -243,14 +241,14 @@ export class BoardStoreService {
     columns.splice(event.toIndex, 0, moved);
     this.patchState({ columns });
 
-    this.api
+    this.boardApi
       .reorderColumns(board.id, columns.map(c => c.id))
       .pipe(
         tap(() => {
-          this.notificationService.success('Columns reordered');
+          this.notificationService.success('Columns reordered successfully');
         }),
         catchError(() => {
-          this.stateSubject.next(snapshot);
+          this.stateSignal.set(snapshot);
           this.notificationService.error('Failed to reorder columns');
           return of(null);
         })
@@ -259,14 +257,14 @@ export class BoardStoreService {
   }
 
   private patchState(partial: Partial<BoardState>): void {
-    this.stateSubject.next({
-      ...this.getState(),
+    this.stateSignal.update(current => ({
+      ...current,
       ...partial
-    });
+    }));
   }
 
   private getState(): BoardState {
-    return this.stateSubject.getValue();
+    return this.stateSignal();
   }
 
   private normalizeBoard(board: Board & { _id?: string }): Board {

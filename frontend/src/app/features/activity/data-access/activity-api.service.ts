@@ -7,8 +7,18 @@ import { ActivityListData } from '../models/activity.model';
 
 @Injectable({ providedIn: 'root' })
 export class ActivityApiService {
-  private readonly baseUrl = `${environment.apiUrl}`;
+  private readonly baseUrl = `${environment.apiUrl}/activity`;
   private readonly http = inject(HttpClient);
+
+  getGlobalActivity(page = 1, limit = 30): Observable<ApiResponse<ActivityListData>> {
+    return this.http.get<ApiResponse<ActivityListData>>(
+      `${this.baseUrl}`,
+      {
+        params: { page, limit },
+        withCredentials: true
+      }
+    );
+  }
 
   getWorkspaceActivity(workspaceId: string, page = 1, limit = 30): Observable<ApiResponse<ActivityListData>> {
     return this.http.get<ApiResponse<ActivityListData>>(

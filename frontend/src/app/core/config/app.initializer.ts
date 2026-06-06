@@ -1,8 +1,14 @@
-import { inject } from '@angular/core';
+import { inject, EnvironmentInjector, runInInjectionContext } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { AuthStoreService } from '../../features/auth/data-access/auth-store.service';
 
-export function initializeApp(): Promise<unknown> {
+export function initializeApp(): () => Promise<any> {
   const authStore = inject(AuthStoreService);
+  const injector = inject(EnvironmentInjector); 
 
-  return () => authStore.initializeSession();
+  return () => {
+    return runInInjectionContext(injector, () => 
+      firstValueFrom(authStore.initializeSession())
+    );
+  };
 }

@@ -44,9 +44,7 @@ export class NavbarComponent {
   isUserMenuOpen = false;
   constructor(private authStore: AuthStoreService) {}
   logout() {
-    // Implement logout logic here
     this.authStore.logout();
-    console.log('User logged out');
   }
   toggleUserMenu(event?: MouseEvent) {
     event?.stopPropagation();

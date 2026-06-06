@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Subject, catchError, debounceTime, distinctUntilChanged, map, of, tap } from 'rxjs';
+import { inject, Injectable, signal, computed } from '@angular/core';
+import { Subject, catchError, debounceTime, distinctUntilChanged, map, of, tap } from 'rxjs';
 import { BoardColumn } from '../../../core/models/column.model';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Task } from '../../../core/models/task.model';
@@ -17,8 +17,9 @@ export class TaskStoreService {
   private readonly loadingTaskBoardIds = new Set<string>();
   private readonly filterTrigger$ = new Subject<string>();
 
-  private readonly stateSubject = new BehaviorSubject<TaskState>(initialTaskState);
-  readonly state$ = this.stateSubject.asObservable();
+  private readonly stateSignal = signal<TaskState>(initialTaskState);
+
+  readonly state = this.stateSignal.asReadonly();
 
   constructor() {
     this.filterTrigger$
@@ -30,13 +31,14 @@ export class TaskStoreService {
       });
   }
 
-  readonly vm$ = this.state$.pipe(
-    map(state => ({
-      loading: state.loading,
-      saving: state.saving,
-      error: state.error
-    }))
-  );
+  readonly vm = computed(() => {
+    const s = this.stateSignal();
+    return {
+      loading: s.loading,
+      saving: s.saving,
+      error: s.error
+    };
+  });
 
   getTasksInBoard(boardId: string, columns: BoardColumn[] = [], force = false): void {
     if (!boardId?.trim()) {
@@ -204,7 +206,7 @@ export class TaskStoreService {
           this.notificationService.success('Task moved successfully');
         }),
         catchError(() => {
-          this.stateSubject.next(snapshot);
+          this.stateSignal.set(snapshot);
           this.notificationService.error('Failed to move task');
           return of(null);
         })
@@ -406,14 +408,14 @@ export class TaskStoreService {
   }
 
   private patchState(partial: Partial<TaskState>): void {
-    this.stateSubject.next({
-      ...this.getState(),
+    this.stateSignal.update(current => ({
+      ...current,
       ...partial
-    });
+    }));
   }
 
   private getState(): TaskState {
-    return this.stateSubject.getValue();
+    return this.stateSignal();
   }
 
   private normalizeTasks(tasks: (Task & { _id?: string })[]): Task[] {

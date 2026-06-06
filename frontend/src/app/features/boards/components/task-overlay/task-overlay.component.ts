@@ -15,11 +15,9 @@ import { Task } from '../../../../core/models/task.model';
 export class TaskOverlayComponent {
   private readonly elementRef = inject(ElementRef);
 
-  // Read-only parameters passed cleanly from the parent board canvas logic
   task = input<Task | null>(null);
   columnName = input<string>('To Do');
 
-  // Unified communication tracking link event pipeline
   closed = output<void>();
 
   close(): void {
@@ -27,7 +25,7 @@ export class TaskOverlayComponent {
   }
 
   onBackdropClick(event: MouseEvent): void {
-    // If the user clicks exactly on the background overlay backdrop mask element
+
     if (event.target === this.elementRef.nativeElement) {
       this.close();
     }

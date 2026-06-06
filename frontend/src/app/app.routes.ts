@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AppShellComponent } from './core/layout/app-shell/app-shell.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { AcceptInviteComponent } from './features/workspace/components/accept-invite.component';
 
 export const appRoutes: Routes = [
   {
@@ -46,9 +47,18 @@ export const appRoutes: Routes = [
           import('./features/activity/activity.routes').then(m => m.ACTIVITY_ROUTES)
       },
       {
+        path: 'w/:workspaceId/activity',
+        loadChildren: () =>
+          import('./features/activity/activity.routes').then(m => m.ACTIVITY_ROUTES)
+      },
+      {
         path: 'settings',
         loadChildren: () =>
           import('./features/settings/settings.routes').then(m => m.SETTINGS_ROUTES)
+      },
+      {
+        path: 'invite/accept',
+        component: AcceptInviteComponent,
       }
     ]
   },

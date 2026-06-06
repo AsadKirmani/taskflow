@@ -1,120 +1,285 @@
-<nav class="h-full overflow-y-auto bg-stone-50 px-4 py-5 text-stone-600">
-  <div class="mb-5">
-    <h1 class="text-xl font-bold tracking-tight text-stone-900">TaskFlow</h1>
-    <p class="text-xs uppercase tracking-[0.24em] text-stone-400">Organize Your Work</p>
+<nav
+  class="h-full overflow-y-auto bg-stone-50 py-5 text-stone-600 transition-all duration-300"
+  [class.px-4]="!isCollapsed()"
+  [class.px-2]="isCollapsed()"
+>
+  <div class="mb-5 truncate" [class.text-center]="isCollapsed()">
+    @if (!isCollapsed()) {
+      <h1 class="text-xl font-bold tracking-tight text-stone-900">TaskFlow</h1>
+      <p class="text-xs uppercase tracking-[0.24em] text-stone-400">Organize Your Work</p>
+    } @else {
+      <span class="text-xl font-extrabold text-stone-900 tracking-tighter">TF</span>
+    }
   </div>
 
   <div class="space-y-1 border-t border-stone-200 pt-3">
     <a
       #dashboardRla="routerLinkActive"
-      class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-stone-200 hover:text-stone-900 [&[active]]:bg-stone-900 [&[active]]:text-white"
-      [attr.active]="dashboardRla.isActive ? '' : null"
+      [class]="
+        dashboardRla.isActive
+          ? 'bg-stone-900 text-white'
+          : 'text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+      "
+      class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
+      [class.px-3]="!isCollapsed()"
+      [class.justify-center]="isCollapsed()"
       routerLink="/dashboard"
-      routerLinkActive
+      routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
       (click)="navigate.emit()"
+      [title]="isCollapsed() ? 'Dashboard' : ''"
     >
-      <mat-icon>dashboard</mat-icon>
-      <span>Dashboard</span>
+      <svg
+        class="w-5 h-5 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V16zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V16z"
+        />
+      </svg>
+      @if (!isCollapsed()) {
+        <span>Dashboard</span>
+      }
     </a>
 
     <a
       #boardsRla="routerLinkActive"
-      class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-stone-200 hover:text-stone-900 [&[active]]:bg-stone-900 [&[active]]:text-white"
-      [attr.active]="boardsRla.isActive ? '' : null"
+      [class]="
+        boardsRla.isActive
+          ? 'bg-stone-900 text-white'
+          : 'text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+      "
+      class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
+      [class.px-3]="!isCollapsed()"
+      [class.justify-center]="isCollapsed()"
       routerLink="/boards"
-      routerLinkActive
+      routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
       (click)="navigate.emit()"
+      [title]="isCollapsed() ? 'Boards' : ''"
     >
-      <mat-icon>view_kanban</mat-icon>
-      <span>Boards</span>
+      <svg
+        class="w-5 h-5 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+        />
+      </svg>
+      @if (!isCollapsed()) {
+        <span>Boards</span>
+      }
     </a>
 
     <a
       #activityRla="routerLinkActive"
-      class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-stone-200 hover:text-stone-900 [&[active]]:bg-stone-900 [&[active]]:text-white"
-      [attr.active]="activityRla.isActive ? '' : null"
+      [class]="
+        activityRla.isActive
+          ? 'bg-stone-900 text-white'
+          : 'text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+      "
+      class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
+      [class.px-3]="!isCollapsed()"
+      [class.justify-center]="isCollapsed()"
       routerLink="/activity"
-      routerLinkActive
+      routerLinkActive="active"
       (click)="navigate.emit()"
+      [title]="isCollapsed() ? 'Activity' : ''"
     >
-      <mat-icon>history</mat-icon>
-      <span>Activity</span>
+      <svg
+        class="w-5 h-5 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      @if (!isCollapsed()) {
+        <span>Activity</span>
+      }
     </a>
 
     <a
       #settingsRla="routerLinkActive"
-      class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-stone-200 hover:text-stone-900 [&[active]]:bg-stone-900 [&[active]]:text-white"
-      [attr.active]="settingsRla.isActive ? '' : null"
+      [class]="
+        settingsRla.isActive
+          ? 'bg-stone-900 text-white'
+          : 'text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+      "
+      class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
+      [class.px-3]="!isCollapsed()"
+      [class.justify-center]="isCollapsed()"
       routerLink="/settings"
-      routerLinkActive
+      routerLinkActive="active"
       (click)="navigate.emit()"
+      [title]="isCollapsed() ? 'Settings' : ''"
     >
-      <mat-icon>settings</mat-icon>
-      <span>Settings</span>
+      <svg
+        class="w-5 h-5 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+        />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      @if (!isCollapsed()) {
+        <span>Settings</span>
+      }
     </a>
   </div>
 
   <section class="mt-6 border-t border-stone-200 pt-4">
-    <p class="mb-3 px-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-400">Workspaces</p>
+    @if (!isCollapsed()) {
+      <p class="mb-3 px-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-400">
+        Workspaces
+      </p>
+    } @else {
+      <div class="text-center mb-3 text-xs font-bold text-stone-400">W</div>
+    }
 
-    <div class="space-y-2" *ngIf="workspaces$ | async as workspaces">
-      <article
-        *ngFor="let workspace of workspaces"
-        class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
-      >
-        <button
-          type="button"
-          class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left transition-colors hover:bg-stone-100"
-          (click)="toggleWorkspace(workspace.id)"
+    <div class="space-y-2">
+      @for (workspace of workspaceStore.workspaces(); track workspace.id) {
+        <article
+          class="overflow-hidden bg-white border border-stone-200"
+          [class.rounded-2xl]="!isCollapsed()"
+          [class.rounded-full]="isCollapsed()"
         >
-          <span class="flex min-w-0 items-center gap-3">
-            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold uppercase text-white">
-              {{ workspace.name | slice:0:1 }}
+          <button
+            type="button"
+            class="flex w-full items-center gap-3 text-left transition-colors hover:bg-stone-100"
+            [class.justify-between]="!isCollapsed()"
+            [class.justify-center]="isCollapsed()"
+            [class.px-3]="!isCollapsed()"
+            [class.py-3]="!isCollapsed()"
+            [class.p-2]="isCollapsed()"
+            (click)="toggleWorkspace(workspace.id)"
+            [title]="workspace.name"
+          >
+            <span class="flex items-center gap-3 min-w-0">
+              <span
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold uppercase text-white shadow-sm"
+              >
+                {{ workspace.name[0] }}
+              </span>
+              @if (!isCollapsed()) {
+                <span class="min-w-0">
+                  <span class="block truncate text-sm font-semibold text-stone-900">{{
+                    workspace.name
+                  }}</span>
+                  <span class="block truncate text-xs text-stone-400">{{ workspace.slug }}</span>
+                </span>
+              }
             </span>
-            <span class="min-w-0">
-              <span class="block truncate text-sm font-semibold text-stone-900">{{ workspace.name }}</span>
-              <span class="block truncate text-xs text-stone-400">{{ workspace.slug }}</span>
-            </span>
-          </span>
-          <mat-icon class="text-stone-400 transition-transform" [class.rotate-180]="isWorkspaceOpen(workspace.id)">
-            expand_more
-          </mat-icon>
-        </button>
 
-        <div *ngIf="isWorkspaceOpen(workspace.id)" class="border-t border-stone-100 bg-stone-50 px-2 py-2">
-          <a
-            class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-white hover:text-stone-900"
-            [routerLink]="['/w', workspace.id, 'boards']"
-            routerLinkActive
-            (click)="navigate.emit()"
-          >
-            <mat-icon>view_kanban</mat-icon>
-            <span>Boards</span>
-          </a>
-          <a
-            class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-white hover:text-stone-900"
-            [routerLink]="['/workspaces/activity', workspace.id, workspace.slug]"
-            routerLinkActive
-            (click)="navigate.emit()"
-          >
-            <mat-icon>history</mat-icon>
-            <span>Activity</span>
-          </a>
-          <a
-            class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-white hover:text-stone-900"
-            [routerLink]="['/workspaces/settings', workspace.id, workspace.slug]"
-            routerLinkActive
-            (click)="navigate.emit()"
-          >
-            <mat-icon>settings</mat-icon>
-            <span>Settings</span>
-          </a>
-        </div>
-      </article>
+            @if (!isCollapsed()) {
+              <svg
+                class="w-5 h-5 text-stone-400 transition-transform duration-200"
+                [class.rotate-180]="isWorkspaceOpen(workspace.id)"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            }
+          </button>
 
-      <p *ngIf="workspaces.length === 0" class="px-2 text-sm text-stone-400">No workspaces yet.</p>
+          @if (!isCollapsed() && isWorkspaceOpen(workspace.id)) {
+            <div class="border-t border-stone-100 bg-stone-50 px-2 py-2.5 space-y-1">
+              <a
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-stone-600 hover:bg-white hover:text-stone-900"
+                [routerLink]="['/w', workspace.id, 'boards']"
+                (click)="navigate.emit()"
+                routerLinkActive="bg-white text-stone-900 font-semibold shadow-sm"
+              >
+                <svg
+                  class="w-4 h-4 text-stone-400"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+                  />
+                </svg>
+                <span>Boards</span>
+              </a>
+              <a
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-stone-600 hover:bg-white hover:text-stone-900"
+                [routerLink]="['/w', workspace.id, 'activity']"
+                (click)="navigate.emit()"
+                routerLinkActive="bg-white text-stone-900 font-semibold shadow-sm"
+              >
+                <svg
+                  class="w-4 h-4 text-stone-400"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <span>Activity</span>
+              </a>
+              <a
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-stone-600 hover:bg-white hover:text-stone-900"
+                [routerLink]="['/w', workspace.id, 'settings']"
+                (click)="navigate.emit()"
+                routerLinkActive="bg-white text-stone-900 font-semibold shadow-sm"
+              >
+                <svg
+                  class="w-4 h-4 text-stone-400"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span>Settings</span>
+              </a>
+            </div>
+          }
+        </article>
+      }
     </div>
   </section>
 </nav>
