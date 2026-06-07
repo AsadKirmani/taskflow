@@ -1,9 +1,9 @@
 @if (vm$ | async; as vm) {
   <section
-    class="dashboard-page flex flex-col bg-base-100 rounded-box gap-5 overflow-y-auto max-h-[calc(85vh)] p-2 sm:p-4"
+    class="dashboard-page flex flex-col bg-base-100 rounded-box gap-2 overflow-y-auto max-h-[calc(85vh)] p-top-0"
   >
     <div
-      class="header bg-base-200 w-full text-base-content sticky top-0 z-10 p-5 rounded-box flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border border-base-300 shadow-sm"
+      class="header bg-base-200 w-full text-base-content sticky top-0 z-1 p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-300"
     >
       <div>
         <h1 class="text-2xl font-bold mb-1">Dashboard</h1>
@@ -18,9 +18,12 @@
         </a>
         <a
           routerLink="/workspaces"
-          class="bg-base-300 text-base-content px-4 py-2.5 rounded-field hover:bg-base-content/10 flex items-center gap-2 text-sm font-semibold transition-all"
+          class="bg-base-content/10 hover:bg-base-content/20 text-base-content px-4 py-2.5 rounded-field flex items-center gap-2 text-sm font-semibold transition-all"
         >
-          <mat-icon class="scale-90">person_add</mat-icon> Invite Member
+          <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+</svg>
+ Invite Member
         </a>
       </div>
     </div>
@@ -30,15 +33,19 @@
     } @else if (vm.error) {
       <p class="rounded-box bg-error/10 p-4 text-sm font-medium text-error shadow-sm border border-error/20">{{ vm.error }}</p>
     }
-
-    <div class="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-      <div class="card p-5 bg-base-200 shadow-sm rounded-box border border-base-300 hover:border-info/50 transition-all">
+  <div class="rounded-b-box bg-base-200 p-4 text-sm font-medium text-base-content/70 shadow-sm border border-base-300">
+    <div class="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 p-3">
+      <div class="card p-5 bg-base-content/5 rounded-box border border-base-300 hover:border-info/50 transition-all">
         <div class="card-header flex gap-3 pb-3 items-center justify-between text-center">
           <h2 class="card-title font-bold text-base-content">Tasks Due Today</h2>
           <span
-            class="card-icon text-info bg-base-100 shadow-sm rounded-box flex items-center justify-center w-10 h-10 border border-base-300"
-            ><mat-icon>pending</mat-icon></span
+          class="card-icon text-info bg-base-100 shadow-sm rounded-box flex items-center justify-center w-10 h-10 border border-base-300"
           >
+         <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+</svg>
+
+        </span>
         </div>
         <div class="card-body">
           <p class="text-4xl font-extrabold text-base-content mb-1">{{ vm.tasksDueToday }}</p>
@@ -46,13 +53,16 @@
         </div>
       </div>
 
-      <div class="card p-5 bg-base-200 shadow-sm rounded-box border border-base-300 hover:border-error/50 transition-all">
+      <div class="card p-5 bg-base-content/5 rounded-box border border-base-300 hover:border-error/50 transition-all">
         <div class="card-header flex gap-2 pb-3 items-center justify-between text-center">
           <h2 class="card-title font-bold text-base-content">Overdue Tasks</h2>
           <span
             class="card-icon text-error bg-base-100 shadow-sm rounded-box flex items-center justify-center w-10 h-10 border border-base-300"
-            ><mat-icon>assignment_late</mat-icon></span
-          >
+            >
+           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-hourglass-bottom" viewBox="0 0 16 16">
+  <path d="M2 1.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1-.5-.5m2.5.5v1a3.5 3.5 0 0 0 1.989 3.158c.533.256 1.011.791 1.011 1.491v.702s.18.149.5.149.5-.15.5-.15v-.7c0-.701.478-1.236 1.011-1.492A3.5 3.5 0 0 0 11.5 3V2z"/>
+</svg>
+            </span>
         </div>
         <div class="card-body">
           <p class="text-4xl font-extrabold text-base-content mb-1">{{ vm.overdueTasks }}</p>
@@ -60,13 +70,17 @@
         </div>
       </div>
 
-      <div class="card p-5 bg-base-200 shadow-sm rounded-box border border-base-300 hover:border-warning/50 transition-all">
+      <div class="card p-5 bg-base-content/5 rounded-box border border-base-300 hover:border-warning/50 transition-all">
         <div class="card-header flex gap-2 pb-3 text-center items-center justify-between">
           <h2 class="card-title font-bold text-base-content">Active Boards</h2>
           <span
-            class="card-icon text-warning bg-base-100 shadow-sm rounded-box flex items-center justify-center w-10 h-10 border border-base-300"
-            ><mat-icon>view_kanban</mat-icon></span
+          class="card-icon text-warning bg-base-100 shadow-sm rounded-box flex items-center justify-center w-10 h-10 border border-base-300"
           >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-kanban" viewBox="0 0 16 16">
+  <path d="M13.5 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm-11-1a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+  <path d="M6.5 3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1zm-4 0a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1zm8 0a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1z"/>
+</svg>
+        </span>
         </div>
         <div class="card-body items-center">
           <p class="text-4xl font-extrabold text-base-content mb-1">{{ vm.activeBoards }}</p>
@@ -74,13 +88,17 @@
         </div>
       </div>
 
-      <div class="card p-5 bg-base-200 shadow-sm rounded-box border border-base-300 hover:border-success/50 transition-all">
+      <div class="card p-5 bg-base-content/5 rounded-box border border-base-300 hover:border-success/50 transition-all">
         <div class="card-header flex gap-2 pb-3 text-center items-center justify-between">
           <h2 class="card-title font-bold text-base-content">Completed Tasks</h2>
           <span
             class="card-icon text-success bg-base-100 shadow-sm rounded-box flex items-center justify-center w-10 h-10 border border-base-300"
-            ><mat-icon>check_circle</mat-icon></span
-          >
+            >
+           <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+</svg>
+
+            </span>
         </div>
         <div class="card-body items-center">
           <p class="text-4xl font-extrabold text-base-content mb-1">{{ vm.completedTasks }}</p>
@@ -88,8 +106,8 @@
         </div>
       </div>
     </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-2">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-2 p-3">
       <div class="task-table col-span-2 flex flex-col gap-3">
         <div class="table-header flex items-center justify-between px-1">
           <h2 class="text-xl font-extrabold text-base-content">My Tasks</h2>
@@ -115,9 +133,9 @@
                     <tr class="hover:bg-base-300/30 transition-colors group">
                       <td class="p-4 flex items-center gap-3 text-sm font-semibold text-base-content">
                         <span
-                          class="status-indicator w-2.5 h-2.5 rounded-full inline-block shrink-0 shadow-sm"
-                          [class.bg-success]="task.isCompleted"
-                          [class.bg-primary]="!task.isCompleted"
+                        class="status-indicator w-2.5 h-2.5 rounded-full inline-block shrink-0 shadow-sm"
+                        [class.bg-success]="task.isCompleted"
+                        [class.bg-primary]="!task.isCompleted"
                         ></span>
                         {{ task.title }}
                       </td>
@@ -133,11 +151,14 @@
                       </td>
                       <td class="p-4 text-sm">
                         <a
-                          class="text-primary hover:text-primary/80 flex items-center gap-1.5 font-bold transition-all group-hover:underline"
-                          [routerLink]="getBoardRoute(task.boardId, task.boardName)"
-                          [queryParams]="getTaskQueryParams(task)"
+                        class="text-primary hover:text-primary/80 flex items-center gap-1.5 font-bold transition-all group-hover:underline"
+                        [routerLink]="getBoardRoute(task.boardId, task.boardName)"
+                        [queryParams]="getTaskQueryParams(task)"
                         >
-                          <mat-icon class="scale-75">open_in_new</mat-icon> Open
+                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 14v4.833A1.166 1.166 0 0 1 16.833 20H5.167A1.167 1.167 0 0 1 4 18.833V7.167A1.166 1.166 0 0 1 5.167 6h4.618m4.447-2H20v5.768m-7.889 2.121 7.778-7.778"/>
+</svg>
+ Open
                         </a>
                       </td>
                     </tr>
@@ -162,7 +183,7 @@
                 <li class="flex items-start justify-between gap-4 p-4 hover:bg-base-300/30 transition-colors">
                   <div class="flex items-start gap-3 min-w-0">
                     <span
-                      class="activity-icon bg-primary w-2 h-2 mt-1.5 rounded-full inline-block shrink-0 shadow-sm"
+                    class="activity-icon bg-primary w-2 h-2 mt-1.5 rounded-full inline-block shrink-0 shadow-sm"
                     ></span>
                     <span class="truncate text-sm font-medium text-base-content">{{ describeActivity(item) }}</span>
                   </div>
@@ -176,5 +197,6 @@
         </div>
       </div>
     </div>
+  </div>
   </section>
 }

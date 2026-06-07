@@ -8,33 +8,58 @@ import { AuthStoreService } from '../../data-access/auth-store.service';
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   template: `
-    <section class="auth-page">
-      <h1>Create account</h1>
+    <section class="flex items-center justify-center mx-auto h-screen bg-base-200">
+  <div class="p-8 bg-base-100 rounded-box shadow-xl border border-base-300 w-full max-w-md">
+    <h1 class="text-2xl font-extrabold text-base-content mb-6">Create account</h1>
 
-      <form [formGroup]="form" (ngSubmit)="submit()">
-        <div>
-          <label for="name">Name</label>
-          <input id="name" type="text" formControlName="name" />
-        </div>
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="mb-5">
+        <label for="name" class="block mb-1.5 text-sm font-semibold text-base-content/90">Name</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          class="w-full p-field border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all"
+          placeholder="John Doe"
+        />
+      </div>
 
-        <div>
-          <label for="email">Email</label>
-          <input id="email" type="email" formControlName="email" />
-        </div>
+      <div class="mb-5">
+        <label for="email" class="block mb-1.5 text-sm font-semibold text-base-content/90">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="w-full p-field border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all"
+          placeholder="name@email.com"
+        />
+      </div>
 
-        <div>
-          <label for="password">Password</label>
-          <input id="password" type="password" formControlName="password" />
-        </div>
+      <div class="mb-6">
+        <label for="password" class="block mb-1.5 text-sm font-semibold text-base-content/90">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="w-full p-field border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all"
+          placeholder="••••••••"
+        />
+      </div>
 
-        <button type="submit">Register</button>
-      </form>
+      <button
+        type="submit"
+        class="w-full p-field rounded-field bg-primary text-primary-content font-bold cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 border-none"
+      >
+        Register
+      </button>
+    </form>
 
-      <p>
-        Already have an account?
-        <a routerLink="/auth/login">Login</a>
-      </p>
-    </section>
+    <p class="mt-6 text-sm text-center text-base-content/70">
+      Already have an account?
+      <a routerLink="/auth/login" class="text-primary font-semibold hover:underline transition-colors">Login</a>
+    </p>
+  </div>
+</section>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

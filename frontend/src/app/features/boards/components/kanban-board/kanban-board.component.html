@@ -1,175 +1,274 @@
 <section class="kanban-board h-full min-h-0 flex flex-col">
-  <header class="kanban-board__header mb-1 bg-white p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-    <div class="flex items-center gap-2 min-w-0">
-      <h1 class="text-lg sm:text-2xl font-bold truncate">{{ board?.name }}</h1>
+  <header
+    class="kanban-board__header mb-1 bg-base-200 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+  >
+    <div class="flex items-center gap-2 min-w-0 text-base-content">
+      <h1 class="text-lg sm:text-2xl font-bold truncate m-0">{{ board?.name }}</h1>
+    </div>
+    <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
+      <img
+        src="https://i.pravatar.cc/40?img=1"
+        alt="User Avatar"
+        class="rounded-full w-7 h-7 sm:w-8 sm:h-8"
+      />
+      <button
+        type="button"
+        class="filter-button sm:ml-4 text-base-content p-2 rounded-box transition-colors border-none cursor-pointer flex items-center justify-center"
+        [class.bg-base-content/30]="isFilterOpen"
+        [class.hover:bg-base-300]="isFilterOpen"
+        [class.hover:bg-base-100]="!isFilterOpen"
+        [attr.aria-pressed]="isFilterOpen"
+        (click)="toggleFilterView($event)"
+      >
+        <svg
+          class="w-6 h-6"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-width="2"
+            d="M18.796 4H5.204a1 1 0 0 0-.753 1.659l5.302 6.058a1 1 0 0 1 .247.659v4.874a.5.5 0 0 0 .2.4l3 2.25a.5.5 0 0 0 .8-.4v-7.124a1 1 0 0 1 .247-.659l5.302-6.059c.566-.646.106-1.658-.753-1.658Z"
+          />
+        </svg>
+      </button>
+      <button
+        class="star-button p-2 rounded-box hover:bg-base-100 border-none cursor-pointer flex items-center justify-center text-base-content"
+      >
+        <svg
+          class="w-6 h-6"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-width="2"
+            d="M11.083 5.104c.35-.8 1.485-.8 1.834 0l1.752 4.022a1 1 0 0 0 .84.597l4.463.342c.9.069 1.255 1.2.556 1.771l-3.33 2.723a1 1 0 0 0-.337 1.016l1.03 4.119c.214.858-.71 1.552-1.474 1.106l-3.913-2.281a1 1 0 0 0-1.008 0L7.583 20.8c-.764.446-1.688-.248-1.474-1.106l1.03-4.119A1 1 0 0 0 6.8 14.56l-3.33-2.723c-.698-.571-.342-1.702.557-1.771l4.462-.342a1 1 0 0 0 .84-.597l1.753-4.022Z"
+          />
+        </svg>
+      </button>
+      <button
+        class="visibility-button p-2 rounded-box hover:bg-base-100 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
+      >
+        <svg
+          class="w-6 h-6"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-width="2"
+            d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"
+          />
+          <path stroke="currentColor" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+      </button>
+      <button
+        class="share-button p-2 rounded=box hover:bg-base-100 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
+      >
+        <svg
+          class="w-6 h-6"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-width="2"
+            d="M7.926 10.898 15 7.727m-7.074 5.39L15 16.29M8 12a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm12 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm0-11a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+          />
+        </svg>
+      </button>
+      <button
+        class="more-button p-2 rounded-box hover:bg-base-100 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
+      >
+        <svg
+          class="w-6 h-6"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-width="2"
+            d="M6 12h.01m6 0h.01m5.99 0h.01"
+          />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  @if (isFilterOpen) {
+    <app-apply-filter
+      [(isOpen)]="isFilterOpen"
+      (filtersChanged)="onFiltersChanged($event)"
+    ></app-apply-filter>
+  }
+
+  <div
+    class="kanban-board__columns flex-1 min-h-0 overflow-x-auto overflow-y-hidden flex items-start bg-base-200 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
+
+  >
+   @for (column of columns; track column.id; let i = $index) {
+      <app-kanban-column
+        [columnIndex]="i"
+        [column]="column"
+        [tasks]="tasksByColumn[column.id] ?? []"
+        [hasActiveFilters]="hasActiveFilters"
+        (nativeTaskDrop)="onTaskDropNative($event)"
+        (nativeColumnDrop)="onColumnDropNative($event)"
+        (taskAdded)="submitTaskInput(column.id, $event)"
+        (taskUpdated)="taskUpdated.emit($event)"
+        (taskCompletionToggled)="taskCompletionToggled.emit({taskId: $event.id, isCompleted: !$event.isCompleted})"
+        (taskClicked)="openTaskOverlay($event)"
+      ></app-kanban-column>
+    }
+
+    <div
+      class="bg-base-100 w-[85vw] sm:w-52 flex-shrink-0 hover:bg-base-300 p-2 rounded-xl text-gray-600 shadow transition-colors"
+    >
+      @if (!isColumnInputOpen) {
+        <button
+          type="button"
+          class="add-column__button w-full text-center border-none bg-transparent cursor-pointer font-medium p-2"
+          (click)="openColumnInput()"
+        >
+          Add Column
+        </button>
+      } @else {
+        <div class="flex flex-col gap-2">
+          <input
+            type="text"
+            class="add-column__input p-2 shadow rounded-lg w-full h-12 outline-none ring-1 ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+            placeholder="Column title..."
+            [value]="columnInputValue"
+            (input)="onColumnInputChange($event)"
+            (keydown.enter)="submitColumnInput()"
+            (keydown.escape)="closeColumnInput()"
+            autofocus
+          />
+          <div class="flex items-center justify-end gap-2">
+            <button
+              type="button"
+              class="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 border-none cursor-pointer text-gray-800"
+              (click)="closeColumnInput()"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="text-xs px-2 py-1 rounded bg-blue-500 text-white hover:bg-blue-600 border-none cursor-pointer"
+              (click)="submitColumnInput()"
+            >
+              Add Column
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+@if (activeTaskOverlay; as selectedTask) {
+  <app-task-overlay [task]="selectedTask" [columnName]="'Today'" (closed)="closeTaskOverlay()">
+  </app-task-overlay>
+}
+<!-- 
+<section class="kanban-board h-full min-h-0 flex flex-col">
+  <header class="kanban-board__header mb-1 bg-base-200 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div class="flex items-center gap-2 min-w-0 text-base-content">
+      <h1 class="text-lg sm:text-2xl font-bold truncate m-0">{{ board?.name }}</h1>
     </div>
     <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
       <img src="https://i.pravatar.cc/40?img=1" alt="User Avatar" class="rounded-full w-7 h-7 sm:w-8 sm:h-8">
       <button
-      type="button"
-      class="filter-button sm:ml-4 p-2 rounded transition-colors"
-      [class.bg-blue-100]="isFilterOpen"
-      [class.text-blue-700]="isFilterOpen"
-      [class.hover:bg-blue-200]="isFilterOpen"
-      [class.hover:bg-gray-100]="!isFilterOpen"
-      [attr.aria-pressed]="isFilterOpen"
-      (click)="toggleFilterView($event)"
+        type="button"
+        class="filter-button sm:ml-4 p-2 rounded transition-colors border-none cursor-pointer flex items-center justify-center"
+        [class.bg-blue-100]="isFilterOpen"
+        [class.text-blue-700]="isFilterOpen"
+        [class.hover:bg-blue-200]="isFilterOpen"
+        [class.hover:bg-gray-100]="!isFilterOpen"
+        (click)="toggleFilterView($event)"
       >
-      <mat-icon>filter_list</mat-icon>
-    </button>
-    <button class="star-button p-2 rounded hover:bg-gray-100">
-      <mat-icon>star_border</mat-icon>
-    </button>
-    <button class="visibility-button p-2 rounded hover:bg-gray-100">
-      <mat-icon>visibility</mat-icon>
-    </button>
-    <button class="share-button p-2 rounded hover:bg-gray-100">
-      <mat-icon>share</mat-icon>
-    </button>
-    <button class="more-button p-2 rounded hover:bg-gray-100">
-      <mat-icon>more_horiz</mat-icon>
-    </button>
-  </div>
-</header>
+        <mat-icon>filter_list</mat-icon>
+      </button>
+      <button class="star-button p-2 rounded hover:bg-gray-100 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content/70"><mat-icon>star_border</mat-icon></button>
+      <button class="visibility-button p-2 rounded hover:bg-gray-100 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content/70"><mat-icon>visibility</mat-icon></button>
+      <button class="share-button p-2 rounded hover:bg-gray-100 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content/70"><mat-icon>share</mat-icon></button>
+      <button class="more-button p-2 rounded hover:bg-gray-100 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content/70"><mat-icon>more_horiz</mat-icon></button>
+    </div>
+  </header>
+
   @if (isFilterOpen) {
     <app-apply-filter [(isOpen)]="isFilterOpen" (filtersChanged)="onFiltersChanged($event)"></app-apply-filter>
   }
-      <div
-        class="kanban-board__columns flex-1 min-h-0 overflow-x-auto overflow-y-hidden flex items-start bg-white p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
-        cdkDropList
-        cdkDropListOrientation="horizontal"
-        [cdkDropListData]="columns"
-        (cdkDropListDropped)="onColumnDrop($event)"
-      >
-        @for (column of columns; track column.id) {
-          <section class="kanban-column self-start bg-gray-100 p-2 w-[85vw] sm:w-64 rounded-xl shadow" cdkDrag [cdkDragData]="column" [cdkDragStartDelay]="dragStartDelay">
-          <div class="flex items-center justify-between p-2">
-            <header class="kanban-column__header" cdkDragHandle>
-              <h3>{{ column.name }}</h3>
-            </header>
-            <mat-icon class="">more_horiz</mat-icon>
+
+  <div class="kanban-board__columns flex-1 min-h-0 overflow-x-auto overflow-y-hidden flex items-start bg-base-200 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl relative">
+    @for (column of columns; track column.id; let i = $index) {
+      <app-kanban-column
+        [columnIndex]="i"
+        [column]="column"
+        [tasks]="tasksByColumn[column.id] ?? []"
+        [hasActiveFilters]="hasActiveFilters"
+        (nativeTaskDrop)="onTaskDropNative($event)"
+        (nativeColumnDrop)="onColumnDropNative($event)"
+        (taskAdded)="submitTaskInput(column.id, $event)"
+        (taskUpdated)="taskUpdated.emit($event)"
+        (taskCompletionToggled)="taskCompletionToggled.emit({taskId: $event.id, isCompleted: !$event.isCompleted})"
+        (taskClicked)="openTaskOverlay($event)"
+      ></app-kanban-column>
+    }
+
+    <div class="bg-base-100 w-[85vw] sm:w-52 flex-shrink-0 hover:bg-base-300 p-2 rounded-xl text-gray-600 shadow transition-colors">
+      @if (!isColumnInputOpen) {
+        <button type="button" class="add-column__button w-full text-center border-none bg-transparent cursor-pointer font-medium p-2" (click)="openColumnInput()">Add Column</button>
+      } @else {
+        <div class="flex flex-col gap-2">
+          <input
+            type="text"
+            class="add-column__input p-2 shadow rounded-lg w-full h-12 outline-none ring-1 ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+            placeholder="Column title..."
+            [value]="columnInputValue"
+            (input)="onColumnInputChange($event)"
+            (keydown.enter)="submitColumnInput()"
+            (keydown.escape)="closeColumnInput()"
+            autofocus
+          />
+          <div class="flex items-center justify-end gap-2">
+            <button type="button" class="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 border-none cursor-pointer text-gray-800" (click)="closeColumnInput()">Cancel</button>
+            <button type="button" class="text-xs px-2 py-1 rounded bg-blue-500 text-white hover:bg-blue-600 border-none cursor-pointer" (click)="submitColumnInput()">Add Column</button>
           </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
 
-            <div
-            cdkDropList
-            [id]="column.id"
-            [cdkDropListData]="tasksByColumn[column.id] ?? []"
-            [cdkDropListConnectedTo]="connectedDropListIds"
-            class="kanban-column__task-list"
-            (cdkDropListDropped)="onTaskDrop($event, column.id)">
-              @for (task of tasksByColumn[column.id] ?? []; track task.id) {
-                <article class="task-card shadow rounded-lg text-start p-2 bg-white mb-2 group cursor-pointer transition-shadow hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 hover:ring-offset-white" cdkDrag [cdkDragData]="task" [cdkDragStartDelay]="dragStartDelay" (click)="openTaskOverlay(task, $event)">
-                  @if (activeEditTaskId !== task.id) {
-                    <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center justify-start gap-1">
-                            <button type="button" class="task-card__mark-complete-button opacity-0 group-hover:opacity-100 transition-opacity" (click)="toggleTaskCompletion(task, $event)">
-                                <mat-icon [class.text-green-600]="task.isCompleted">{{ task.isCompleted ? 'check_circle' : 'circle' }}</mat-icon>
-                            </button>
-                            <h4 class="task-card__title group-hover:translate-x-1 translate-x-[-20px] transition-transform transition-all duration-300" [class.line-through]="task.isCompleted">{{ task.title }}</h4>
-                        </div>
-                      <button
-                        type="button"
-                        class="task-card__button opacity-0 group-hover:opacity-100 transition-opacity"
-                        (click)="startTaskEdit(task, $event)">
-                        <mat-icon>edit</mat-icon>
-                      </button>
-                    </div>
-                  } @else {
-                    <div class="flex flex-col gap-2">
-                      <input
-                        type="text"
-                        class="p-1 shadow rounded-lg w-full h-10 outline-none ring-1 ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        [value]="editTaskTitle"
-                        (input)="onEditTaskTitleChange($any($event.target).value)"
-                        (keydown.enter)="submitTaskEdit(task)"
-                        (keydown.escape)="cancelTaskEdit()"
-                      />
-                      <div class="flex items-center justify-end gap-2">
-                        <button type="button" class="text-xs px-2 py-1 rounded bg-gray-200 hover:bg-gray-300" (click)="cancelTaskEdit()">Cancel</button>
-                        <button type="button" class="text-xs px-2 py-1 rounded bg-blue-500 text-white hover:bg-blue-600" (click)="submitTaskEdit(task)">Save</button>
-                      </div>
-                    </div>
-                  }
-                </article>
-              }
-            </div>
-
-            <div
-              class="add-task p-1 rounded cursor-pointer flex items-center justify-start gap-1 text-gray-600">
-                @if (!isTaskInputOpen(column.id)) {
-                  <button class="add-task__button" (click)="openTaskInput(column.id)">+ Add a task</button>
-                } @else {
-                  <input
-                    type="text"
-                    class="add-task__input p-1 shadow rounded-lg w-full h-12 outline-none ring-1 ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    placeholder="Task title..."
-                    [value]="taskInputValues[column.id] ?? ''"
-                    (input)="onTaskInputChange(column.id, $any($event.target).value)"
-                    (blur)="closeTaskInput(column.id)"
-                    (keydown.enter)="submitTaskInput(column.id)"
-                    (keydown.escape)="closeTaskInput(column.id)"
-                  />
-                }
-              </div>
-              </section>
-              }
-              <div class="bg-gray-200 w-[85vw] sm:w-64 flex-shrink-0 hover:bg-gray-300 p-2 rounded text-gray-600">
-                @if (!isColumnInputOpen) {
-                  <button type="button" class="add-column__button w-full text-left" (click)="openColumnInput()">+ Add Column</button>
-                } @else {
-                  <div class="flex flex-col gap-2">
-                    <input
-                      type="text"
-                      class="add-column__input p-2 shadow rounded-lg w-full h-12 outline-none ring-1 ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
-                      placeholder="Column title..."
-                      [value]="columnInputValue"
-                      (input)="onColumnInputChange($any($event.target).value)"
-                      (keydown.enter)="submitColumnInput()"
-                      (keydown.escape)="closeColumnInput()"
-                    />
-                    <div class="flex items-center justify-end gap-2">
-                      <button type="button" class="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200" (click)="closeColumnInput()">Cancel</button>
-                      <button type="button" class="text-xs px-2 py-1 rounded bg-blue-500 text-white hover:bg-blue-600" (click)="submitColumnInput()">Add Column</button>
-                    </div>
-                  </div>
-                }
-              </div>
-      </div>
-    </section>
-
-    @if (activeTaskOverlay; as selectedTask) {
-      <!-- <div class="fixed inset-0 z-40 bg-black/40" (click)="closeTaskOverlay($event)"></div>
-      <section class="fixed z-50 inset-0 flex items-center justify-center p-4" (click)="closeTaskOverlay($event)">
-        <article class="w-full max-w-2xl rounded-xl bg-white shadow-2xl border border-gray-200" (click)="$event.stopPropagation()">
-          <header class="flex items-center justify-between border-b border-gray-200 p-4">
-            <h2 class="text-lg font-semibold text-gray-900">{{ selectedTask.title }}</h2>
-            <button type="button" class="p-1 rounded hover:bg-gray-100" (click)="closeTaskOverlay($event)">
-              <mat-icon>close</mat-icon>
-            </button>
-          </header>
-          <div class="p-4 space-y-3 text-sm text-gray-700 max-h-[70vh] overflow-auto">
-            <p>
-              <span class="font-medium">Description:</span>
-              {{ selectedTask.description || 'No description' }}
-            </p>
-            <p>
-              <span class="font-medium">Priority:</span>
-              {{ selectedTask.priority }}
-            </p>
-            <p>
-              <span class="font-medium">Status:</span>
-              {{ selectedTask.isCompleted ? 'Completed' : 'In Progress' }}
-            </p>
-            <p>
-              <span class="font-medium">Due Date:</span>
-              {{ selectedTask.dueDate || 'No due date' }}
-            </p>
-          </div>
-        </article>
-      </section> -->
-    <app-task-overlay 
-    [task]="activeTaskOverlay" 
+@if (activeTaskOverlay; as selectedTask) {
+  <app-task-overlay 
+    [task]="selectedTask" 
     [columnName]="'Today'" 
     (closed)="closeTaskOverlay()">
   </app-task-overlay>
-    }
+} -->

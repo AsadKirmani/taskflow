@@ -1,27 +1,34 @@
-import { inject, Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Injectable, signal } from '@angular/core';
 
-@Injectable({ providedIn: 'root' })
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
+
+export interface Toast {
+  id: string;
+  message: string;
+  type: ToastType;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
 export class NotificationService {
-  private readonly snackBar = inject(MatSnackBar);
+  toasts = signal<Toast[]>([]);
 
-  success(message: string): void {
-    this.snackBar.open(message, 'Close', {
-      duration: 3000,
-      panelClass: ['snackbar-success']
-    });
+  show(message: string, type: ToastType = 'info', duration = 3000) {
+    const id = Math.random().toString(36).substring(2, 9);
+    this.toasts.update(currentToasts => [...currentToasts, { id, message, type }]);
+
+    setTimeout(() => {
+      this.remove(id);
+    }, duration);
   }
 
-  error(message: string): void {
-    this.snackBar.open(message, 'Close', {
-      duration: 5000,
-      panelClass: ['snackbar-error']
-    });
-  }
+  success(message: string, duration?: number) { this.show(message, 'success', duration); }
+  error(message: string, duration?: number) { this.show(message, 'error', duration); }
+  info(message: string, duration?: number) { this.show(message, 'info', duration); }
+  warning(message: string, duration?: number) { this.show(message, 'warning', duration); }
 
-  info(message: string): void {
-    this.snackBar.open(message, 'Close', {
-      duration: 3000
-    });
+  remove(id: string) {
+    this.toasts.update(currentToasts => currentToasts.filter(toast => toast.id !== id));
   }
 }

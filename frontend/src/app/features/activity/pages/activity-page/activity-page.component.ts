@@ -11,11 +11,11 @@ import { ActivityItem, ActivityRef } from '../../models/activity.model';
   standalone: true,
   imports: [DatePipe, RouterLink],
   template: `
-    <section class="h-full min-h-0 p-3 sm:p-4 bg-gray-50 rounded-xl flex flex-col gap-3">
-      <header class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-xl bg-white p-3 sm:p-4 shadow-sm">
+    <section class="rounded-box flex flex-col gap-2 overflow-y-auto max-h-[83vh] p-top-0">
+      <header class="header bg-base-200 w-full text-base-content sticky top-0 z-1 p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-300">
         <div class="min-w-0">
-          <h1 class="text-lg sm:text-xl font-semibold text-gray-900">Activity</h1>
-          <p class="text-sm text-gray-500">
+          <h1 class="text-lg sm:text-xl font-semibold text-base-content">Activity</h1>
+          <p class="text-sm text-base-content/70">
             @if (boardId()) {
               Board activity feed
             } @else if (workspaceId()) {
@@ -26,33 +26,32 @@ import { ActivityItem, ActivityRef } from '../../models/activity.model';
           </p>
         </div>
         @if (workspaceId()) {
-          <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded break-all self-start sm:self-auto">
+          <span class="text-xs text-base-content/70 bg-base-100 px-2 py-1 rounded break-all self-start sm:self-auto">
             Workspace: {{ workspaceId() }}
           </span>
         }
       </header>
 
-      <div class="flex-1 min-h-0 overflow-auto rounded-xl bg-white p-3 shadow-sm">
+      <div class="flex-1 rounded-b-box bg-base-200 p-3 shadow-sm">
         @if (loading()) {
-          <p class="text-sm text-gray-500">Loading activity...</p>
+          <p class="text-sm text-base-content/70">Loading activity...</p>
         } @else if (error()) {
           <p class="text-sm text-red-600">{{ error() }}</p>
         } @else if (items().length === 0) {
-          <p class="text-sm text-gray-500">No activity yet.</p>
+          <p class="text-sm text-base-content/70">No activity yet.</p>
         } @else {
           <ul class="space-y-2">
-          <p>Items Count: {{ items().length }}</p> 
             @for (item of items(); track item._id ?? item.id ?? item.createdAt) {
-              <li class="rounded-lg border border-gray-100 p-3 hover:bg-gray-50 transition-colors">
+              <li class="rounded-box border border-base-content/10 p-3 hover:bg-base-100 transition-colors">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div class="min-w-0">
-                    <p class="text-sm font-medium text-gray-900">{{ describeActivity(item) }}</p>
-                    <p class="text-xs text-gray-500">{{ describeContext(item) }}</p>
+                    <p class="text-sm font-medium text-base-content">{{ describeActivity(item) }}</p>
+                    <p class="text-xs text-base-content/70">{{ describeContext(item) }}</p>
                     
                     @if (getDeepLink(item, workspaceId()); as deepLink) {
                       @if (deepLink.commands) {
                         <a
-                          class="mt-1 inline-flex text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                          class="mt-1 inline-flex text-xs font-medium text-primary hover:text-primary-focus hover:underline"
                           [routerLink]="deepLink.commands"
                           [queryParams]="deepLink.queryParams"
                         >
@@ -61,7 +60,7 @@ import { ActivityItem, ActivityRef } from '../../models/activity.model';
                       }
                     }
                   </div>
-                  <span class="text-xs text-gray-400 shrink-0">{{ item.createdAt | date:'medium' }}</span>
+                  <span class="text-xs text-base-content/70 shrink-0">{{ item.createdAt | date:'medium' }}</span>
                 </div>
               </li>
             }
