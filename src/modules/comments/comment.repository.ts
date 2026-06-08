@@ -12,7 +12,7 @@ export const commentRepository = {
     return newComment;
   },
     async getCommentsByTaskId(taskId: string) {
-    const comments = await CommentModel.find({ taskId });
+    const comments = await CommentModel.find({ taskId }).sort({ createdAt: -1 });
     return comments;
   },
   async updateComment(

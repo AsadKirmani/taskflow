@@ -3,7 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { MatIconRegistry } from '@angular/material/icon';
 import { ThemeService } from './core/services/theme.service'
 import { polyfill } from 'mobile-drag-drop';
-import { ToastContainerComponent } from './shared/toast-container.component';
+import { ToastContainerComponent } from './shared/components/toast-container.component';
 
 @Component({
   selector: 'app-root',

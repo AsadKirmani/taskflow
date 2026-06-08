@@ -7,6 +7,7 @@ import { TaskDropEventPayload } from '../models/drag-drop.model';
 import { BoardApiService } from './board-api.service';
 import { BoardFilters } from './board-state.model';
 import { TaskState, initialTaskState } from './task-state.model';
+import { TaskComment } from '../../../core/models/comment.model';
 
 @Injectable({ providedIn: 'root' })
 export class TaskStoreService {
@@ -16,6 +17,7 @@ export class TaskStoreService {
   private readonly loadedTaskBoardIds = new Set<string>();
   private readonly loadingTaskBoardIds = new Set<string>();
   private readonly filterTrigger$ = new Subject<string>();
+  comments = signal<TaskComment[]>([]);
 
   private readonly stateSignal = signal<TaskState>(initialTaskState);
 
@@ -480,4 +482,52 @@ export class TaskStoreService {
       currentUserId: filters.currentUserId
     });
   }
+  getCommentsForTask(workspaceId: string, boardId: string, taskId: string) {
+    this.api.getCommentsForTask(workspaceId, boardId, taskId).subscribe({
+      next: (response) => {
+        const rawComments = Array.isArray(response) ? response : [];
+        const mappedComments = rawComments.map((comment: any) => ({
+          ...comment,
+          id: comment._id,
+        })) as TaskComment[];
+        this.comments.set(mappedComments);
+      },
+      error: () => {
+        this.notificationService.error('Failed to fetch comments');
+      }
+    });
+}
+postCommentToTask(workspaceId: string, boardId: string, taskId: string, content: string){
+    this.api.postCommentToTask(workspaceId, boardId, taskId, content).subscribe({
+     next: (response: any) => {
+      let rawNewComment = response.data || response; 
+
+      if (Array.isArray(rawNewComment)) {
+        rawNewComment = rawNewComment[0]; 
+      }
+
+      const newComment: TaskComment = {
+        ...rawNewComment,
+        id: rawNewComment._id
+      };
+
+      this.comments.update(existingComments => [newComment, ...existingComments]);
+      
+    },
+    error: (err) => console.error('Comment add karne mein error:', err)
+    });
+}
+deleteComment(commentId: string){
+    if (!commentId?.trim()) {
+      this.notificationService.error('Comment ID is required');
+      return of(null);
+    }
+    return this.api.deleteComment(commentId).pipe(
+      map(response => response.data ?? null),
+      catchError(() => {
+        this.notificationService.error('Failed to delete comment');
+        return of(null);
+      })
+    );
+}
 }

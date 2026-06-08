@@ -41,7 +41,6 @@ export class TaskCardComponent {
   onInput(event: Event) {
     this.editValue.set((event.target as HTMLInputElement).value);
   }
-  // Native HTML5 Drag Start
   onDragStart(event: DragEvent) {
     event.stopPropagation();
     this.isDragging.set(true);

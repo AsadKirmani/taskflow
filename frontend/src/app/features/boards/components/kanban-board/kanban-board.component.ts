@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, output, effect } from '@angular/core';
 import { Board } from '../../../../core/models/board.model';
 import { BoardColumn } from '../../../../core/models/column.model';
 import { Task } from '../../../../core/models/task.model';
@@ -28,25 +28,26 @@ export class KanbanBoardComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  @Input() board: Board | null = null;
-  @Input() columns: BoardColumn[] = [];
-  @Input() tasksByColumn: Record<string, Task[] | undefined> = {};
-  @Input() loading = false;
+  board = input<Board | null>(null);
+  columns = input<BoardColumn[]>([]);
+  tasksByColumn = input<Record<string, Task[] | undefined>>({});
+  loading = input<boolean>(false);
+  
+  taskMoved = output<TaskDropEventPayload>();
+  columnMoved = output<ColumnDropEventPayload>();
+  taskAdded = output<AddTaskEventPayload>();
+  columnAdded = output<AddColumnEventPayload>();
+  taskUpdated = output<UpdateTaskEventPayload>();
+  taskCompletionToggled = output<ToggleTaskCompletionEventPayload>();
   
   activeTaskOverlayId: string | null = null;
   isColumnInputOpen = false;
   columnInputValue = '';
   isFilterOpen = false;
   hasActiveFilters = false;
-  
-  @Output() taskMoved = new EventEmitter<TaskDropEventPayload>();
-  @Output() columnMoved = new EventEmitter<ColumnDropEventPayload>();
-  @Output() taskAdded = new EventEmitter<AddTaskEventPayload>();
-  @Output() columnAdded = new EventEmitter<AddColumnEventPayload>();
-  @Output() taskUpdated = new EventEmitter<UpdateTaskEventPayload>();
-  @Output() taskCompletionToggled = new EventEmitter<ToggleTaskCompletionEventPayload>();
-  
+
   constructor() {
+    
     this.route.queryParamMap
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
@@ -59,51 +60,27 @@ export class KanbanBoardComponent {
     this.isFilterOpen = !this.isFilterOpen;
   }
 
-  // --- Directly Forwarding Native Events ---
   onColumnDropNative(payload: ColumnDropEventPayload): void {
     const { fromIndex, toIndex } = payload;
     if (fromIndex === toIndex) return;
-
-    // 1. Optimistic Update for Columns
-    const updatedColumns = [...this.columns];
-    const [movedColumn] = updatedColumns.splice(fromIndex, 1);
-    updatedColumns.splice(toIndex, 0, movedColumn);
-    
-    // 2. UI update instant
-    this.columns = updatedColumns;
-
-    // 3. Background call
     this.columnMoved.emit(payload);
   }
 
   onTaskDropNative(payload: TaskDropEventPayload): void {
     const { sourceColumnId, targetColumnId, sourceIndex, targetIndex } = payload;
-    
-    // Agar same position pe drop hua hai toh ignore karo
     if (sourceColumnId === targetColumnId && sourceIndex === targetIndex) return;
 
-    // 1. Optimistic Update: Arrays ki shallow copy banao (OnPush ko trigger karne ke liye)
-    const sourceTasks = [...(this.tasksByColumn[sourceColumnId] || [])];
-    const targetTasks = sourceColumnId === targetColumnId ? sourceTasks : [...(this.tasksByColumn[targetColumnId] || [])];
+    const currentTasks = this.tasksByColumn();
+    const sourceTasks = [...(currentTasks[sourceColumnId] || [])];
+    const targetTasks = sourceColumnId === targetColumnId ? sourceTasks : [...(currentTasks[targetColumnId] || [])];
 
-    // 2. Task ko source list se nikalo
     const [movedTask] = sourceTasks.splice(sourceIndex, 1);
-
-    // 3. Same column me niche drag karne par index adjust karo (kyunki array ek element chota ho gaya hai)
     let insertIndex = targetIndex;
     if (sourceColumnId === targetColumnId && sourceIndex < targetIndex) {
       insertIndex--;
     }
-
-    // 4. Task ko naye target pe insert karo
     targetTasks.splice(insertIndex, 0, movedTask);
 
-    // 5. Naye reference ke sath data set karo (UI instant update hoga)
-    this.tasksByColumn = {
-      ...this.tasksByColumn,
-      [sourceColumnId]: sourceTasks,
-      [targetColumnId]: targetTasks
-    };
     this.taskMoved.emit(payload);
   }
 
@@ -152,8 +129,9 @@ export class KanbanBoardComponent {
 
   get activeTaskOverlay(): Task | null {
     if (!this.activeTaskOverlayId) return null;
-    for (const tasks of Object.values(this.tasksByColumn)) {
-      const match = tasks?.find(task => task.id === this.activeTaskOverlayId);
+    const tasksRecord = this.tasksByColumn();
+    for (const tasks of Object.values(tasksRecord)) {
+      const match = tasks?.find((task: Task) => task.id === this.activeTaskOverlayId);
       if (match) return match;
     }
     return null;
@@ -194,5 +172,4 @@ export class KanbanBoardComponent {
   private toSlug(value: string): string {
     return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'task';
   }
-  
 }

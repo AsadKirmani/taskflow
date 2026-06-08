@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SearchService } from '../../core/services/search.service';
-import { Task } from '../../core/models/task.model';
+import { SearchService } from '../../../core/services/search.service';
+import { Task } from '../../../core/models/task.model';
 
 @Component({
   selector: 'app-search-overlay',

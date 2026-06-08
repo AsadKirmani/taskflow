@@ -1,0 +1,243 @@
+<div
+  class="border border-gray-300 rounded-md bg-white overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 flex flex-col shadow-sm"
+>
+  <!-- <tiptap-bubble-menu [editor]="descEditor">
+    <div
+      class="flex items-center gap-1 bg-[#172b4d] p-1.5 rounded-lg shadow-xl border border-gray-700 text-white animate-in zoom-in-95 duration-150"
+    >
+      <button
+        (click)="descEditor.chain().focus().toggleBold().run()"
+        [class.bg-white.text-black]="descEditor.isActive('bold')"
+        class="w-8 h-8 flex items-center justify-center rounded hover:bg-white/20 font-bold transition-colors"
+      >
+        B
+      </button>
+      <button
+        (click)="descEditor.chain().focus().toggleItalic().run()"
+        [class.bg-white.text-black]="descEditor.isActive('italic')"
+        class="w-8 h-8 flex items-center justify-center rounded hover:bg-white/20 italic transition-colors"
+      >
+        I
+      </button>
+      <button
+        (click)="descEditor.chain().focus().toggleStrike().run()"
+        [class.bg-white.text-black]="descEditor.isActive('strike')"
+        class="w-8 h-8 flex items-center justify-center rounded hover:bg-white/20 line-through transition-colors"
+      >
+        S
+      </button>
+    </div>
+  </tiptap-bubble-menu>
+
+  <tiptap-floating-menu [editor]="descEditor">
+    <div
+      class="flex items-center gap-1 bg-white p-1 rounded-md shadow-lg border border-gray-200 animate-in fade-in duration-150"
+    >
+      <button
+        (click)="descEditor.chain().focus().toggleHeading({ level: 1 }).run()"
+        [class.bg-gray-200]="descEditor.isActive('heading', { level: 1 })"
+        class="px-2 py-1 flex items-center justify-center rounded hover:bg-gray-100 text-gray-700 font-bold text-xs transition-colors"
+      >
+        H1
+      </button>
+      <button
+        (click)="descEditor.chain().focus().toggleHeading({ level: 2 }).run()"
+        [class.bg-gray-200]="descEditor.isActive('heading', { level: 2 })"
+        class="px-2 py-1 flex items-center justify-center rounded hover:bg-gray-100 text-gray-700 font-bold text-xs transition-colors"
+      >
+        H2
+      </button>
+      <div class="w-px h-4 bg-gray-300 mx-1"></div>
+      <button
+        (click)="descEditor.chain().focus().toggleBulletList().run()"
+        [class.bg-gray-200]="descEditor.isActive('bulletList')"
+        class="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 text-gray-700 transition-colors"
+      >
+        <mat-icon class="text-[16px]">format_list_bulleted</mat-icon>
+      </button>
+    </div>
+  </tiptap-floating-menu> -->
+  <div
+    class="bg-gray-50 border-b border-gray-200 px-2 py-1 flex flex-wrap gap-1 items-center relative z-10"
+  >
+    <div class="flex items-center">
+      <button
+        (click)="editor.chain().focus().toggleBold().run()"
+        [class.bg-gray-200]="editor.isActive('bold')"
+        class="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-200 text-gray-700 font-bold transition-colors"
+        title="Bold (Ctrl+B)"
+      >
+        B
+      </button>
+      <button
+        (click)="editor.chain().focus().toggleItalic().run()"
+        [class.bg-gray-200]="editor.isActive('italic')"
+        class="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-200 text-gray-700 italic transition-colors"
+        title="Italic (Ctrl+I)"
+      >
+        I
+      </button>
+      <button
+        (click)="editor.chain().focus().toggleStrike().run()"
+        [class.bg-gray-200]="editor.isActive('strike')"
+        class="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-200 text-gray-700 line-through transition-colors"
+        title="Strike (Ctrl+Shift+X)"
+      >
+        S
+      </button>
+    </div>
+
+    <div class="w-px h-4 bg-gray-300 mx-1"></div>
+
+    <div class="relative group">
+      <button
+        class="flex items-center gap-0.5 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded text-sm transition-colors focus:outline-none min-w-[50px] justify-between"
+        title="Text Style & Headings"
+      >
+        <div class="flex items-center justify-center w-6">
+          @if (editor.isActive('heading', { level: 1 })) {
+            <span class="font-bold text-sm">H1</span>
+          } @else if (editor.isActive('heading', { level: 2 })) {
+            <span class="font-bold text-sm">H2</span>
+          } @else if (editor.isActive('heading', { level: 3 })) {
+            <span class="font-bold text-sm">H3</span>
+          } @else {
+            <mat-icon class="text-[18px]">text_format</mat-icon>
+          }
+        </div>
+        <mat-icon class="text-[16px]">arrow_drop_down</mat-icon>
+      </button>
+      <div
+        class="absolute left-0 mt-0 w-44 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:flex flex-col py-1 z-50"
+      >
+        <button
+          (click)="editor.chain().focus().setParagraph().run()"
+          [class.bg-blue-50.text-blue-700]="editor.isActive('paragraph')"
+          class="text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+          title="Paragraph (Ctrl+Alt+0)"
+        >
+          Normal Text
+        </button>
+        <button
+          (click)="editor.chain().focus().toggleHeading({ level: 1 }).run()"
+          [class.bg-blue-50.text-blue-700]="editor.isActive('heading', { level: 1 })"
+          class="text-left px-3 py-1.5 text-lg font-bold text-gray-800 hover:bg-gray-100 transition-colors"
+          title="Heading 1 (Ctrl+Alt+1)"
+        >
+          Heading 1
+        </button>
+        <button
+          (click)="editor.chain().focus().toggleHeading({ level: 2 }).run()"
+          [class.bg-blue-50.text-blue-700]="editor.isActive('heading', { level: 2 })"
+          class="text-left px-3 py-1.5 text-base font-bold text-gray-800 hover:bg-gray-100 transition-colors"
+          title="Heading 2 (Ctrl+Alt+2)"
+        >
+          Heading 2
+        </button>
+        <button
+          (click)="editor.chain().focus().toggleHeading({ level: 3 }).run()"
+          [class.bg-blue-50.text-blue-700]="editor.isActive('heading', { level: 3 })"
+          class="text-left px-3 py-1.5 text-sm font-bold text-gray-800 hover:bg-gray-100 transition-colors"
+          title="Heading 3 (Ctrl+Alt+3)"
+        >
+          Heading 3
+        </button>
+      </div>
+    </div>
+
+    <div class="w-px h-4 bg-gray-300 mx-1"></div>
+
+    <div class="relative group">
+      <button
+        class="flex items-center gap-0.5 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded text-sm transition-colors focus:outline-none"
+        title="Lists"
+      >
+        <div class="flex items-center justify-center w-5">
+          @if (editor.isActive('orderedList')) {
+            <mat-icon class="text-[18px]">format_list_numbered</mat-icon>
+          } @else {
+            <mat-icon class="text-[18px]">format_list_bulleted</mat-icon>
+          }
+        </div>
+        <mat-icon class="text-[16px]">arrow_drop_down</mat-icon>
+      </button>
+      <div
+        class="absolute left-0 mt-0 w-48 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:flex flex-col py-1 z-50"
+      >
+        <button
+          (click)="editor.chain().focus().toggleBulletList().run()"
+          [class.bg-blue-50.text-blue-700]="editor.isActive('bulletList')"
+          class="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+          title="Bullet List (Ctrl+Shift+8)"
+        >
+          <mat-icon class="text-[18px]">format_list_bulleted</mat-icon> Bullet List
+        </button>
+        <button
+          (click)="editor.chain().focus().toggleOrderedList().run()"
+          [class.bg-blue-50.text-blue-700]="editor.isActive('orderedList')"
+          class="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+          title="Numbered List (Ctrl+Shift+7)"
+        >
+          <mat-icon class="text-[18px]">format_list_numbered</mat-icon> Numbered List
+        </button>
+      </div>
+    </div>
+
+    <div class="w-px h-4 bg-gray-300 mx-2"></div>
+
+    <div class="flex items-center gap-1">
+      <button
+        (click)="editor.chain().focus().toggleBlockquote().run()"
+        [class.bg-gray-200]="editor.isActive('blockquote')"
+        class="px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-200 hover:text-gray-900 rounded transition-colors"
+        title="Blockquote (Ctrl+Shift+B)"
+      >
+        Quote
+      </button>
+      <button
+        (click)="editor.chain().focus().setHorizontalRule().run()"
+        class="px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-200 hover:text-gray-900 rounded transition-colors"
+        title="Insert Horizontal Line"
+      >
+        Divider
+      </button>
+      <button
+        (click)="
+          editor.chain().focus().unsetAllMarks().run(); editor.chain().focus().clearNodes().run()
+        "
+        class="px-2 py-1 text-xs font-semibold text-red-500 hover:bg-red-50 hover:text-red-700 rounded transition-colors"
+        title="Clear All Formatting"
+      >
+        Reset Format
+      </button>
+    </div>
+
+    <div class="flex-1"></div>
+
+    <div class="flex items-center gap-1">
+      <button
+        (click)="editor.chain().focus().undo().run()"
+        [disabled]="!editor.can().undo()"
+        class="px-2 py-1 text-xs font-semibold text-gray-500 hover:bg-gray-200 hover:text-gray-800 rounded disabled:opacity-40 transition-colors"
+        title="Undo (Ctrl+Z)"
+      >
+        Undo
+      </button>
+      <button
+        (click)="editor.chain().focus().redo().run()"
+        [disabled]="!editor.can().redo()"
+        class="px-2 py-1 text-xs font-semibold text-gray-500 hover:bg-gray-200 hover:text-gray-800 rounded disabled:opacity-40 transition-colors"
+        title="Redo (Ctrl+Y)"
+      >
+        Redo
+      </button>
+    </div>
+  </div>
+
+  <tiptap-editor
+    [editor]="editor"
+    class="p-4 block outline-none cursor-text"
+    [style.min-height]="minHeight()"
+  >
+  </tiptap-editor>
+</div>

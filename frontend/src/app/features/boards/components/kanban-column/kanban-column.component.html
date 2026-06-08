@@ -8,10 +8,10 @@
   <div class="flex flex-col p-2 gap-1 mb-2">
     <div class="flex items-center justify-between text-base-content/50">
       <header class="kanban-column__header cursor-grab flex items-center gap-2" cdkDragHandle>
-        <h3 class="font-bold m-0 text-base-content">{{ column.name }}</h3>
+        <h3 class="font-bold m-0 text-base-content">{{ column().name }}</h3>
         <span
           class="bg-base-200 text-base-content/70 px-2 py-0.5 rounded-full text-xs font-semibold"
-          >{{ tasks.length }}</span
+          >{{ tasks().length }}</span
         >
       </header>
       <svg
@@ -31,8 +31,8 @@
         <circle cx="5" cy="12" r="1"></circle>
       </svg>
     </div>
-    @if (hasActiveFilters) {
-      <span class="text-xs text-primary font-semibold">{{ tasks.length }} matching tasks</span>
+    @if (hasActiveFilters()) {
+      <span class="text-xs text-primary font-semibold">{{ tasks().length }} matching tasks</span>
     }
   </div>
   <div
@@ -42,11 +42,11 @@
     (dragleave)="onTaskDragLeave($event)"
     (drop)="onTaskDrop($event)"
   >
-    @for (task of tasks; track task.id) {
+    @for (task of tasks(); track task.id) {
       <app-task-card
         [task]="task"
-        [columnIndex]="columnIndex"
-        [sourceColumnId]="column.id"
+        [columnIndex]="columnIndex()"
+        [sourceColumnId]="column().id"
         (updateTitle)="taskUpdated.emit({ taskId: task.id, title: $event })"
         (toggleCompletion)="taskCompletionToggled.emit(task)"
         (openOverlay)="taskClicked.emit(task)"

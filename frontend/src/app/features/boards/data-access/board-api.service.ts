@@ -6,6 +6,7 @@ import { Board } from '../../../core/models/board.model';
 import { BoardColumn } from '../../../core/models/column.model';
 import { Task } from '../../../core/models/task.model';
 import { environment } from '../../../../environments/environment';
+import { TaskComment } from '../../../core/models/comment.model';
 
 export interface BoardDetailResponse {
   board: Board;
@@ -127,4 +128,21 @@ export class BoardApiService {
       { withCredentials: true }
     );
   }
+  getCommentsForTask(workspaceId: string, boardId: string, taskId: string): Observable<ApiResponse<{ comments: TaskComment[] }>> {
+    return this.http.get<ApiResponse<{ comments: TaskComment[] }>>(`${this.baseUrl}/workspaces/${workspaceId}/boards/${boardId}/tasks/${taskId}/comments`, {
+      withCredentials: true
+    });
+  }
+  postCommentToTask(workspaceId: string, boardId: string, taskId: string, content: string): Observable<ApiResponse<{ comment: TaskComment }>> {
+    return this.http.post<ApiResponse<{ comment: TaskComment }>>(
+      `${this.baseUrl}/workspaces/${workspaceId}/boards/${boardId}/tasks/${taskId}/comments`,
+      { content },
+      { withCredentials: true }
+    );
+}
+deleteComment(commentId: string): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(`${this.baseUrl}/comments/${commentId}`, {
+      withCredentials: true
+    });
+}
 }

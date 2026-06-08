@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { AuthStoreService } from '../../../features/auth/data-access/auth-store.service';
 import { UserMenuComponent } from './usermenu.component';
 import { ThemeService } from '../../services/theme.service';
-import { SearchOverlayComponent } from '../../../shared/search/search-overlay.component';
+import { SearchOverlayComponent } from '../../../shared/components/search/search-overlay.component';
 
 @Component({
   selector: 'app-navbar',
@@ -89,14 +89,12 @@ export class NavbarComponent {
       this.isUserMenuOpen = false;
     }
   }
-  // Overlay ko reference karne ke liye
   @ViewChild('searchOverlay') searchOverlay!: SearchOverlayComponent;
 
-  // Keyboard shortcut: Ctrl+K ya Cmd+K se search open karne ke liye
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
-      event.preventDefault(); // Browser ka default search bar rokne ke liye
+      event.preventDefault();
       this.searchOverlay.openSearch();
     }
   }

@@ -3,7 +3,7 @@
     class="kanban-board__header mb-1 bg-base-200 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
   >
     <div class="flex items-center gap-2 min-w-0 text-base-content">
-      <h1 class="text-lg sm:text-2xl font-bold truncate m-0">{{ board?.name }}</h1>
+      <h1 class="text-lg sm:text-2xl font-bold truncate m-0">{{ board()?.name }}</h1>
     </div>
     <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
       <img
@@ -130,11 +130,11 @@
     class="kanban-board__columns flex-1 min-h-0 overflow-x-auto overflow-y-hidden flex items-start bg-base-200 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
 
   >
-   @for (column of columns; track column.id; let i = $index) {
+   @for (column of columns(); track column.id; let i = $index) {
       <app-kanban-column
         [columnIndex]="i"
         [column]="column"
-        [tasks]="tasksByColumn[column.id] ?? []"
+        [tasks]="tasksByColumn()[column.id] ?? []"
         [hasActiveFilters]="hasActiveFilters"
         (nativeTaskDrop)="onTaskDropNative($event)"
         (nativeColumnDrop)="onColumnDropNative($event)"
@@ -191,8 +191,7 @@
 </section>
 
 @if (activeTaskOverlay; as selectedTask) {
-  <app-task-overlay [task]="selectedTask" [columnName]="'Today'" (closed)="closeTaskOverlay()">
-  </app-task-overlay>
+  <app-task-overlay [task]="selectedTask" [columnName]="'Today'" (closed)="closeTaskOverlay()" [workspaceId]="board()?.workspaceId ?? ''" [boardId]="board()?.id ?? ''"></app-task-overlay>
 }
 <!-- 
 <section class="kanban-board h-full min-h-0 flex flex-col">
