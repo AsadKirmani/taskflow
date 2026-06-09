@@ -9,9 +9,6 @@ export const boardRepository = {
     description?: string;
     visibility: "private" | "workspace";
     createdBy: string;
-    workspaceId: string;
-    workSpaceName: string;
-    memberIds?: string[];
   }) {
     const newboard = await BoardModel.create(data);
     await BoardModel.findByIdAndUpdate(newboard._id, {
@@ -70,5 +67,14 @@ export const boardRepository = {
       ]
     });
     return boards;
+  },
+   async reorderColumns(boardId: string, newColumnOrder: string[]) {
+    return await BoardModel.findByIdAndUpdate(
+      boardId, 
+      {$set: { columnOrder: newColumnOrder }}, 
+      { new: true });
+  },
+  async deleteBoard(boardId: string) {
+    return await BoardModel.findByIdAndDelete(boardId);
   }
 };

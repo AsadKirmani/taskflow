@@ -5,6 +5,8 @@ import { authService } from '../auth/auth.service';
 import { AppError } from '../../shared/errors/app-error';
 import { activityService } from '../activity/activity.service';
 import crypto from 'crypto';
+import { PermissionService } from '../../services/permission.service';
+import { WorkspaceMemberModel } from '../../models/workspace-member.model';
 
 const createSlug = (value: string) => {
   const slug = value
@@ -19,21 +21,7 @@ const createSlug = (value: string) => {
 export const workspaceService = {
   async listUserWorkspaces(userId: string) {
     const workspaces = await workspaceRepository.listUserWorkspaces(userId);
-
-    return workspaces.map(workspace => {
-      const ownerId = workspace.ownerId?.toString();
-      const member = workspace.members?.find(memberItem => memberItem.userId?.toString() === userId);
-      const currentUserRole = ownerId === userId ? 'admin' : member?.role ?? 'member';
-
-      return {
-        id: workspace._id.toString(),
-        name: workspace.name,
-        slug: workspace.slug,
-        description: workspace.description ?? '',
-        memberCount: workspace.members?.length ?? 0,
-        currentUserRole
-      };
-    });
+    return workspaces;
   },
   async createWorkspace(input: CreateWorkspaceDto, userId: string) {
     const baseSlug = createSlug(input.name);
@@ -105,7 +93,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
     const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 48);
-    const status = 'pending';
+    const status = 'INVITED';
 
     await workspaceRepository.workspaceInvitation(
         workspaceId, 
@@ -158,9 +146,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
       throw new AppError('Workspace no longer exists', 404, 'NOT_FOUND');
     }
 
-    const isAlreadyMember = workspace.members.some(
-      (m: any) => m.userId.toString() === userId.toString()
-    );
+    const isAlreadyMember = await WorkspaceMemberModel.exists({ workspaceId, userId, status: 'ACTIVE' });
 
     if (isAlreadyMember) {
       throw new AppError('You are already a member of this workspace', 400, 'ALREADY_MEMBER');
@@ -169,7 +155,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
     await workspaceRepository.addMemberToWorkspace(workspaceId, {
       userId,
       role: invitation.role,
-      status: 'active',
+      status: 'ACTIVE',
       invitedBy: invitation.invitedBy,
       joinedAt: new Date()
     });
@@ -190,5 +176,26 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
       message: 'Successfully joined the workspace',
       workspaceId 
     };
+  },
+  async deleteWorkspace(workspaceId: string, userId: string) {
+    const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+    }
+    // Check if the user has permission to delete the workspace
+    const hasPermission = await PermissionService.hasPermission(userId, workspaceId, 'workspace:delete');
+    if (!hasPermission) {
+      throw new AppError('Unauthorized', 403, 'FORBIDDEN');
+    }
+    await workspaceRepository.deleteWorkspace(workspaceId);
+    await activityService.logActivity({
+      workspaceId,
+      userId,
+      actionType: 'workspace_deleted',
+      entityType: 'workspace',
+      entityId: workspaceId,
+      metadata: {}
+    });
+    return { success: true, message: 'Workspace deleted successfully' };
   }
 };

@@ -35,7 +35,7 @@ export const commentService = {
 
     return newComment;
   },
-  async getCommentsByTaskId(taskId: string) {
+  async getCommentsByTaskId(userId: string, taskId: string) {
     const comments = await commentRepository.getCommentsByTaskId(taskId);
     return comments;
   },
@@ -65,4 +65,23 @@ export const commentService = {
 
     return updatedComment;
   },
-};
+  async deleteComment(commentId: string, userId: string) {
+    const existingComment = await commentRepository.getCommentById(commentId);
+    await commentRepository.updateComment(commentId, { archived: true });
+
+    if (existingComment) {
+      await activityService.logActivity({
+        workspaceId: existingComment.workspaceId.toString(),
+        boardId: existingComment.boardId.toString(),
+        taskId: existingComment.taskId.toString(),
+        userId,
+        actionType: 'comment_deleted',
+        entityType: 'comment',
+        entityId: commentId,
+        metadata: {
+          previousContentPreview: existingComment.content?.slice(0, 120)
+        }
+      });
+    }
+  }
+  };

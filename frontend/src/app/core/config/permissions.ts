@@ -1,0 +1,73 @@
+export const PERMISSIONS = {
+  // Workspace Actions
+  WORKSPACE_DELETE: 'workspace:delete',
+  WORKSPACE_EDIT: 'workspace:edit',
+  MANAGE_USERS: 'workspace:manage_users',
+
+  // Board Actions
+  BOARD_CREATE: 'board:create',
+  BOARD_DELETE: 'board:delete',
+  BOARD_EDIT: 'board:edit',
+  BOARD_VIEW: 'board:view',
+
+  // Column Actions
+  COLUMN_CREATE: 'column:create',
+  COLUMN_EDIT: 'column:edit',
+  COLUMN_DELETE: 'column:delete',
+  COLUMN_VIEW: 'column:view',
+
+  // Task Actions
+  TASK_CREATE: 'task:create',
+  TASK_EDIT: 'task:edit',
+  TASK_DELETE: 'task:delete',
+  TASK_VIEW: 'task:view',
+
+  // Comment Actions
+  COMMENT_CREATE: 'comment:create',
+  COMMENT_EDIT: 'comment:edit',
+  COMMENT_DELETE: 'comment:delete'
+};
+
+export const ROLE_PERMISSIONS: Record<string, string[]> = {
+  OWNER: [
+    '*'
+  ],
+  
+  ADMIN: [
+    PERMISSIONS.WORKSPACE_EDIT,
+    PERMISSIONS.MANAGE_USERS,
+    PERMISSIONS.BOARD_CREATE,
+    PERMISSIONS.BOARD_DELETE,
+    PERMISSIONS.BOARD_EDIT,
+    PERMISSIONS.BOARD_VIEW,
+    PERMISSIONS.COLUMN_CREATE,
+    PERMISSIONS.COLUMN_EDIT,
+    PERMISSIONS.COLUMN_DELETE,
+    PERMISSIONS.COLUMN_VIEW,
+    PERMISSIONS.TASK_CREATE,
+    PERMISSIONS.TASK_EDIT,
+    PERMISSIONS.TASK_DELETE,
+    PERMISSIONS.TASK_VIEW,
+    PERMISSIONS.COMMENT_CREATE,
+    PERMISSIONS.COMMENT_EDIT,
+    PERMISSIONS.COMMENT_DELETE
+  ],
+  
+  MEMBER: [
+    PERMISSIONS.BOARD_CREATE,
+    PERMISSIONS.BOARD_VIEW,
+    PERMISSIONS.COLUMN_CREATE,
+    PERMISSIONS.COLUMN_VIEW,
+    PERMISSIONS.TASK_CREATE,
+    PERMISSIONS.TASK_EDIT,
+    PERMISSIONS.TASK_VIEW,
+    PERMISSIONS.COMMENT_CREATE,
+    PERMISSIONS.COMMENT_EDIT
+  ],
+  
+  GUEST: [
+    PERMISSIONS.BOARD_VIEW,
+    PERMISSIONS.TASK_VIEW,
+    PERMISSIONS.COMMENT_CREATE
+  ]
+};

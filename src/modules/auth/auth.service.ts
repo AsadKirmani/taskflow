@@ -49,7 +49,7 @@ export const authService = {
 
       throw error;
     }
-
+    
     const accessToken = signAccessToken({
       sub: user._id.toString(),
       email: user.email,

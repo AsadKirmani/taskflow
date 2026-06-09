@@ -1,3 +1,4 @@
+// src/models/refresh-token.model.ts
 import { Schema, model, InferSchemaType } from 'mongoose';
 
 const RefreshTokenSchema = new Schema(
@@ -11,12 +12,13 @@ const RefreshTokenSchema = new Schema(
     tokenHash: {
       type: String,
       required: true,
+      unique: true,
       select: false
     },
     expiresAt: {
       type: Date,
       required: true,
-      index: true
+      index: { expires: '7d' }
     },
     revokedAt: {
       type: Date,
@@ -37,9 +39,15 @@ const RefreshTokenSchema = new Schema(
   },
   {
     timestamps: true,
-    versionKey: false
+    versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
 );
+
+RefreshTokenSchema.virtual('id').get(function() { 
+  return this._id.toHexString(); 
+});
 
 export type RefreshTokenDocument = InferSchemaType<typeof RefreshTokenSchema>;
 export const RefreshTokenModel = model('RefreshToken', RefreshTokenSchema);

@@ -141,4 +141,8 @@ export const taskService = {
       });
     }
   },
+  async deleteTask(taskId: string, userId?: string) {
+    const task = await taskRepository.getTaskById(taskId);
+    await taskRepository.deleteTask(taskId);
+  }
 };

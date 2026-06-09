@@ -1,6 +1,9 @@
 import { taskService } from "./task.service";
 import { Request, Response } from "express";
 import { AppError } from "../../shared/errors/app-error";
+import { PermissionService } from "../../services/permission.service";
+import { PERMISSIONS } from "../../config/roles";
+import { boardService } from "../boards/board.service";
 
 const parseCsv = (value: unknown): string[] => {
   if (typeof value !== 'string') {
@@ -15,19 +18,22 @@ const parseCsv = (value: unknown): string[] => {
 
 export const taskController = {
   async createTask(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
-    }
-    const { columnId, boardId } = req.params as {
-      columnId: string;
-      boardId: string;
-    };
-    const { title, description, workspaceId } = req.body as {
+    const { title, description, workspaceId, columnId, boardId } = req.body as {
       title: string;
       description?: string;
       workspaceId: string;
+      columnId: string;
+      boardId: string;
     };
-    const userId = req.auth.userId;
+    const userId = req.auth!.userId;
+    const board = await boardService.getBoardById(userId, boardId);
+    if (!board || board.workspaceId.toString() !== workspaceId) {
+      throw new AppError("Invalid Board or Workspace combination", 400, "BAD_REQUEST");
+    }
+    const hasAccess = await PermissionService.hasPermission(userId, workspaceId, PERMISSIONS.TASK_CREATE);
+    if (!hasAccess) {
+      throw new AppError("Aapko is workspace mein naya task create karne ki permission nahi hai.", 403, "FORBIDDEN");
+    }
     const newTask = await taskService.createTask(
       title,
       description,
@@ -39,9 +45,6 @@ export const taskController = {
     res.status(201).json({ success: true, data: newTask });
   },
   async getTasksInBoard(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
-    }
     const { boardId } = req.params as { boardId: string };
 
     const dueType = typeof req.query.dueType === 'string' ? req.query.dueType : 'all';
@@ -49,6 +52,16 @@ export const taskController = {
       typeof req.query.memberScope === 'string' ? req.query.memberScope : 'all';
     const completion =
       typeof req.query.completion === 'string' ? req.query.completion : 'all';
+      const userId = req.auth!.userId;
+    const board = await boardService.getBoardById(userId, boardId);
+    if (!board) {
+      throw new AppError("Board not found", 404, "NOT_FOUND");
+    }
+
+    const hasAccess = await PermissionService.hasPermission(userId, board.workspaceId.toString(), PERMISSIONS.TASK_VIEW);
+    if (!hasAccess) {
+      throw new AppError("Aapko is board ke tasks dekhne ki permission nahi hai.", 403, "FORBIDDEN");
+    }
 
     const tasks = await taskService.getTasksInBoard(boardId, {
       search: typeof req.query.search === 'string' ? req.query.search : '',
@@ -58,7 +71,7 @@ export const taskController = {
       activity: parseCsv(req.query.activity) as Array<
         'recentlyupdated' | 'recentlycreated' | 'activeinlastweek' | 'activeinlastmonth'
       >,
-      currentUserId: req.auth.userId,
+      currentUserId: req.auth!.userId,
       memberScope: memberScope === 'no_members' || memberScope === 'me' ? memberScope : 'all',
       completion:
         completion === 'completed' || completion === 'incomplete' ? completion : 'all',
@@ -73,20 +86,19 @@ export const taskController = {
     res.json({ success: true, data: { items: tasks } });
   },
   async getTaskById(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
-    }
+    const userId = req.auth!.userId;
     const { taskId } = req.params as { taskId: string };
     const task = await taskService.getTaskById(taskId);
     if (!task) {
       throw new AppError("Task not found", 404, "NOT_FOUND");
     }
+    const hasAccess = await PermissionService.hasPermission(userId, task.workspaceId.toString(), PERMISSIONS.TASK_VIEW);
+    if (!hasAccess) {
+      throw new AppError("Aapko is task ko dekhne ki permission nahi hai.", 403, "FORBIDDEN");
+    }
     res.json({ success: true, data: { task } });
   },
   async updateTask(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-        throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
-    }
     const { taskId } = req.params as { taskId: string };
     const { title, description, isCompleted } = req.body as {
         title?: string;
@@ -112,21 +124,50 @@ export const taskController = {
       updatePayload.isCompleted = isCompleted;
       updatePayload.completedAt = isCompleted ? new Date() : null;
     }
+    const userId = req.auth!.userId;
+    const task = await taskService.getTaskById(taskId);
+    if (!task) {
+      throw new AppError("Task not found", 404, "NOT_FOUND");
+    }
+    const hasAccess = await PermissionService.hasPermission(userId, task.workspaceId.toString(), PERMISSIONS.TASK_EDIT);
+    if (!hasAccess) {
+      throw new AppError("Aapko is task ko edit karne ki permission nahi hai.", 403, "FORBIDDEN");
+    }
 
-    const updatedTask = await taskService.updateTask(taskId, updatePayload, req.auth.userId);
+    const updatedTask = await taskService.updateTask(taskId, updatePayload, req.auth!.userId);
     res.json({ success: true, data: updatedTask });
   },
   async moveTask(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-        throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
-    }
     const { taskId } = req.params as { taskId: string };
     const { sourceColumnId, targetColumnId, targetIndex } = req.body as {
         sourceColumnId: string;
         targetColumnId: string;
         targetIndex: number;
     };
-    await taskService.moveTask(taskId, sourceColumnId, targetColumnId, targetIndex, req.auth.userId);
+    const userId = req.auth!.userId;
+    const task = await taskService.getTaskById(taskId);
+    if (!task) {
+      throw new AppError("Task not found", 404, "NOT_FOUND");
+    }
+    const hasAccess = await PermissionService.hasPermission(userId, task.workspaceId.toString(), PERMISSIONS.TASK_EDIT);
+    if (!hasAccess) {
+      throw new AppError("Aapko is task ko move karne ki permission nahi hai.", 403, "FORBIDDEN");
+    }
+    await taskService.moveTask(taskId, sourceColumnId, targetColumnId, targetIndex, userId);
     res.json({ success: true, message: "Task moved successfully", data: null });
+  },
+  async deleteTask(req: Request, res: Response) {
+    const { taskId } = req.params as { taskId: string };
+    const userId = req.auth!.userId;
+    const task = await taskService.getTaskById(taskId);
+    if (!task) {
+      throw new AppError("Task not found", 404, "NOT_FOUND");
+    }
+    const hasAccess = await PermissionService.hasPermission(userId, task.workspaceId.toString(), PERMISSIONS.TASK_DELETE);
+    if (!hasAccess) {
+      throw new AppError("Aapko is task ko delete karne ki permission nahi hai.", 403, "FORBIDDEN");
+    }
+    await taskService.deleteTask(taskId, userId);
+    res.json({ success: true, message: "Task deleted successfully", data: null });
   }
 };

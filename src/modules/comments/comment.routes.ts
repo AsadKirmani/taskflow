@@ -7,20 +7,26 @@ import { commentController } from './comment.controller';
 
 const router = Router();
 
-router.get('/workspaces/:workspaceId/boards/:boardId/tasks/:taskId/comments', authMiddleware, asyncHandler(commentController.getCommentsByTaskId));
+router.get('/comments', authMiddleware, asyncHandler(commentController.getCommentsByTaskId));
 
 router.post(
-  '/workspaces/:workspaceId/boards/:boardId/tasks/:taskId/comments',
+  '/comments',
   authMiddleware,
   validate(createCommentDto),
   asyncHandler(commentController.createComment)
 );
 
 router.patch(
-  '/workspaces/:workspaceId/boards/:boardId/tasks/:taskId/comments/:commentId',
+  '/comments/:commentId',
   authMiddleware,
   validate(updateCommentDto),
   asyncHandler(commentController.updateComment)
+);
+
+router.delete(
+  '/comments/:commentId',
+  authMiddleware,
+  asyncHandler(commentController.deleteComment)
 );
 
 export default router;

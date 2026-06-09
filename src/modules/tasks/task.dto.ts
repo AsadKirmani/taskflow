@@ -12,6 +12,8 @@ const checklistItemDto = z.object({
 
 export const createTaskDto = z.object({
   workspaceId: z.string().min(1),
+  boardId: z.string().min(1),
+  columnId: z.string().min(1),
   title: z.string().min(1).max(200),
   description: z.string().max(10000).optional().default(''),
   assigneeIds: z.array(z.string()).optional().default([]),

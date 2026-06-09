@@ -4,12 +4,8 @@ import { AppError } from '../../shared/errors/app-error';
 
 export const workspaceController = {
     async listWorkspaces(req: Request, res: Response) {
-        if (!req.auth?.userId) {
-            throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-        }
-
-        const workspaces = await workspaceService.listUserWorkspaces(req.auth.userId);
-
+        const userId = req.auth!.userId;
+        const workspaces = await workspaceService.listUserWorkspaces(userId);
         res.json({
             success: true,
             data: workspaces
@@ -17,39 +13,27 @@ export const workspaceController = {
     },
 
   async createWorkspace(req: Request, res: Response) {
-        if (!req.auth?.userId) {
-            throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-    }
-
-        const workspace = await workspaceService.createWorkspace(req.body, req.auth.userId);
+        const userId = req.auth!.userId;
+        const workspace = await workspaceService.createWorkspace(req.body, userId);
         res.status(201).json({ success: true, data: workspace });
     },
 
     async getWorkspaceDetail(req: Request, res: Response) {
-        if (!req.auth?.userId) {
-            throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-        }
-
+        const userId = req.auth!.userId;
         const { workspaceId } = req.params as { workspaceId: string };
-        const workspaceDetail = await workspaceService.getWorkspaceDetail(workspaceId, req.auth.userId);
+        const workspaceDetail = await workspaceService.getWorkspaceDetail(workspaceId, userId);
         res.json({ success: true, data: workspaceDetail });
     },
 
     async updateWorkSpace(req: Request, res: Response) {
-        if (!req.auth?.userId) {
-            throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-        }
-
+        const userId = req.auth!.userId;
         const { workspaceId } = req.params as { workspaceId: string };
-        const updatedWorkspace = await workspaceService.updateWorkSpace(workspaceId, req.body, req.auth.userId);
+        const updatedWorkspace = await workspaceService.updateWorkSpace(workspaceId, req.body, userId);
         res.json({ success: true, data: updatedWorkspace });
     },
 
     async inviteWorkspaceMember(req: Request, res: Response) {
-        if (!req.auth?.userId) {
-            throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-        }
-
+        const userId = req.auth!.userId;
         const { workspaceId } = req.params as { workspaceId: string };
         const { email, role } = req.body as {
             email: string;
@@ -59,7 +43,7 @@ export const workspaceController = {
         const result = await workspaceService.inviteWorkspaceMember(
             workspaceId,
             email,
-            req.auth.userId,
+            userId,
             role,
         );
 
@@ -67,13 +51,11 @@ export const workspaceController = {
     },
 
   async acceptWorkspaceInvite(req: Request, res: Response) {
-      if (!req.auth?.userId) {
-          throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-      }
+      const userId = req.auth!.userId;
       const { token } = req.body as { token: string };
       const result = await workspaceService.acceptWorkspaceInvitation(
           token, 
-          req.auth.userId
+          userId
       );
 
       res.status(200).json(result);

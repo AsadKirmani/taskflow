@@ -25,4 +25,7 @@ export const commentRepository = {
   async getCommentById(commentId: string) {
     return CommentModel.findById(commentId);
   },
+  async deleteComment(commentId: string) {
+    await CommentModel.findByIdAndDelete(commentId);
+  }
 };

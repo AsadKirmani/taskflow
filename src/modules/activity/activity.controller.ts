@@ -16,48 +16,35 @@ const parsePagination = (req: Request) => {
 
 export const activityController = {
   async getGlobalActivity(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-    }
-
     const { page, limit } = parsePagination(req);
-
-    const result = await activityService.getGlobalActivity(req.auth.userId, page, limit);
+    const userId = req.auth!.userId;
+    const result = await activityService.getGlobalActivity(userId, page, limit);
     res.json({ success: true, data: { ...result, page, limit } });
   },
   async getWorkspaceActivity(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-    }
 
     const { workspaceId } = req.params as { workspaceId: string };
     const { page, limit } = parsePagination(req);
-
-    const result = await activityService.getWorkspaceActivity(workspaceId, page, limit);
+    const userId = req.auth!.userId;
+    const result = await activityService.getWorkspaceActivity(userId, workspaceId, page, limit);
     res.json({ success: true, data: { ...result, page, limit } });
   },
 
   async getBoardActivity(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-    }
 
     const { workspaceId, boardId } = req.params as { workspaceId: string; boardId: string };
     const { page, limit } = parsePagination(req);
-
-    const result = await activityService.getBoardActivity(workspaceId, boardId, page, limit);
+    const userId = req.auth!.userId;
+    const result = await activityService.getBoardActivity(userId, workspaceId, boardId, page, limit);
     res.json({ success: true, data: { ...result, page, limit } });
   },
 
   async getTaskActivity(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-    }
 
     const { taskId } = req.params as { taskId: string };
     const { page, limit } = parsePagination(req);
-
-    const result = await activityService.getTaskActivity(taskId, page, limit);
+    const userId = req.auth!.userId;
+    const result = await activityService.getTaskActivity(userId, taskId, page, limit);
     res.json({ success: true, data: { ...result, page, limit } });
   }
 };

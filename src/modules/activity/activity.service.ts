@@ -26,15 +26,15 @@ export const activityService = {
     return activityRepository.getGlobalActivity(workspaceIds, page, limit);
   },
 
-  async getWorkspaceActivity(workspaceId: string, page: number, limit: number) {
+  async getWorkspaceActivity(userId: string, workspaceId: string, page: number, limit: number) {
     return activityRepository.getWorkspaceActivity(workspaceId, page, limit);
   },
 
-  async getBoardActivity(workspaceId: string, boardId: string, page: number, limit: number) {
+  async getBoardActivity(userId: string, workspaceId: string, boardId: string, page: number, limit: number) {
     return activityRepository.getBoardActivity(workspaceId, boardId, page, limit);
   },
 
-  async getTaskActivity(taskId: string, page: number, limit: number) {
+  async getTaskActivity(userId: string, taskId: string, page: number, limit: number) {
     return activityRepository.getTaskActivity(taskId, page, limit);
   }
 };

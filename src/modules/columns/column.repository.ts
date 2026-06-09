@@ -24,14 +24,16 @@ export const columnRepository = {
     });
     return updatedColumn;
   },
+  getColumnById(columnId: string) {
+    return ColumnModel.findById(columnId);
+  },
   async getColumnsByBoardId(boardId: string) {
     return ColumnModel.find({ boardId }).sort({ position: 1 });
   },
-  async reorderColumns(columnIds: string[]) {
-    await Promise.all(
-      columnIds.map((id, index) =>
-        ColumnModel.findByIdAndUpdate(id, { position: index })
-      )
-    );
+  async reorderTasks(columnId: string, newTaskOrder: string[]) {
+    return await ColumnModel.findByIdAndUpdate(
+      columnId, 
+      {$set: { taskOrder: newTaskOrder }}, 
+      { new: true });
   }
 };

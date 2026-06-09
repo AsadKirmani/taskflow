@@ -9,12 +9,14 @@ const router = Router();
 
 router.get('/boards/:boardId/tasks', authMiddleware, asyncHandler(taskController.getTasksInBoard));
 
-router.post('/boards/:boardId/columns/:columnId/tasks', authMiddleware, validate(createTaskDto), asyncHandler(taskController.createTask));
+router.post('/tasks', authMiddleware, validate(createTaskDto), asyncHandler(taskController.createTask));
 
-router.get('/boards/:boardId/tasks/:taskId', authMiddleware, asyncHandler(taskController.getTaskById));
+router.get('/tasks/:taskId', authMiddleware, asyncHandler(taskController.getTaskById));
 
-router.patch('/boards/:boardId/tasks/:taskId', authMiddleware, validate(updateTaskDto), asyncHandler(taskController.updateTask));
+router.patch('/tasks/:taskId', authMiddleware, validate(updateTaskDto), asyncHandler(taskController.updateTask));
 
-router.patch('/boards/:boardId/tasks/:taskId/move', authMiddleware, validate(moveTaskDto), asyncHandler(taskController.moveTask));
+router.patch('/tasks/:taskId/move', authMiddleware, validate(moveTaskDto), asyncHandler(taskController.moveTask));
+
+router.delete('/tasks/:taskId', authMiddleware, asyncHandler(taskController.deleteTask));
 
 export default router;

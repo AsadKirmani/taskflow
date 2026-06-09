@@ -11,7 +11,7 @@ const BoardSchema = new Schema(
     },
     workSpaceName: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
       maxlength: 120
     },
