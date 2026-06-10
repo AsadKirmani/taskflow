@@ -127,7 +127,7 @@ export const boardController = {
     await PermissionService.ensureBoardPermission(
       userId,
       { workspaceId: board.workspaceId.toString() },
-      PERMISSION.BOARD_EDIT
+      PERMISSION.BOARD_DELETE
     );
 
     await boardService.deleteBoard(boardId, userId);

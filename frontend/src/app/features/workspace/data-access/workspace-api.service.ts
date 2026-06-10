@@ -9,7 +9,11 @@ import { Workspace } from "../../../core/models/workspace.model";
 export class WorkspaceApiService {
   private readonly baseUrl = `${environment.apiUrl}/workspaces`;
   private readonly http = inject(HttpClient);
-
+  getMeContext(): Observable<ApiResponse<Workspace[]>> {
+    return this.http.get<ApiResponse<Workspace[]>>(`${this.baseUrl}/me`, {
+      withCredentials: true
+    });
+  }
   getWorkspaces(): Observable<ApiResponse<Workspace[]>> {
     return this.http.get<ApiResponse<Workspace[]>>(this.baseUrl, {
       withCredentials: true

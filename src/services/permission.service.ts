@@ -43,6 +43,7 @@ console.log("User role in workspace:", role);
     if (!role) {
       return false;
     }
+    if (role === 'OWNER') return true;
 
     const permissions =
       ROLE_PERMISSIONS[
@@ -51,10 +52,6 @@ console.log("User role in workspace:", role);
 
     if (!permissions) {
       return false;
-    }
-
-    if (role === 'OWNER') {
-      return true;
     }
 
     return permissions.includes(permission);

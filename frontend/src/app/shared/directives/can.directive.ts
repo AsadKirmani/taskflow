@@ -1,21 +1,31 @@
-import { Directive, Input, TemplateRef, ViewContainerRef, OnInit, effect, inject } from '@angular/core';
+import { Directive, input, TemplateRef, ViewContainerRef, effect, inject } from '@angular/core';
 import { PermissionService } from '../../core/services/permission.service';
+import { Permission } from '../../core/config/permissions';
 
-@Directive({ selector: '[appCan]', standalone: true })
-export class CanDirective implements OnInit {
-  @Input('appCan') permission!: string;
+@Directive({ 
+  selector: '[appCan]', 
+  standalone: true 
+})
+export class CanDirective {
+  permission = input.required<Permission>({ alias: 'appCan' });
+  
   private permissionService = inject(PermissionService);
-  private checkAccess = this.permissionService.hasPermission(this.permission);
+  private templateRef = inject(TemplateRef<any>);
+  private viewContainer = inject(ViewContainerRef);
 
-  constructor(private templateRef: TemplateRef<any>, private viewContainer: ViewContainerRef) {
+  constructor() {
     effect(() => {
-      if (this.checkAccess()) {
-        this.viewContainer.createEmbeddedView(this.templateRef);
+      const requiredPerm = this.permission();
+
+      const isAllowed = this.permissionService.hasPermission(requiredPerm);
+      
+      if (isAllowed) {
+        if (this.viewContainer.length === 0) {
+          this.viewContainer.createEmbeddedView(this.templateRef);
+        }
       } else {
         this.viewContainer.clear();
       }
     });
   }
-
-  ngOnInit() {}
 }
