@@ -12,6 +12,7 @@ const applyActivityPopulation = <T>(query: T & {
   ]);
 
 export const activityRepository = {
+
   async logActivity(data: {
     workspaceId: string;
     userId: string;
@@ -23,6 +24,7 @@ export const activityRepository = {
     taskId?: string;
     metadata?: Record<string, unknown>;
   }) {
+
     return ActivityLogModel.create({
       workspaceId: data.workspaceId,
       boardId: data.boardId ?? null,
@@ -35,9 +37,20 @@ export const activityRepository = {
       metadata: data.metadata ?? {}
     });
   },
-  async getGlobalActivity(workspaceIds: string[], page: number, limit: number) {
+
+  async getGlobalActivity(
+    workspaceIds: string[],
+    page: number,
+    limit: number
+  ) {
+
     const skip = (page - 1) * limit;
-    const query = { workspaceId: { $in: workspaceIds } };
+
+    const query = {
+      workspaceId: {
+        $in: workspaceIds
+      }
+    };
 
     const [items, total] = await Promise.all([
       applyActivityPopulation(
@@ -45,33 +58,29 @@ export const activityRepository = {
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
+          .lean()
       ),
+
       ActivityLogModel.countDocuments(query)
     ]);
 
-    const enrichedItems = await enrichMoveColumnNames(items as Array<Record<string, unknown>>);
-    return { items: enrichedItems, total };
+    return {
+      items: await enrichMoveColumnNames(items),
+      total
+    };
   },
 
-  async getWorkspaceActivity(workspaceId: string, page: number, limit: number) {
-    const skip = (page - 1) * limit;
-    const [items, total] = await Promise.all([
-      applyActivityPopulation(
-        ActivityLogModel.find({ workspaceId })
-          .sort({ createdAt: -1 })
-          .skip(skip)
-          .limit(limit)
-      ),
-      ActivityLogModel.countDocuments({ workspaceId })
-    ]);
+  async getWorkspaceActivity(
+    workspaceId: string,
+    page: number,
+    limit: number
+  ) {
 
-    const enrichedItems = await enrichMoveColumnNames(items as Array<Record<string, unknown>>);
-    return { items: enrichedItems, total };
-  },
-
-  async getBoardActivity(workspaceId: string, boardId: string, page: number, limit: number) {
     const skip = (page - 1) * limit;
-    const query = { workspaceId, boardId };
+
+    const query = {
+      workspaceId
+    };
 
     const [items, total] = await Promise.all([
       applyActivityPopulation(
@@ -79,17 +88,31 @@ export const activityRepository = {
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
+          .lean()
       ),
+
       ActivityLogModel.countDocuments(query)
     ]);
 
-    const enrichedItems = await enrichMoveColumnNames(items as Array<Record<string, unknown>>);
-    return { items: enrichedItems, total };
+    return {
+      items: await enrichMoveColumnNames(items),
+      total
+    };
   },
 
-  async getTaskActivity(taskId: string, page: number, limit: number) {
+  async getBoardActivity(
+    workspaceId: string,
+    boardId: string,
+    page: number,
+    limit: number
+  ) {
+
     const skip = (page - 1) * limit;
-    const query = { taskId };
+
+    const query = {
+      workspaceId,
+      boardId
+    };
 
     const [items, total] = await Promise.all([
       applyActivityPopulation(
@@ -97,66 +120,131 @@ export const activityRepository = {
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
+          .lean()
       ),
+
       ActivityLogModel.countDocuments(query)
     ]);
 
-    const enrichedItems = await enrichMoveColumnNames(items as Array<Record<string, unknown>>);
-    return { items: enrichedItems, total };
+    return {
+      items: await enrichMoveColumnNames(items),
+      total
+    };
+  },
+
+  async getTaskActivity(
+    taskId: string,
+    page: number,
+    limit: number
+  ) {
+
+    const skip = (page - 1) * limit;
+
+    const query = {
+      taskId
+    };
+
+    const [items, total] = await Promise.all([
+      applyActivityPopulation(
+        ActivityLogModel.find(query)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean()
+      ),
+
+      ActivityLogModel.countDocuments(query)
+    ]);
+
+    return {
+      items: await enrichMoveColumnNames(items),
+      total
+    };
   }
 };
 
-const enrichMoveColumnNames = async (items: Array<Record<string, unknown>>) => {
+async function enrichMoveColumnNames(
+  items: Array<Record<string, unknown>>
+) {
+
   const columnIds = new Set<string>();
 
   for (const item of items) {
-    const actionType = String(item['actionType'] ?? '');
-    const metadata = (item['metadata'] ?? {}) as Record<string, unknown>;
 
-    if (actionType !== 'task_moved') {
+    if (item.actionType !== 'task_moved') {
       continue;
     }
 
-    const sourceId = typeof metadata['sourceColumnId'] === 'string' ? metadata['sourceColumnId'] : null;
-    const destinationId = typeof metadata['destinationColumnId'] === 'string' ? metadata['destinationColumnId'] : null;
+    const metadata =
+      (item.metadata ?? {}) as Record<string, unknown>;
 
-    if (sourceId) {
-      columnIds.add(sourceId);
+    const sourceColumnId =
+      metadata.sourceColumnId as string | undefined;
+
+    const destinationColumnId =
+      metadata.destinationColumnId as string | undefined;
+
+    if (sourceColumnId) {
+      columnIds.add(sourceColumnId);
     }
 
-    if (destinationId) {
-      columnIds.add(destinationId);
+    if (destinationColumnId) {
+      columnIds.add(destinationColumnId);
     }
   }
 
-  if (columnIds.size === 0) {
+  if (!columnIds.size) {
     return items;
   }
 
-  const columns = await ColumnModel.find({ _id: { $in: [...columnIds] } }).select('_id name');
-  const columnNameById = new Map(columns.map(column => [column._id.toString(), column.name]));
+  const columns = await ColumnModel.find({
+    _id: {
+      $in: [...columnIds]
+    }
+  })
+    .select('_id name')
+    .lean();
+
+  const columnMap = new Map(
+    columns.map(column => [
+      column._id.toString(),
+      column.name
+    ])
+  );
 
   for (const item of items) {
-    const actionType = String(item['actionType'] ?? '');
-    const metadata = (item['metadata'] ?? {}) as Record<string, unknown>;
 
-    if (actionType !== 'task_moved') {
+    if (item.actionType !== 'task_moved') {
       continue;
     }
 
-    const sourceId = typeof metadata['sourceColumnId'] === 'string' ? metadata['sourceColumnId'] : null;
-    const destinationId = typeof metadata['destinationColumnId'] === 'string' ? metadata['destinationColumnId'] : null;
+    const metadata =
+      (item.metadata ?? {}) as Record<string, unknown>;
 
-    if (!metadata['sourceColumnName'] && sourceId && columnNameById.has(sourceId)) {
-      metadata['sourceColumnName'] = columnNameById.get(sourceId);
+    const sourceColumnId =
+      metadata.sourceColumnId as string | undefined;
+
+    const destinationColumnId =
+      metadata.destinationColumnId as string | undefined;
+
+    if (
+      sourceColumnId &&
+      !metadata.sourceColumnName
+    ) {
+      metadata.sourceColumnName =
+        columnMap.get(sourceColumnId);
     }
 
-    if (!metadata['destinationColumnName'] && destinationId && columnNameById.has(destinationId)) {
-      metadata['destinationColumnName'] = columnNameById.get(destinationId);
+    if (
+      destinationColumnId &&
+      !metadata.destinationColumnName
+    ) {
+      metadata.destinationColumnName =
+        columnMap.get(destinationColumnId);
     }
 
-    item['metadata'] = metadata;
+    item.metadata = metadata;
   }
 
   return items;
-};
+}

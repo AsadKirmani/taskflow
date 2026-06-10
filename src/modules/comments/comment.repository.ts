@@ -6,7 +6,8 @@ export const commentRepository = {
     taskId: string;
     boardId: string;
     workspaceId: string;
-    userId: string;
+    author: string;
+    authorId: string;
   }) {
     const newComment = await CommentModel.create(data);
     return newComment;

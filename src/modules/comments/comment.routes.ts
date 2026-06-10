@@ -7,10 +7,10 @@ import { commentController } from './comment.controller';
 
 const router = Router();
 
-router.get('/comments', authMiddleware, asyncHandler(commentController.getCommentsByTaskId));
+router.get('/tasks/:taskId/comments', authMiddleware, asyncHandler(commentController.getCommentsByTaskId));
 
 router.post(
-  '/comments',
+  '/tasks/:taskId/comments',
   authMiddleware,
   validate(createCommentDto),
   asyncHandler(commentController.createComment)

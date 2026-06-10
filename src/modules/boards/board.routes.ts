@@ -13,40 +13,40 @@ router.get(
   asyncHandler(boardController.getBoardsInWorkspace),
 );
 router.post(
-  "/",
+  "/boards",
   authMiddleware,
   validate(createBoardDto),
   asyncHandler(boardController.createBoard),
 );
 router.get(
-  "/",
+  "/boards",
   authMiddleware,
   asyncHandler(boardController.getBoards),
 );
 router.get(
-  ":boardId",
+  "/boards/:boardId",
   authMiddleware,
   asyncHandler(boardController.getBoardById),
 );
 
 router.patch(
-  ":boardId",
+  "/boards/:boardId",
   authMiddleware,
   validate(updateBoardDto),
   asyncHandler(boardController.updateBoard),
 );
 
 router.delete(
-  "/:boardId",
+  "/boards/:boardId",
   authMiddleware,
   asyncHandler(boardController.deleteBoard),
 );
 
-// router.patch(
-//   "/workspaces/:workspaceId/boards/:boardId/reorder-columns",
-//   authMiddleware,
-//   validate(reorderColumnsDto),
-//   asyncHandler(boardController.reorderColumns),
-// );
+router.patch(
+  "/boards/:boardId/reorder-columns",
+  authMiddleware,
+  validate(reorderColumnsDto),
+  asyncHandler(boardController.reorderColumns),
+);
 
 export default router;

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { workspaceService } from './workspace.service';
 import { AppError } from '../../shared/errors/app-error';
+import { PermissionService } from '../../services/permission.service';
+import { WorkspaceRole } from '../../shared/constants/enums';
 
 export const workspaceController = {
     async listWorkspaces(req: Request, res: Response) {
@@ -28,6 +30,7 @@ export const workspaceController = {
     async updateWorkSpace(req: Request, res: Response) {
         const userId = req.auth!.userId;
         const { workspaceId } = req.params as { workspaceId: string };
+        await PermissionService.ensure(workspaceId, userId, 'workspace:edit');
         const updatedWorkspace = await workspaceService.updateWorkSpace(workspaceId, req.body, userId);
         res.json({ success: true, data: updatedWorkspace });
     },
@@ -39,7 +42,8 @@ export const workspaceController = {
             email: string;
             role: string;
         };
-
+        await PermissionService.ensure(workspaceId, userId, 'member:invite');
+        await PermissionService.ensureCanInviteRole(userId, workspaceId, role as WorkspaceRole);
         const result = await workspaceService.inviteWorkspaceMember(
             workspaceId,
             email,
@@ -59,5 +63,20 @@ export const workspaceController = {
       );
 
       res.status(200).json(result);
+  },
+  async updateWorkspaceMemberRole(req: Request, res: Response) {
+    const userId = req.auth!.userId;
+    const { workspaceId, memberId } = req.params as { workspaceId: string; memberId: string };
+    const { newRole } = req.body as { newRole: string };
+    await PermissionService.ensure(workspaceId, userId, 'member:role_change');
+    await PermissionService.ensureCanChangeRole(userId, workspaceId, newRole as WorkspaceRole);
+  },
+  async removeWorkspaceMember(req: Request, res: Response) {
+    const userId = req.auth!.userId;
+    const { workspaceId, memberId } = req.params as { workspaceId: string; memberId: string };
+    await PermissionService.ensure(workspaceId, userId, 'member:remove');
+    await PermissionService.ensureCanManageMember(userId, memberId, workspaceId);
+    await workspaceService.removeWorkspaceMember(workspaceId, memberId, userId);
+    res.json({ success: true, message: 'Member removed successfully' });
   }
 };

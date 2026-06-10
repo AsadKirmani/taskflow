@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 import { AppError } from "../../shared/errors/app-error";
 import { PermissionService } from "../../services/permission.service";
-import { PERMISSIONS } from "../../config/roles";
+import { PERMISSION } from "../../config/roles";
 import { columnService } from "./column.service";
 import { boardService } from "../boards/board.service"; // 👈 Board verify karne ke liye
 
@@ -25,12 +25,7 @@ export const columnController = {
     }
 
     // Permission Check
-    const hasAccess = await PermissionService.hasPermission(userId, workspaceId, PERMISSIONS.COLUMN_CREATE); // (Agar tumne roles.ts me COLUMN_CREATE rakha hai, toh wahi use karna)
-    // (Agar tumne roles.ts me COLUMN_CREATE rakha hai, toh wahi use karna)
-    if (!hasAccess) {
-      throw new AppError("Aapko is workspace mein naya column create karne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
-
+    await PermissionService.ensureBoardPermission(userId, { workspaceId }, PERMISSION.COLUMN_CREATE);
     const column = await columnService.createColumn(name, boardId, workspaceId, userId);
     res.status(201).json({ success: true, data: column });
   },
@@ -48,15 +43,11 @@ export const columnController = {
     }
 
     // 🛡️ STEP 2: Ab verified workspaceId ke sath access check karo
-    const hasAccess = await PermissionService.hasPermission(
-      userId, 
-      column.workspaceId.toString(), 
-      PERMISSIONS.COLUMN_EDIT // Column update karna column edit karne ke barabar hai
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId: column.workspaceId.toString() },
+      PERMISSION.COLUMN_EDIT
     );
-    
-    if (!hasAccess) {
-      throw new AppError("Aapko is column ko update karne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
 
     const updatedColumn = await columnService.updateColumn(columnId, { name, archived }, userId);
     res.json({ success: true, data: updatedColumn });
@@ -74,10 +65,7 @@ export const columnController = {
     }
 
     // 🛡️ STEP 2: Check karo ki user ke paas is workspace ke boards dekhne ka right hai ya nahi
-    const hasAccess = await PermissionService.hasPermission(userId, board.workspaceId.toString(), PERMISSIONS.BOARD_VIEW);
-    if (!hasAccess) {
-      throw new AppError("Aapko is board ke columns dekhne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
+    await PermissionService.ensureColumnPermission(userId, { workspaceId: board.workspaceId.toString() }, PERMISSION.COLUMN_VIEW);
 
     const columns = await columnService.getColumnsByBoardId(boardId, userId);
     res.json({ success: true, data: { columns } });
@@ -96,17 +84,12 @@ export const columnController = {
     }
 
     // 🛡️ STEP 2: Task reordering requires EDIT permissions on the board/tasks
-    const hasAccess = await PermissionService.hasPermission(
-       userId, 
-       column.workspaceId.toString(), 
-       PERMISSIONS.TASK_EDIT // Task idhar se udhar karna TASK_EDIT mein aana chahiye
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId: column.workspaceId.toString() },
+      PERMISSION.TASK_EDIT
     );
-    
-    if (!hasAccess) {
-      throw new AppError("Aapko tasks reorder karne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
-
     await columnService.reorderTasks(columnId, taskIds, userId);
-    res.json({ success: true, message: "Tasks reordered successfully", data: null });
+    res.json({ success: true });
   }
 };

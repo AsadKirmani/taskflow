@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 import { AppError } from "../../shared/errors/app-error";
 import { PermissionService } from "../../services/permission.service";
-import { PERMISSIONS } from "../../config/roles";
+import { PERMISSION } from "../../config/roles";
 import { boardService } from "./board.service";
 
 export const boardController = {
@@ -15,13 +15,13 @@ export const boardController = {
     if (!workspaceId) {
       throw new AppError("workspaceId is required in the request body", 400, "BAD_REQUEST");
     }
-
-    const hasAccess = await PermissionService.hasPermission(userId, workspaceId, PERMISSIONS.BOARD_CREATE);
-    if (!hasAccess) {
-      throw new AppError("Aapko is workspace mein naya board create karne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
-
+    await PermissionService.ensureBoardPermission(
+      userId,
+      workspaceId,
+      PERMISSION.BOARD_CREATE
+    );
     const board = await boardService.createBoard(req.body, userId);
+
     res.status(201).json({ success: true, data: board });
   },
 
@@ -37,10 +37,11 @@ export const boardController = {
     }
 
     // Step 2: Permission check using DB workspaceId
-    const hasAccess = await PermissionService.hasPermission(userId, board.workspaceId.toString(), PERMISSIONS.BOARD_VIEW);
-    if (!hasAccess) {
-      throw new AppError("Aapko is board ko dekhne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId: board.workspaceId.toString() },
+      PERMISSION.BOARD_VIEW
+    );
 
     res.json({ success: true, data: board });
   },
@@ -49,14 +50,12 @@ export const boardController = {
   async getBoardsInWorkspace(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { workspaceId } = req.params as { workspaceId: string };
-    
-    // URL mein workspaceId hai, direct check maro
-    const hasAccess = await PermissionService.hasPermission(userId, workspaceId, PERMISSIONS.BOARD_VIEW);
-    if (!hasAccess) {
-      throw new AppError("Aapko is workspace ke boards dekhne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
-
     const boards = await boardService.getBoardsInWorkspace(workspaceId, userId);
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId },
+      PERMISSION.BOARD_VIEW
+    );
     res.json({ success: true, data: { items: boards } });
   },
 
@@ -72,10 +71,11 @@ export const boardController = {
     }
 
     // Step 2: Asli workspaceId ke sath verify karo
-    const hasAccess = await PermissionService.hasPermission(userId, existingBoard.workspaceId.toString(), PERMISSIONS.BOARD_EDIT);
-    if (!hasAccess) {
-      throw new AppError("Aapko is board ko update karne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId: existingBoard.workspaceId.toString() },
+      PERMISSION.BOARD_EDIT
+    );
     
     const updatedBoard = await boardService.updateBoard(boardId, req.body, userId);
     res.json({ success: true, data: updatedBoard });
@@ -104,10 +104,11 @@ export const boardController = {
     }
 
     // Step 2: Edit permission check karo
-    const hasAccess = await PermissionService.hasPermission(userId, board.workspaceId.toString(), PERMISSIONS.BOARD_EDIT);
-    if (!hasAccess) {
-      throw new AppError("Aapko is board ke columns reorder karne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId: board.workspaceId.toString() },
+      PERMISSION.BOARD_EDIT
+    );
 
     await boardService.reorderColumns(boardId, columnIds, userId);
     res.json({ success: true, message: "Column order updated" });
@@ -123,10 +124,11 @@ export const boardController = {
     }
 
     // Step 2: Edit permission check karo
-    const hasAccess = await PermissionService.hasPermission(userId, board.workspaceId.toString(), PERMISSIONS.BOARD_EDIT);
-    if (!hasAccess) {
-      throw new AppError("Aapko is board ko delete karne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId: board.workspaceId.toString() },
+      PERMISSION.BOARD_EDIT
+    );
 
     await boardService.deleteBoard(boardId, userId);
     res.json({ success: true, message: "Board deleted successfully" });

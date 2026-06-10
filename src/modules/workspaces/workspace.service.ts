@@ -7,6 +7,7 @@ import { activityService } from '../activity/activity.service';
 import crypto from 'crypto';
 import { PermissionService } from '../../services/permission.service';
 import { WorkspaceMemberModel } from '../../models/workspace-member.model';
+import { PERMISSION } from '../../config/roles';
 
 const createSlug = (value: string) => {
   const slug = value
@@ -123,6 +124,17 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
   },
 
   async updateWorkspaceMemberRole(workspaceId: string, memberId: string, newRole: string, userId: string) {
+    const updatedMember = await workspaceRepository.updateMemberRole(workspaceId, memberId, newRole);
+    if (updatedMember) {
+      await activityService.logActivity({
+        workspaceId,
+        userId,
+        actionType: 'workspace_member_role_updated',
+        entityType: 'workspace',
+        entityId: workspaceId,
+        metadata: { memberId, newRole }
+      });
+    }
     return { success: true, message: `Member ${memberId} role updated to ${newRole}` };
   },
 
@@ -177,15 +189,29 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
       workspaceId 
     };
   },
-  async deleteWorkspace(workspaceId: string, userId: string) {
+  async removeWorkspaceMember(workspaceId: string, memberId: string, userId: string) {
     const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
     if (!workspace) {
       throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
     }
-    // Check if the user has permission to delete the workspace
-    const hasPermission = await PermissionService.hasPermission(userId, workspaceId, 'workspace:delete');
-    if (!hasPermission) {
-      throw new AppError('Unauthorized', 403, 'FORBIDDEN');
+    const member = await WorkspaceMemberModel.findOne({ workspaceId, userId: memberId });
+    if (!member) {
+      throw new AppError('Member not found in workspace', 404, 'MEMBER_NOT_FOUND');
+    }
+    await workspaceRepository.removeMemberFromWorkspace(workspaceId, memberId);
+    await activityService.logActivity({
+      workspaceId,
+      userId,
+      actionType: 'workspace_member_removed',
+      entityType: 'workspace',
+      entityId: workspaceId,
+      metadata: { memberId }
+    });
+  },
+  async deleteWorkspace(workspaceId: string, userId: string) {
+    const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
     }
     await workspaceRepository.deleteWorkspace(workspaceId);
     await activityService.logActivity({

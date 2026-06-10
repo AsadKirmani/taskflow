@@ -66,9 +66,9 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/workspaces', workspaceRoutes);
-app.use('/api/v1/boards', boardRoutes);
+app.use('/api/v1', boardRoutes);
 app.use('/api/v1', columnRoutes);
-app.use('/api/v1/', taskRoutes);
+app.use('/api/v1', taskRoutes);
 app.use('/api/v1', commentRoutes);
 app.use('/api/v1/activity', activityRoutes);
 app.use('/api/v1', archiveRoutes);

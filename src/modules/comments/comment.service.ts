@@ -8,14 +8,16 @@ export const commentService = {
     taskId: string,
     boardId: string,
     workspaceId: string,
-    userId: string,
+    author: string,
+    authorId: string,
   ) {
     const newComment = await commentRepository.createComment({
         content,
         taskId,
         boardId,
         workspaceId,
-        userId,
+        author,
+        authorId,
     });
     const task = await taskRepository.getTaskById(taskId);
     await taskRepository.updateTask(taskId, { commentCount: (task?.commentCount ?? 0) + 1 });
@@ -24,7 +26,7 @@ export const commentService = {
       workspaceId,
       boardId,
       taskId,
-      userId,
+      userId: authorId,
       actionType: 'comment_created',
       entityType: 'comment',
       entityId: newComment._id.toString(),
@@ -64,6 +66,9 @@ export const commentService = {
       }
 
     return updatedComment;
+  },
+  getCommentById(commentId: string) {
+    return commentRepository.getCommentById(commentId);
   },
   async deleteComment(commentId: string, userId: string) {
     const existingComment = await commentRepository.getCommentById(commentId);

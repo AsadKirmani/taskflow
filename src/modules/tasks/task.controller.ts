@@ -2,7 +2,7 @@ import { taskService } from "./task.service";
 import { Request, Response } from "express";
 import { AppError } from "../../shared/errors/app-error";
 import { PermissionService } from "../../services/permission.service";
-import { PERMISSIONS } from "../../config/roles";
+import { PERMISSION } from "../../config/roles";
 import { boardService } from "../boards/board.service";
 
 const parseCsv = (value: unknown): string[] => {
@@ -30,10 +30,11 @@ export const taskController = {
     if (!board || board.workspaceId.toString() !== workspaceId) {
       throw new AppError("Invalid Board or Workspace combination", 400, "BAD_REQUEST");
     }
-    const hasAccess = await PermissionService.hasPermission(userId, workspaceId, PERMISSIONS.TASK_CREATE);
-    if (!hasAccess) {
-      throw new AppError("Aapko is workspace mein naya task create karne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
+    await PermissionService.ensureTaskPermission(
+      userId,
+      { workspaceId },
+      PERMISSION.TASK_CREATE
+    );
     const newTask = await taskService.createTask(
       title,
       description,
@@ -57,12 +58,6 @@ export const taskController = {
     if (!board) {
       throw new AppError("Board not found", 404, "NOT_FOUND");
     }
-
-    const hasAccess = await PermissionService.hasPermission(userId, board.workspaceId.toString(), PERMISSIONS.TASK_VIEW);
-    if (!hasAccess) {
-      throw new AppError("Aapko is board ke tasks dekhne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
-
     const tasks = await taskService.getTasksInBoard(boardId, {
       search: typeof req.query.search === 'string' ? req.query.search : '',
       priorities: parseCsv(req.query.priorities),
@@ -83,6 +78,11 @@ export const taskController = {
           ? dueType
           : 'all'
     });
+      await PermissionService.ensureTaskPermission(
+        userId,
+        { workspaceId: board.workspaceId.toString() },
+        PERMISSION.TASK_VIEW
+      );
     res.json({ success: true, data: { items: tasks } });
   },
   async getTaskById(req: Request, res: Response) {
@@ -92,10 +92,11 @@ export const taskController = {
     if (!task) {
       throw new AppError("Task not found", 404, "NOT_FOUND");
     }
-    const hasAccess = await PermissionService.hasPermission(userId, task.workspaceId.toString(), PERMISSIONS.TASK_VIEW);
-    if (!hasAccess) {
-      throw new AppError("Aapko is task ko dekhne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
+    await PermissionService.ensureTaskPermission(
+      userId,
+      { workspaceId: task.workspaceId.toString() },
+      PERMISSION.TASK_VIEW
+    );
     res.json({ success: true, data: { task } });
   },
   async updateTask(req: Request, res: Response) {
@@ -129,10 +130,11 @@ export const taskController = {
     if (!task) {
       throw new AppError("Task not found", 404, "NOT_FOUND");
     }
-    const hasAccess = await PermissionService.hasPermission(userId, task.workspaceId.toString(), PERMISSIONS.TASK_EDIT);
-    if (!hasAccess) {
-      throw new AppError("Aapko is task ko edit karne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
+    await PermissionService.ensureTaskPermission(
+      userId,
+      { workspaceId: task.workspaceId.toString() },
+      PERMISSION.TASK_EDIT
+    );
 
     const updatedTask = await taskService.updateTask(taskId, updatePayload, req.auth!.userId);
     res.json({ success: true, data: updatedTask });
@@ -149,10 +151,11 @@ export const taskController = {
     if (!task) {
       throw new AppError("Task not found", 404, "NOT_FOUND");
     }
-    const hasAccess = await PermissionService.hasPermission(userId, task.workspaceId.toString(), PERMISSIONS.TASK_EDIT);
-    if (!hasAccess) {
-      throw new AppError("Aapko is task ko move karne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
+    await PermissionService.ensureTaskPermission(
+      userId,
+      { workspaceId: task.workspaceId.toString() },
+      PERMISSION.TASK_EDIT
+    );
     await taskService.moveTask(taskId, sourceColumnId, targetColumnId, targetIndex, userId);
     res.json({ success: true, message: "Task moved successfully", data: null });
   },
@@ -163,10 +166,11 @@ export const taskController = {
     if (!task) {
       throw new AppError("Task not found", 404, "NOT_FOUND");
     }
-    const hasAccess = await PermissionService.hasPermission(userId, task.workspaceId.toString(), PERMISSIONS.TASK_DELETE);
-    if (!hasAccess) {
-      throw new AppError("Aapko is task ko delete karne ki permission nahi hai.", 403, "FORBIDDEN");
-    }
+    await PermissionService.ensureTaskPermission(
+      userId,
+      { workspaceId: task.workspaceId.toString() },
+      PERMISSION.TASK_DELETE
+    );
     await taskService.deleteTask(taskId, userId);
     res.json({ success: true, message: "Task deleted successfully", data: null });
   }

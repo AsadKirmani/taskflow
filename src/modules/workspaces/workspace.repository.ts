@@ -96,6 +96,17 @@ async workspaceInvitation(workspaceId: string, email: string, role: string, invi
 
     return newMember;
   },
+  async updateMemberRole(workspaceId: string, userId: string, newRole: string) {
+    const updatedMember = await WorkspaceMemberModel.findOneAndUpdate(
+      { workspaceId, userId },
+      { role: newRole },
+      { new: true }
+    );
+    return updatedMember;
+  },
+  async removeMemberFromWorkspace(workspaceId: string, userId: string) {
+    await WorkspaceMemberModel.findOneAndDelete({ workspaceId, userId });
+  },
   async deleteWorkspace(workspaceId: string) {
     return WorkspaceModel.findByIdAndDelete(workspaceId);
   }
