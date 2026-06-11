@@ -20,8 +20,6 @@ export class PermissionService {
         })
         .select('role')
         .lean();
-    console.log("Membership found for user:", userId, "in workspace:", workspaceId, "is:", membership);
-
     return membership?.role ?? null;
   }
 
@@ -33,13 +31,11 @@ export class PermissionService {
     workspaceId: string,
     permission: Permission
   ): Promise<boolean> {
-console.log("Checking permission for user:", userId, "in workspace:", workspaceId, "for permission:", permission);
     const role =
       await this.getUserRole(
         userId,
         workspaceId
       );
-console.log("User role in workspace:", role);
     if (!role) {
       return false;
     }

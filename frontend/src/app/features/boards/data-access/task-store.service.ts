@@ -482,8 +482,8 @@ export class TaskStoreService {
       currentUserId: filters.currentUserId
     });
   }
-  getCommentsForTask(workspaceId: string, boardId: string, taskId: string) {
-    this.api.getCommentsForTask(workspaceId, boardId, taskId).subscribe({
+  getCommentsForTask(taskId: string) {
+    this.api.getCommentsForTask(taskId).subscribe({
       next: (response) => {
         const rawComments = Array.isArray(response) ? response : [];
         const mappedComments = rawComments.map((comment: any) => ({
@@ -497,8 +497,8 @@ export class TaskStoreService {
       }
     });
 }
-postCommentToTask(workspaceId: string, boardId: string, taskId: string, content: string){
-    this.api.postCommentToTask(workspaceId, boardId, taskId, content).subscribe({
+postCommentToTask(taskId: string, content: string){
+    this.api.postCommentToTask(taskId, content).subscribe({
      next: (response: any) => {
       let rawNewComment = response.data || response; 
 
@@ -514,7 +514,7 @@ postCommentToTask(workspaceId: string, boardId: string, taskId: string, content:
       this.comments.update(existingComments => [newComment, ...existingComments]);
       
     },
-    error: (err) => console.error('Comment add karne mein error:', err)
+    error: (err) => console.error('Failed to post comment:', err)
     });
 }
 deleteComment(commentId: string){

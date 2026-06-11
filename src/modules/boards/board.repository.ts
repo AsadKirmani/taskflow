@@ -23,6 +23,7 @@ export const boardRepository = {
   },
 
   async getBoardsInWorkspace(workspaceId: string, userId: string) {
+
     const boards = await BoardModel.find({ 
       workspaceId,
       $or: [
@@ -49,21 +50,10 @@ export const boardRepository = {
   },
 
   async getBoardsForUser(userId: string) {
-    const userObjId = new Types.ObjectId(userId);
-
-    const userWorkspaces = await WorkspaceModel.find({
-      $or: [{ ownerId: userObjId }, { 'members.userId': userObjId }]
-    }).select('_id');
-
-    const workspaceIds = userWorkspaces.map(ws => ws._id);
-
     const boards = await BoardModel.find({
       $or: [
         { createdBy: userId },
-        { 
-          workspaceId: { $in: workspaceIds }, 
-          visibility: "workspace"
-        }
+        { memberIds: userId }
       ]
     });
     return boards;

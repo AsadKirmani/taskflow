@@ -4,7 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ActivityApiService } from '../../data-access/activity-api.service';
 import { WorkspaceStoreService } from '../../../workspace/data-access/workspace-store.service';
-import { ActivityItem, ActivityRef } from '../../models/activity.model';
+import { ActivityItem, ActivityRef, formatActivityAction } from '../../models/activity.model';
 
 @Component({
   selector: 'app-activity-page',
@@ -118,19 +118,9 @@ export class ActivityPageComponent {
     }
   }
 
-  
-  
-  formatAction(action: string): string {
-    return action
-      .split('_')
-      .filter(Boolean)
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  }
-
   describeActivity(item: ActivityItem): string {
     const actor = this.getActorName(item);
-    const action = this.getActionPhrase(item.actionType);
+    const action = formatActivityAction(item.actionType);
     const target = this.getTargetText(item);
     return target ? `${actor} ${action} ${target}.` : `${actor} ${action}.`;
   }
@@ -174,32 +164,7 @@ export class ActivityPageComponent {
     const actor = this.asRef(item.userId);
     return actor?.name || 'Someone';
   }
-
-  private getActionPhrase(actionType: string): string {
-    const actionMap: Record<string, string> = {
-      workspace_created: 'created',
-      workspace_updated: 'updated',
-      workspace_member_invited: 'invited a member to',
-      board_created: 'created',
-      board_updated: 'updated',
-      board_archived: 'archived',
-      board_restored: 'restored',
-      column_created: 'created',
-      column_updated: 'updated',
-      column_archived: 'archived',
-      column_restored: 'restored',
-      task_created: 'created',
-      task_updated: 'updated',
-      task_completed: 'completed',
-      task_reopened: 'reopened',
-      task_moved: 'moved',
-      task_archived: 'archived',
-      task_restored: 'restored',
-      comment_created: 'commented on',
-      comment_updated: 'edited a comment on'
-    };
-    return actionMap[actionType] ?? this.formatAction(actionType).toLowerCase();
-  }
+    
 
   private getTargetText(item: ActivityItem): string {
     const task = this.asRef(item.taskId);

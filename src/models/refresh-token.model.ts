@@ -1,4 +1,3 @@
-// src/models/refresh-token.model.ts
 import { Schema, model, InferSchemaType } from 'mongoose';
 
 const RefreshTokenSchema = new Schema(

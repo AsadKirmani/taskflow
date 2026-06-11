@@ -2,6 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Task } from '../../core/models/task.model';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +39,7 @@ export class SearchService {
 
     try {
       const results = await firstValueFrom(
-        this.http.get<Task[]>(`http://localhost:5000/api/v1/search?q=${encodeURIComponent(query)}`)
+        this.http.get<Task[]>(`${environment.apiUrl}/search?q=${encodeURIComponent(query)}`)
       );
       return results;
     } catch (error) {

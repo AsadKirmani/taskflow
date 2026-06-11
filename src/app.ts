@@ -70,7 +70,7 @@ app.use('/api/v1', boardRoutes);
 app.use('/api/v1', columnRoutes);
 app.use('/api/v1', taskRoutes);
 app.use('/api/v1', commentRoutes);
-app.use('/api/v1/activity', activityRoutes);
+app.use('/api/v1', activityRoutes);
 app.use('/api/v1', archiveRoutes);
 app.use('/api/v1', searchRoutes);
 

@@ -34,11 +34,7 @@ import { WorkspaceStoreService } from '../../data-access/workspace-store.service
         <p class="text-gray-500">No workspaces found.</p>
       }
 
-      @if (workspaceStore.currentError()) {
-        <p class="text-red-600 mt-2 p-2 bg-red-50 rounded border border-red-100">
-          {{ workspaceStore.currentError() }}
-        </p>
-      }
+    
 
       <p class="text-xs text-gray-400 mt-6">Workspace list placeholder page.</p>
     </section>

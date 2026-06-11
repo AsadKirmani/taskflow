@@ -26,6 +26,7 @@ export const commentService = {
       workspaceId,
       boardId,
       taskId,
+      columnId: task!.columnId.toString(),
       userId: authorId,
       actionType: 'comment_created',
       entityType: 'comment',

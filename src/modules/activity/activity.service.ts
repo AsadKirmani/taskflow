@@ -23,11 +23,11 @@ export const activityService = {
       return { items: [], total: 0 };
     }
 
-    return activityRepository.getGlobalActivity(workspaceIds, page, limit);
+    return activityRepository.getGlobalActivity(userId, workspaceIds, page, limit);
   },
 
   async getWorkspaceActivity(userId: string, workspaceId: string, page: number, limit: number) {
-    return activityRepository.getWorkspaceActivity(workspaceId, page, limit);
+    return activityRepository.getWorkspaceActivity(userId, workspaceId, page, limit);
   },
 
   async getBoardActivity(userId: string, workspaceId: string, boardId: string, page: number, limit: number) {

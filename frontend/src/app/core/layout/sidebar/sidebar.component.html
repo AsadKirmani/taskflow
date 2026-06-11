@@ -124,7 +124,6 @@ routerLinkActive="active"
     
     <div class="space-y-2">
       @for (workspace of workspaceStore.workspaces(); track workspace.id) {
-        <p>Count {{workspaceStore.workspaces().length}}</p>
         <article
         class="overflow-hidden border border-base-content/10 transition-colors hover:border-accent"
         [class.rounded-2xl]="!isCollapsed()"

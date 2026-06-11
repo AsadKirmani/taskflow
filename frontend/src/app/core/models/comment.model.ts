@@ -3,6 +3,7 @@ export interface TaskComment {
     workspaceId: string;
     boardId: string;
     taskId: string;
+    author: string;
     authorId: string;
     content: string;
     createdAt: string;

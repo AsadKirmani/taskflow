@@ -1,15 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
-import { catchError, forkJoin, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { BoardApiService } from '../../../boards/data-access/board-api.service';
 import { ActivityApiService } from '../../../activity/data-access/activity-api.service';
+import { WorkspaceStoreService } from '../../../workspace/data-access/workspace-store.service';
 import { Board } from '../../../../core/models/board.model';
 import { Task } from '../../../../core/models/task.model';
-import { ActivityItem, ActivityRef } from '../../../activity/models/activity.model';
+import { ActivityItem, ActivityRef, formatActivityAction } from '../../../activity/models/activity.model';
 
 interface DashboardTaskRow {
   id: string;
@@ -48,66 +49,120 @@ interface DashboardVm {
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardPageComponent {
+export class DashboardPageComponent implements OnInit {
   private readonly boardApi = inject(BoardApiService);
   private readonly activityApi = inject(ActivityApiService);
+  private readonly workspaceStore = inject(WorkspaceStoreService);
 
-  readonly vm$: Observable<DashboardVm> = this.boardApi.getBoards().pipe(
-    map(response => this.normalizeBoards((response.data?.items ?? []) as (Board & { _id?: string })[])),
-    switchMap(boards => {
-      const workspaceId = boards[0]?.workspaceId;
-      const taskRequests = boards.map(board =>
-        this.boardApi.getTasksInBoard(board.id).pipe(
-          map(response =>
-            this.normalizeTasks((response.data?.items ?? []) as (Task & { _id?: string })[]).map(task => ({
-              ...task,
-              boardId: task.boardId || board.id
-            }))
-          ),
-          catchError(() => of([] as Task[]))
-        )
-      );
+  readonly loading = signal<boolean>(true);
+  readonly error = signal<string | null>(null);
+  readonly rawBoards = signal<Board[]>([]);
+  readonly rawTasks = signal<Task[]>([]);
+  readonly rawActivities = signal<ActivityItem[]>([]);
 
-      const tasksByBoard$ = taskRequests.length ? forkJoin(taskRequests) : of([] as Task[][]);
-      const activity$ = workspaceId
-        ? this.activityApi.getWorkspaceActivity(workspaceId, 1, 5).pipe(
-            map(response => response.data?.items ?? []),
-            catchError(() => of([] as ActivityItem[]))
-          )
-        : of([] as ActivityItem[]);
+  readonly vm = computed<DashboardVm>(() => {
+    const boards = this.rawBoards();
+    const tasks = this.rawTasks();
+    const activities = this.rawActivities();
+    const loading = this.loading();
+    const error = this.error();
 
-      return forkJoin({ tasksByBoard: tasksByBoard$, activities: activity$ }).pipe(
-        map(({ tasksByBoard, activities }) => this.buildVm(boards, tasksByBoard.flat(), activities))
-      );
-    }),
-    catchError(() =>
-      of({
-        loading: false,
-        error: 'Failed to load dashboard data',
-        tasksDueToday: 0,
-        overdueTasks: 0,
-        activeBoards: 0,
-        completedTasks: 0,
-        newAssignmentsToday: 0,
-        completedOnTime: 0,
-        tasks: [],
-        activities: []
-      } satisfies DashboardVm)
-    ),
-    startWith({
-      loading: true,
-      error: null,
-      tasksDueToday: 0,
-      overdueTasks: 0,
-      activeBoards: 0,
-      completedTasks: 0,
-      newAssignmentsToday: 0,
-      completedOnTime: 0,
-      tasks: [],
-      activities: []
-    } satisfies DashboardVm),
-    shareReplay({ refCount: true, bufferSize: 1 })
-  );
+    const now = new Date();
+    const notCompleted = tasks.filter(task => !task.isCompleted);
+    const tasksDueToday = notCompleted.filter(task => this.isDueToday(task.dueDate, now)).length;
+    const overdueTasks = notCompleted.filter(task => this.isOverdue(task.dueDate, now)).length;
+    const completedTasks = tasks.filter(task => task.isCompleted).length;
+    const newAssignmentsToday = tasks.filter(task => this.isSameDay(task.createdAt, now)).length;
+    const completedOnTime = tasks.filter(task => task.isCompleted && !this.isOverdue(task.dueDate, now)).length;
+
+    const boardById = new Map(boards.map(board => [board.id, board]));
+    const boardIdsWithTasks = new Set(tasks.map(task => task.boardId));
+
+    const taskRows = [...tasks]
+      .sort((a, b) => {
+        const aDue = a.dueDate ? new Date(a.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
+        const bDue = b.dueDate ? new Date(b.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
+        return aDue - bDue;
+      })
+      .slice(0, 8)
+      .map(task => ({
+        id: task.id,
+        boardId: task.boardId,
+        boardName: boardById.get(task.boardId)?.name ?? 'Unknown board',
+        title: task.title,
+        dueDate: task.dueDate ?? null,
+        priority: task.priority,
+        isCompleted: !!task.isCompleted
+      }));
+
+    return {
+      loading,
+      error,
+      tasksDueToday,
+      overdueTasks,
+      activeBoards: boardIdsWithTasks.size,
+      completedTasks,
+      newAssignmentsToday,
+      completedOnTime,
+      tasks: taskRows,
+      activities
+    };
+  });
+
+  async ngOnInit() {
+    await this.loadDashboardData();
+  }
+
+  private async loadDashboardData() {
+    this.loading.set(true);
+    this.error.set(null);
+
+    try {
+      const boardsRes = await firstValueFrom(this.boardApi.getBoards());
+      const normalizedBoards = this.normalizeBoards((boardsRes.data?.items ?? []) as (Board & { _id?: string })[]);
+      this.rawBoards.set(normalizedBoards);
+
+      if (normalizedBoards.length === 0) {
+        this.loading.set(false);
+        return;
+      }
+
+      const activeWsId = this.workspaceStore.activeWorkspace()?.id;
+      const workspaceId = activeWsId || normalizedBoards[0]?.workspaceId;
+
+      const taskPromises = normalizedBoards.map(async board => {
+        try {
+          const res = await firstValueFrom(this.boardApi.getTasksInBoard(board.id));
+          return this.normalizeTasks((res.data?.items ?? []) as (Task & { _id?: string })[]).map(task => ({
+            ...task,
+            boardId: task.boardId || board.id
+          }));
+        } catch {
+          return [];
+        }
+      });
+
+      let activityPromise = Promise.resolve([] as ActivityItem[]);
+      if (workspaceId) {
+        activityPromise = firstValueFrom(this.activityApi.getWorkspaceActivity(workspaceId, 1, 5))
+          .then(res => res.data?.items ?? [])
+          .catch(() => [] as ActivityItem[]);
+      }
+
+      const [tasksArrays, activitiesData] = await Promise.all([
+        Promise.all(taskPromises),
+        activityPromise
+      ]);
+
+      this.rawTasks.set(tasksArrays.flat());
+      this.rawActivities.set(activitiesData);
+
+    } catch (err) {
+      this.error.set('Failed to load dashboard data');
+    } finally {
+      this.loading.set(false);
+    }
+  }
 
   readonly priorityClassMap: Record<string, string> = {
     low: 'text-blue-500',
@@ -139,7 +194,7 @@ export class DashboardPageComponent {
     const actor = this.getRef(item.userId)?.name || 'Someone';
     const task = this.getRef(item.taskId)?.title;
     const board = this.getRef(item.boardId)?.name;
-    const action = item.actionType.replace(/_/g, ' ');
+    const action = formatActivityAction(item.actionType);
 
     if (task) {
       return `${actor} ${action} "${task}"`;
@@ -150,49 +205,6 @@ export class DashboardPageComponent {
     }
 
     return `${actor} ${action}`;
-  }
-
-  private buildVm(boards: Board[], tasks: Task[], activities: ActivityItem[]): DashboardVm {
-    const now = new Date();
-    const notCompleted = tasks.filter(task => !task.isCompleted);
-    const tasksDueToday = notCompleted.filter(task => this.isDueToday(task.dueDate, now)).length;
-    const overdueTasks = notCompleted.filter(task => this.isOverdue(task.dueDate, now)).length;
-    const completedTasks = tasks.filter(task => task.isCompleted).length;
-    const newAssignmentsToday = tasks.filter(task => this.isSameDay(task.createdAt, now)).length;
-    const completedOnTime = tasks.filter(task => task.isCompleted && !this.isOverdue(task.dueDate, now)).length;
-
-    const boardById = new Map(boards.map(board => [board.id, board]));
-    const boardIdsWithTasks = new Set(tasks.map(task => task.boardId));
-
-    const taskRows = [...tasks]
-      .sort((a, b) => {
-        const aDue = a.dueDate ? new Date(a.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
-        const bDue = b.dueDate ? new Date(b.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
-        return aDue - bDue;
-      })
-      .slice(0, 8)
-      .map(task => ({
-        id: task.id,
-        boardId: task.boardId,
-        boardName: boardById.get(task.boardId)?.name ?? 'Unknown board',
-        title: task.title,
-        dueDate: task.dueDate ?? null,
-        priority: task.priority,
-        isCompleted: !!task.isCompleted
-      }));
-
-    return {
-      loading: false,
-      error: null,
-      tasksDueToday,
-      overdueTasks,
-      activeBoards: boardIdsWithTasks.size,
-      completedTasks,
-      newAssignmentsToday,
-      completedOnTime,
-      tasks: taskRows,
-      activities
-    };
   }
 
   private normalizeBoards(boards: (Board & { _id?: string })[]): Board[] {

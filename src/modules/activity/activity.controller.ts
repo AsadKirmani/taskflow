@@ -43,10 +43,10 @@ export const activityController = {
     const { workspaceId, boardId } = req.params as { workspaceId: string; boardId: string };
     const { page, limit } = parsePagination(req);
     const userId = req.auth!.userId;
-    await PermissionService.ensure(
+    await PermissionService.ensureBoardPermission(
       userId,
-      workspaceId,
-      PERMISSION.ACTIVITY_LOG_VIEW
+      { workspaceId },
+      PERMISSION.BOARD_VIEW
     );
     const result = await activityService.getBoardActivity(userId, workspaceId, boardId, page, limit);
     res.json({ success: true, data: { ...result, page, limit } });
@@ -60,10 +60,10 @@ export const activityController = {
     if (!task) {
       throw new AppError("Task not found", 404, "NOT_FOUND");
     }
-    await PermissionService.ensure(
+    await PermissionService.ensureBoardPermission(
       userId,
-      task.workspaceId.toString(),
-      PERMISSION.ACTIVITY_LOG_VIEW,
+      { workspaceId: task.workspaceId.toString() },
+      PERMISSION.BOARD_VIEW,
     )
     const result = await activityService.getTaskActivity(userId, taskId, page, limit);
     res.json({ success: true, data: { ...result, page, limit } });

@@ -21,7 +21,7 @@ export const authMiddleware = (req: Request, _res: Response, next: NextFunction)
     const payload = verifyAccessToken(token);
     req.auth = {
       userId: payload.sub,
-      email: payload.email
+      email: payload.email,
     };
 
     next();

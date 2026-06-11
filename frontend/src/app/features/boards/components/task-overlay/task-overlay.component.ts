@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { TextEditorComponent } from '../../../../shared/components/editor/text-editor.component';
 import { Task } from '../../../../core/models/task.model';
-import { ActivatedRoute } from '@angular/router';
 import { TaskStoreService } from '../../data-access/task-store.service';
 import { TaskComment } from '../../../../core/models/comment.model';
 
@@ -14,25 +13,12 @@ import { TaskComment } from '../../../../core/models/comment.model';
   templateUrl: './task-overlay.component.html'
 })
 export class TaskOverlayComponent {
-  private route = inject(ActivatedRoute);
-  private destroyRef = inject(DestroyRef);
   private taskStore = inject(TaskStoreService);
   workspaceId = input.required<string>();
   boardId = input.required<string>();
   comments: Signal<TaskComment[]> = this.taskStore.comments;
   newComment = signal('');
-  
-  constructor() {
-    effect(() => {
-      const wId = this.workspaceId();
-      const bId = this.boardId();
-      const tId = this.task()?.id;
-
-      if (wId && bId && tId) {
-        this.taskStore.getCommentsForTask(wId, bId, tId);
-      }
-    });
-  }
+  currentTask = signal<Task | null>(null);
   task = input.required<Task>();
   columnName = input.required<string>();
   closed = output<void>();
@@ -44,6 +30,17 @@ export class TaskOverlayComponent {
 
   isWritingComment = signal(false);
   attachments = signal<{name: string, url: string}[]>([]);
+  
+  constructor() {
+    effect(() => {
+      const tId = this.task()?.id;
+
+      if (tId) {
+        this.taskStore.getCommentsForTask(tId);
+      }
+    });
+  }
+  
 
   close() { this.closed.emit(); }
 
@@ -60,12 +57,10 @@ export class TaskOverlayComponent {
     const text = this.newComment().trim();
     if (!text) return;
 
-    const wId = this.workspaceId();
-    const bId = this.boardId();
     const tId = this.task()?.id;
 
-    if (wId && bId && tId) {
-      this.taskStore.postCommentToTask(wId, bId, tId, text);
+    if (tId) {
+      this.taskStore.postCommentToTask(tId, text);
       this.cancelComment();
     }
   }

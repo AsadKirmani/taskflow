@@ -1,39 +1,32 @@
 export const PERMISSION = {
-  // Workspace Actions
   WORKSPACE_DELETE: 'workspace:delete',
   WORKSPACE_EDIT: 'workspace:edit',
 
-  // Board Actions
   BOARD_CREATE: 'board:create',
   BOARD_DELETE: 'board:delete',
   BOARD_EDIT: 'board:edit',
   BOARD_VIEW: 'board:view',
 
-  // Column Actions
   COLUMN_CREATE: 'column:create',
   COLUMN_EDIT: 'column:edit',
   COLUMN_MOVE: 'column:move',
   COLUMN_DELETE: 'column:delete',
   COLUMN_VIEW: 'column:view',
 
-  // Task Actions
   TASK_CREATE: 'task:create',
   TASK_EDIT: 'task:edit',
   TASK_MOVE: 'task:move',
   TASK_DELETE: 'task:delete',
   TASK_VIEW: 'task:view',
 
-  // Comment Actions
   COMMENT_CREATE: 'comment:create',
   COMMENT_EDIT: 'comment:edit',
   COMMENT_DELETE: 'comment:delete',
 
-  //Manage Members
   MEMBER_INVITE: 'member:invite',
   MEMBER_REMOVE: 'member:remove',
   MEMBER_ROLE_CHANGE: 'member:role_change',
 
-  //Activity Log
   ACTIVITY_LOG_VIEW: 'activity_log:view'
 } as const;
 

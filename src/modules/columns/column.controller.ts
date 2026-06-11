@@ -1,95 +1,112 @@
-// src/modules/columns/column.controller.ts
 import { Request, Response } from "express";
 import { AppError } from "../../shared/errors/app-error";
 import { PermissionService } from "../../services/permission.service";
 import { PERMISSION } from "../../config/roles";
 import { columnService } from "./column.service";
-import { boardService } from "../boards/board.service"; // 👈 Board verify karne ke liye
+import { boardService } from "../boards/board.service";
 
 export const columnController = {
-  
-  // 1. CREATE COLUMN
   async createColumn(req: Request, res: Response) {
     const userId = req.auth!.userId;
-    const { name, boardId, workspaceId } = req.body as { name: string; boardId: string; workspaceId: string };
-    
+    const { name, boardId, workspaceId } = req.body as {
+      name: string;
+      boardId: string;
+      workspaceId: string;
+    };
+
     if (!boardId || !workspaceId) {
-      throw new AppError("boardId and workspaceId are required in the request body", 400, "BAD_REQUEST");
+      throw new AppError(
+        "boardId and workspaceId are required in the request body",
+        400,
+        "BAD_REQUEST",
+      );
     }
 
-    // 🛡️ SECURITY CHECK: Kya yeh Board sach mein is Workspace ka hissa hai?
-    // Hacker dusre workspaceId bhej kar kisi aur ke board me column na bana de
     const board = await boardService.getBoardById(userId, boardId);
     if (!board || board.workspaceId.toString() !== workspaceId) {
-      throw new AppError("Invalid Board or Workspace combination", 400, "BAD_REQUEST");
+      throw new AppError(
+        "Invalid Board or Workspace combination",
+        400,
+        "BAD_REQUEST",
+      );
     }
 
-    // Permission Check
-    await PermissionService.ensureBoardPermission(userId, { workspaceId }, PERMISSION.COLUMN_CREATE);
-    const column = await columnService.createColumn(name, boardId, workspaceId, userId);
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId },
+      PERMISSION.COLUMN_CREATE,
+    );
+    const column = await columnService.createColumn(
+      name,
+      boardId,
+      workspaceId,
+      userId,
+    );
     res.status(201).json({ success: true, data: column });
   },
 
-  // 2. UPDATE COLUMN
   async updateColumn(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { columnId } = req.params as { columnId: string };
-    const { name, archived } = req.body as { name?: string; archived?: boolean; };
+    const { name, archived } = req.body as {
+      name?: string;
+      archived?: boolean;
+    };
 
-    // 🛡️ STEP 1: Pehle asli Column nikalo taaki uski DB wali workspaceId mile
-    const column = await columnService.getColumnById(columnId); // Assumed method
-    if (!column) {
-       throw new AppError("Column not found", 404, "NOT_FOUND");
-    }
-
-    // 🛡️ STEP 2: Ab verified workspaceId ke sath access check karo
-    await PermissionService.ensureBoardPermission(
-      userId,
-      { workspaceId: column.workspaceId.toString() },
-      PERMISSION.COLUMN_EDIT
-    );
-
-    const updatedColumn = await columnService.updateColumn(columnId, { name, archived }, userId);
-    res.json({ success: true, data: updatedColumn });
-  },
-
-  // 3. GET COLUMNS BY BOARD ID
-  async getColumnsByBoardId(req: Request, res: Response) {
-    const userId = req.auth!.userId;
-    const { boardId } = req.params as { boardId: string };
-
-    // 🛡️ STEP 1: Board fetch karo taaki workspaceId mil sake
-    const board = await boardService.getBoardById(userId, boardId);
-    if (!board) {
-      throw new AppError("Board not found", 404, "NOT_FOUND");
-    }
-
-    // 🛡️ STEP 2: Check karo ki user ke paas is workspace ke boards dekhne ka right hai ya nahi
-    await PermissionService.ensureColumnPermission(userId, { workspaceId: board.workspaceId.toString() }, PERMISSION.COLUMN_VIEW);
-
-    const columns = await columnService.getColumnsByBoardId(boardId, userId);
-    res.json({ success: true, data: { columns } });
-  },
-
-  // 4. REORDER TASKS (Inside a Column)
-  async reorderTasks(req: Request, res: Response) {
-    const userId = req.auth!.userId;
-    const { columnId } = req.params as { columnId: string };
-    const { taskIds } = req.body as { taskIds: string[] };
-
-    // 🛡️ STEP 1: Database se column fetch karo for workspaceId
     const column = await columnService.getColumnById(columnId);
     if (!column) {
       throw new AppError("Column not found", 404, "NOT_FOUND");
     }
 
-    // 🛡️ STEP 2: Task reordering requires EDIT permissions on the board/tasks
     await PermissionService.ensureBoardPermission(
       userId,
       { workspaceId: column.workspaceId.toString() },
-      PERMISSION.TASK_EDIT
+      PERMISSION.COLUMN_EDIT,
+    );
+
+    const updatedColumn = await columnService.updateColumn(
+      columnId,
+      { name, archived },
+      userId,
+    );
+    res.json({ success: true, data: updatedColumn });
+  },
+
+  async getColumnsByBoardId(req: Request, res: Response) {
+    const userId = req.auth!.userId;
+    const { boardId } = req.params as { boardId: string };
+
+    const board = await boardService.getBoardById(userId, boardId);
+    if (!board) {
+      throw new AppError("Board not found", 404, "NOT_FOUND");
+    }
+
+    await PermissionService.ensureColumnPermission(
+      userId,
+      { workspaceId: board.workspaceId.toString() },
+      PERMISSION.COLUMN_VIEW,
+    );
+
+    const columns = await columnService.getColumnsByBoardId(boardId, userId);
+    res.json({ success: true, data: { columns } });
+  },
+
+  async reorderTasks(req: Request, res: Response) {
+    const userId = req.auth!.userId;
+    const { columnId } = req.params as { columnId: string };
+    const { taskIds } = req.body as { taskIds: string[] };
+
+    const column = await columnService.getColumnById(columnId);
+    if (!column) {
+      throw new AppError("Column not found", 404, "NOT_FOUND");
+    }
+
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId: column.workspaceId.toString() },
+      PERMISSION.TASK_EDIT,
     );
     await columnService.reorderTasks(columnId, taskIds, userId);
     res.json({ success: true });
-  }
+  },
 };

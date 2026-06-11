@@ -40,19 +40,16 @@ export class WorkspaceStoreService {
 
     this.updateState({ loading: true, error: null });
 
-    // 🚀 TERA NAYA /ME ENDPOINT CALL
     this.workspaceApi.getMeContext().subscribe({
       next: (response: any) => {
-        // 🔥 Tumhare exact JSON structure se data nikalna
         const userWorkspaces = response?.data?.workspaces || [];
 
-        // Backend ke fields (id, name, role) ko Frontend model mein perfectly map karna
         const mappedWorkspaces: Workspace[] = userWorkspaces.map((ws: any) => ({
-          id: ws.id,                           // Seedha id map ho gaya
-          name: ws.name,                       // Seedha name map ho gaya
-          slug: ws.name.toLowerCase().replace(/\s+/g, '-'), // UI routing/display ke liye
+          id: ws.id,                           
+          name: ws.name,                      
+          slug: ws.name.toLowerCase().replace(/\s+/g, '-'), 
           description: '', 
-          currentUserRole: ws.role             // YAHAN ROLE MAP HO GAYA ('OWNER')
+          currentUserRole: ws.role
         }));
 
         this.updateState({
@@ -72,18 +69,17 @@ export class WorkspaceStoreService {
     });
   }
 
-  // 🔥 Sidebar isko call karega
   setActiveWorkspace(workspaceId: string | null): void {
     this.updateState({ activeWorkspaceId: workspaceId });
 
     if (workspaceId) {
       const selectedWs = this.activeWorkspace();
       if (selectedWs && selectedWs.currentUserRole) {
-        // 'OWNER' pehle se hi uppercase hai, par safety ke liye toUpperCase() rakha hai
+
         this.permissionService.setRole(selectedWs.currentUserRole.toUpperCase() as WorkspaceRole);
       }
     } else {
-      this.permissionService.setRole(null); // Koi workspace select nahi, toh permissions bhi reset kar do
+      this.permissionService.setRole(null);
     }
   }
 
