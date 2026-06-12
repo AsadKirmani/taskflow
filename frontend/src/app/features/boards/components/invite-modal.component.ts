@@ -8,14 +8,14 @@ import { WorkspaceApiService } from '../../workspace/data-access/workspace-api.s
   imports: [], 
   template: `
     <div class="fixed inset-0 bg-slate-950/50 flex items-center justify-center z-50 p-4" (click)="closeModal()">
-      <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md border border-stone-200" (click)="$event.stopPropagation()">
+      <div class="bg-base-100 rounded-2xl shadow-xl p-6 w-full max-w-md border border-base-content/30" (click)="$event.stopPropagation()">
         
         <div class="flex items-center justify-between mb-6">
           <div>
-            <h2 class="text-xl font-bold text-stone-900">Invite to Workspace</h2>
-            <p class="text-sm text-stone-500">Collaborate with your team members.</p>
+            <h2 class="text-xl font-bold text-base-content">Invite to Workspace</h2>
+            <p class="text-sm text-base-content/70">Collaborate with your team members.</p>
           </div>
-          <button (click)="closeModal()" class="text-stone-400 hover:text-stone-600 transition-colors p-2 rounded-full hover:bg-stone-100">
+          <button (click)="closeModal()" class="text-base-content/70 hover:text-base-content transition-colors p-2 rounded-full hover:bg-base-content/10">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
@@ -23,39 +23,39 @@ import { WorkspaceApiService } from '../../workspace/data-access/workspace-api.s
         <form (submit)="sendInvite($event)">
           
           <div class="mb-4">
-            <label class="block text-sm font-semibold text-stone-700 mb-2">Email Address</label>
+            <label class="block text-sm font-semibold text-base-content mb-2">Email Address</label>
             <input 
               type="email" 
               name="email" 
               required
               placeholder="colleague@company.com" 
-              class="w-full px-4 py-2.5 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-900 focus:border-transparent transition-all"
+              class="w-full px-4 py-2.5 border border-base-content/30 text-base-content focus:border-accent rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
             >
           </div>
 
           <div class="mb-6">
-            <label class="block text-sm font-semibold text-stone-700 mb-2">Role</label>
+            <label class="block text-sm font-semibold text-base-content mb-2">Role</label>
             <select 
               name="role" 
-              class="w-full px-4 py-2.5 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-900 bg-white"
+              class="w-full px-4 py-2.5 border border-base-content/30 text-base-content rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all bg-base-100"
             >
               <option value="member">Member (Can edit boards)</option>
               <option value="viewer">Viewer (Read-only)</option>
             </select>
           </div>
 
-          <div class="flex gap-3 pt-2 border-t border-stone-100">
+          <div class="flex gap-3 pt-2">
             <button 
               type="button" 
               (click)="closeModal()" 
-              class="flex-1 px-4 py-2.5 border border-stone-300 text-stone-700 font-semibold rounded-xl hover:bg-stone-50 transition-colors"
+              class="flex-1 border border-base-content/30 text-base-content font-semibold rounded-box hover:bg-base-content/10 transition-colors"
             >
               Cancel
             </button>
             <button 
               type="submit" 
               [disabled]="isSubmitting()"
-              class="flex-1 px-4 py-2.5 bg-stone-900 text-white font-semibold rounded-xl hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              class="flex-1 p-2 bg-primary text-white font-semibold rounded-box hover:bg-primary/80 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               @if (isSubmitting()) {
                 <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">

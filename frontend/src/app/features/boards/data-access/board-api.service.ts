@@ -113,7 +113,7 @@ export class BoardApiService {
     );
   }
 
-  updateTask(boardId: string, taskId: string, payload: UpdateTaskPayload): Observable<ApiResponse<Task>> {
+  updateTask(taskId: string, payload: UpdateTaskPayload): Observable<ApiResponse<Task>> {
     return this.http.patch<ApiResponse<Task>>(
       `${this.baseUrl}/tasks/${taskId}`,
       payload,

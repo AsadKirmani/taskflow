@@ -7,7 +7,7 @@ export interface TaskLabel {
 
 export interface ChecklistItem {
   title: string;
-  completed: boolean;
+  isCompleted: boolean;
 }
 
 export interface Task {

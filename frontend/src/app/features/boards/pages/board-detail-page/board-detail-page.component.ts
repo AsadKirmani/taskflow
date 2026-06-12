@@ -104,13 +104,13 @@ export class BoardDetailPageComponent implements OnInit {
     const board = this.currentBoard();
     if (!board?.id) return;
 
-    this.taskStore.updateTask(board.id, event.taskId, { title: event.title });
+    this.taskStore.updateTask(event.taskId, { title: event.title });
   }
 
   onTaskCompletionToggled(event: ToggleTaskCompletionEventPayload): void {
     const board = this.currentBoard();
     if (!board?.id) return;
 
-    this.taskStore.toggleTaskCompletion(board.id, event.taskId, event.isCompleted);
+    this.taskStore.toggleTaskCompletion(event.taskId, event.isCompleted);
   }
 }

@@ -1,46 +1,46 @@
 <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-2 sm:p-4 animate-fade-in" (click)="close()">
   
-  <article class="bg-white w-full max-w-5xl rounded-xl shadow-2xl flex flex-col max-h-[95vh] text-[#172b4d] overflow-hidden" (click)="$event.stopPropagation()">
+  <article class="bg-base-300 w-full max-w-5xl rounded-xl shadow-2xl flex flex-col max-h-[95vh] text-[#172b4d] overflow-hidden" (click)="$event.stopPropagation()">
     
-    <header class="flex items-center justify-between px-5 py-3 border-b border-gray-200">
-      <div class="bg-gray-100 hover:bg-gray-200 cursor-pointer px-3 py-1.5 rounded-md text-sm font-semibold text-gray-700 flex items-center gap-1 transition-colors">
+    <header class="flex items-center justify-between px-5 py-3 border-b border-base-content/20">
+      <div class="bg-base-100 hover:bg-base-200 cursor-pointer px-3 py-1.5 rounded-md text-sm font-semibold text-base-content flex items-center gap-1 transition-colors">
         {{ columnName() }} <mat-icon class="text-[16px] w-4 h-4 leading-none">keyboard_arrow_down</mat-icon>
       </div>
       
-      <div class="flex items-center gap-1 text-gray-600">
-        <button class="p-1.5 hover:bg-gray-100 rounded-md transition-colors flex items-center justify-center"><mat-icon class="text-[20px] w-5 h-5">image</mat-icon></button>
-        <button class="p-1.5 hover:bg-gray-100 rounded-md transition-colors flex items-center justify-center"><mat-icon class="text-[20px] w-5 h-5">more_horiz</mat-icon></button>
-        <button (click)="close()" class="p-1.5 hover:bg-gray-100 rounded-md transition-colors flex items-center justify-center ml-2"><mat-icon class="text-[20px] w-5 h-5">close</mat-icon></button>
+      <div class="flex items-center gap-1 text-base-content/70">
+        <button class="p-1.5 hover:bg-base-100 rounded-box transition-colors flex items-center justify-center"><mat-icon class="text-[20px] w-5 h-5">image</mat-icon></button>
+        <button class="p-1.5 hover:bg-base-100 rounded-box transition-colors flex items-center justify-center"><mat-icon class="text-[20px] w-5 h-5">more_horiz</mat-icon></button>
+        <button (click)="close()" class="p-1.5 hover:bg-base-100 rounded-box transition-colors flex items-center justify-center ml-2"><mat-icon class="text-[20px] w-5 h-5">close</mat-icon></button>
       </div>
-    </header>
+    </header>                                           
 
     <div class="flex flex-col md:flex-row flex-1 overflow-hidden min-h-[500px]">
       
-      <div class="flex-1 p-5 sm:p-8 flex flex-col gap-8 bg-white overflow-y-auto">
+      <div class="flex-1 p-5 sm:p-8 flex flex-col gap-8 bg-base-200 overflow-y-auto">
         
         <div>
           <div class="flex items-start gap-3">
-            <mat-icon class="text-gray-400 mt-1 w-6 h-6 flex-shrink-0">radio_button_unchecked</mat-icon>
-            <h2 class="text-2xl font-bold m-0 leading-tight">{{ task().title || 'Task Title' }}</h2>
+            <mat-icon class=" mt-1 w-6 h-6 flex-shrink-0">radio_button_unchecked</mat-icon>
+            <h2 class="text-2xl font-bold m-0 leading-tight text-base-content">{{ task().title || 'Task Title' }}</h2>
           </div>
           
           <div class="flex flex-wrap gap-2 pl-9 mt-4">
-            <button class="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+            <button class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
               <mat-icon class="text-[18px] w-[18px] h-[18px]">add</mat-icon> Add
             </button>
-            <button class="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+            <button class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
               <mat-icon class="text-[18px] w-[18px] h-[18px]">label</mat-icon> Labels
             </button>
-            <button class="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+            <button class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
               <mat-icon class="text-[18px] w-[18px] h-[18px]">schedule</mat-icon> Dates
             </button>
-            <button class="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+            <button class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
               <mat-icon class="text-[18px] w-[18px] h-[18px]">check_box</mat-icon> Checklist
             </button>
-            <button class="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+            <button class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
               <mat-icon class="text-[18px] w-[18px] h-[18px]">person_outline</mat-icon> Members
             </button>
-            <button (click)="triggerAttachmentUpload()" class="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+            <button (click)="triggerAttachmentUpload()" class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
               <mat-icon class="text-[18px] w-[18px] h-[18px]">attach_file</mat-icon> Attach
             </button>
             <input type="file" #fileInput class="hidden" (change)="onFileSelected($event)" />
@@ -48,18 +48,18 @@
         </div>
 
         <div class="flex items-start gap-3">
-          <mat-icon class="text-gray-600 w-6 h-6 flex-shrink-0">subject</mat-icon>
+          <mat-icon class="text-base-content w-6 h-6 flex-shrink-0">subject</mat-icon>
           <div class="flex-1 w-full relative">
-            <h3 class="font-semibold text-base mb-3 text-[#172b4d]">Description</h3>
+            <h3 class="font-semibold text-base mb-3 text-base-content">Description</h3>
             
             @if (!isEditingDesc()) {
               <div 
                 (click)="enableDescEdit()"
-                class="bg-gray-50 hover:bg-gray-100 border border-transparent hover:border-gray-200 min-h-[5rem] rounded-md p-4 text-sm cursor-pointer transition-colors prose prose-sm max-w-none text-gray-700"
+                class="bg-base-100 hover:bg-base-200 border border-base-content/10 hover:border-base-content/30 min-h-[5rem] rounded-md p-4 text-sm cursor-pointer transition-colors prose prose-sm max-w-none text-base-content"
                 [innerHTML]="descValue() || 'Add a more detailed description...'">
               </div>
             } @else {
-              <div class="flex flex-col gap-2">
+              <div class="flex flex-col gap-2 animate-in fade-in duration-200">
                 <app-text-editor 
                   [(value)]="descValue" 
                   placeholder="Write a detailed description..."
@@ -67,8 +67,8 @@
                 </app-text-editor>
                 
                 <div class="flex gap-2 mt-1">
-                  <button (click)="saveDescription()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-1.5 rounded-md transition-colors">Save</button>
-                  <button (click)="cancelDescEdit()" class="hover:bg-gray-200 text-gray-700 text-sm font-medium px-4 py-1.5 rounded-md transition-colors">Cancel</button>
+                  <button (click)="saveDescription()" class="bg-primary hover:bg-primary-/20 text-base-100 text-sm font-medium px-4 py-1.5 rounded-box transition-colors">Save</button>
+                  <button (click)="cancelDescEdit()" class="hover:bg-base-300 text-base-content text-sm font-medium px-4 py-1.5 rounded-box transition-colors">Cancel</button>
                 </div>
               </div>
             }
@@ -77,18 +77,18 @@
 
         @if (attachments().length > 0) {
           <div class="flex items-start gap-3">
-            <mat-icon class="text-gray-600 w-6 h-6 flex-shrink-0">attachment</mat-icon>
+            <mat-icon class="text-base-content w-6 h-6 flex-shrink-0">attachment</mat-icon>
             <div class="flex-1">
-              <h3 class="font-semibold text-base mb-3 text-[#172b4d]">Attachments</h3>
+              <h3 class="font-semibold text-base mb-3 text-base-content">Attachments</h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 @for (file of attachments(); track file.name) {
-                  <div class="flex items-center gap-3 p-2 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer group">
-                    <div class="w-12 h-12 bg-gray-200 rounded flex items-center justify-center flex-shrink-0 text-gray-500">
+                  <div class="flex items-center gap-3 p-2 rounded-md border border-base-content/10 hover:bg-base-200 transition-colors cursor-pointer group">
+                    <div class="w-12 h-12 bg-base-200 rounded flex items-center justify-center flex-shrink-0 text-base-content/70 group-hover:text-base-content transition-colors">
                       <mat-icon>insert_drive_file</mat-icon>
                     </div>
                     <div class="min-w-0 flex-1">
-                      <p class="text-sm font-semibold text-[#172b4d] truncate m-0 group-hover:underline">{{ file.name }}</p>
-                      <p class="text-xs text-gray-500 m-0 mt-0.5">Added just now</p>
+                      <p class="text-sm font-semibold text-base-content truncate m-0 group-hover:underline">{{ file.name }}</p>
+                      <p class="text-xs text-base-content/70 m-0 mt-0.5">Added just now</p>
                     </div>
                   </div>
                 }
@@ -98,14 +98,14 @@
         }
       </div>
 
-      <div class="w-full md:w-[380px] lg:w-[420px] bg-[#f4f5f7] border-l border-gray-200 p-5 sm:p-8 flex flex-col gap-6 overflow-y-auto">
+      <div class="w-full md:w-[380px] lg:w-[420px] bg-base-100 border-l border-base-content/10 p-5 sm:p-8 flex flex-col gap-6 overflow-y-auto">
         
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <mat-icon class="text-gray-600 w-5 h-5">chat_bubble_outline</mat-icon>
-            <h3 class="font-semibold text-base text-[#172b4d] m-0">Comments and activity</h3>
+            <mat-icon class="text-base-content w-5 h-5">chat_bubble_outline</mat-icon>
+            <h3 class="font-semibold text-base text-base-content m-0">Comments and activity</h3>
           </div>
-          <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs px-3 py-1.5 rounded-md font-medium transition-colors">Show details</button>
+          <button class="bg-base-200 hover:bg-base-300 text-base-content text-xs px-3 py-1.5 rounded-md font-medium transition-colors">Show details</button>
         </div>
 
         <div class="flex flex-col gap-2 mt-4 relative">
@@ -113,7 +113,7 @@
           @if (!isWritingComment()) {
             <div 
               (click)="startWritingComment()"
-              class="w-full bg-white border border-gray-300 rounded-md p-3 shadow-sm text-sm text-gray-500 cursor-text hover:bg-gray-50 transition-colors">
+              class="w-full bg-base-100 border border-base-content/10 rounded-md p-3 shadow-sm text-sm text-base-content/70 cursor-text hover:bg-base-200 transition-colors">
               Write a comment...
             </div>
           } @else {
@@ -128,10 +128,10 @@
                 <button 
                   [disabled]="newComment().trim() === '' || newComment().trim() === '<p></p>'"
                   (click)="postComment()" 
-                  class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium px-4 py-1.5 rounded-md transition-colors">
+                  class="bg-primary hover:bg-primary/30 disabled:opacity-50 disabled:cursor-not-allowed text-base-300 text-xs font-medium px-4 py-1.5 rounded-box transition-colors">
                   Save
                 </button>
-                <button (click)="cancelComment()" class="text-gray-600 hover:text-gray-900 text-xs font-medium px-3 py-1.5 rounded-md hover:bg-gray-200 transition-colors">Cancel</button>
+                <button (click)="cancelComment()" class="text-base-content/70 hover:text-base-content text-xs font-medium px-3 py-1.5 rounded-box hover:bg-base-200 transition-colors">Cancel</button>
               </div>
             </div>
           }
@@ -140,16 +140,16 @@
         <div class="flex flex-col gap-5 mt-2">
           @for (comment of comments(); track comment.id) {
             <div class="flex items-start gap-3">
-              <div class="w-8 h-8 rounded-full bg-blue-100 border border-blue-200 text-blue-700 flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-sm">
+              <div class="w-8 h-8 rounded-full bg-base-200 border border-base-content/10 text-accent flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-sm">
                 {{ comment.author.charAt(0).toUpperCase() }}
               </div>
               <div class="flex flex-col flex-1">
-                <div class="text-sm text-gray-800 leading-tight">
-                  <span class="font-bold text-[#172b4d]">{{ comment.author }}</span> 
-                  <span class="text-gray-600 mx-1">added a comment</span>
+                <div class="text-sm text-base-content leading-tight">
+                  <span class="font-bold text-accent">{{ comment.author }}</span> 
+                  <span class="text-base-content/70 mx-1">added a comment</span>
                 </div>
-                <div class="text-xs text-gray-500 mb-1.5 mt-0.5">{{ comment.createdAt | date:'short' }}</div>
-                <div class="bg-white border border-gray-200 shadow-sm rounded-md p-3 text-sm text-[#172b4d] prose prose-sm max-w-none" [innerHTML]="comment.content">
+                <div class="text-xs text-base-content/70 mb-1.5 mt-0.5">{{ comment.createdAt | date:'short' }}</div>
+                <div class="bg-base-300 border border-base-content/10 shadow-sm rounded-md p-3 text-sm text-base-content prose prose-sm max-w-none" [innerHTML]="comment.content">
                 </div>
               </div>
             </div>

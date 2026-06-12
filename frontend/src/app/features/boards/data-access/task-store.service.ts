@@ -145,12 +145,11 @@ export class TaskStoreService {
   }
 
   updateTask(
-    boardId: string,
     taskId: string,
     updates: { title?: string; description?: string; isCompleted?: boolean }
   ): void {
-    if (!boardId?.trim() || !taskId?.trim()) {
-      this.notificationService.error('Board ID and Task ID are required');
+    if (!taskId?.trim()) {
+      this.notificationService.error('Task ID is required');
       return;
     }
 
@@ -162,7 +161,7 @@ export class TaskStoreService {
     }
 
     this.api
-      .updateTask(boardId, taskId, updates)
+      .updateTask(taskId, updates)
       .pipe(
         map(response => this.normalizeTasks([response.data as Task & { _id?: string }])[0]),
         tap(updatedTask => {
@@ -243,8 +242,8 @@ export class TaskStoreService {
     );
   }
 
-  toggleTaskCompletion(boardId: string, taskId: string, isCompleted: boolean): void {
-    this.updateTask(boardId, taskId, { isCompleted });
+  toggleTaskCompletion(taskId: string, isCompleted: boolean): void {
+    this.updateTask(taskId, { isCompleted });
   }
 
   private applyOptimisticTaskMove(event: TaskDropEventPayload): void {

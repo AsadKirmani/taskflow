@@ -22,19 +22,19 @@ import { SearchOverlayComponent } from '../../../shared/components/search/search
 
       </button>
       <span class="text-base-content/50 w-0.5 h-6 bg-base-content/50"></span>
-      <div class="relative rounded-full bg-base-100 text-base-content/50 flex sm:flex-none w-26 sm:w-64 md:w-80" (click)="searchOverlay.openSearch()">
+      <div class="relative rounded-full bg-base-100 text-base-content/50 flex sm:flex-none w-24 sm:w-64 md:w-80" (click)="searchOverlay.openSearch()">
         <svg class="w-6 h-6 absolute left-2 top-1/2 transform -translate-y-1/2 mr-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
 </svg>
 
-        <input type="text" placeholder="Search tasks..." class="w-full sm:w-64 md:w-80 pl-8 pr-4 py-2 rounded-full placeholder:text-base-content/50 placeholder:italic border border-base-content/10 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-transparent text-base-content" />
+        <input type="text" placeholder="Search tasks..." class="w-full sm:w-64 md:w-80 pl-8 pr-4 py-2 rounded-full placeholder:text-base-content/50 placeholder:italic border border-base-content/30 focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-accent focus:border-accent transition-colors bg-transparent text-base-content" />
       </div>
     </div>
     
     <div class="flex items-center justify-end gap-2">
     <button 
   (click)="themeService.toggleTheme()" 
-  class="p-2 rounded-full hover:bg-base-200 text-base-content/70 hover:text-primary transition-colors flex items-center justify-center border border-base-300"
+  class="p-2 rounded-full hover:bg-base-200 text-base-content/70 hover:text-primary transition-colors flex items-center justify-center border border-base-content/30"
   title="Toggle Theme"
 >
   @if (themeService.currentTheme() === 'light') {
@@ -48,14 +48,14 @@ import { SearchOverlayComponent } from '../../../shared/components/search/search
   }
 </button>
 
-    <button type="button" aria-label="Notifications" class="p-2 rounded-full hover:bg-base-200 text-base-content/70 hover:text-primary transition-colors flex items-center justify-center border border-base-300">
+    <button type="button" aria-label="Notifications" class="p-2 rounded-full hover:bg-base-200 text-base-content/70 hover:text-primary transition-colors flex items-center justify-center border border-base-content/30">
        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.292-.538 1.292H5.538C5 18 5 17.301 5 16.708c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365ZM8.733 18c.094.852.306 1.54.944 2.112a3.48 3.48 0 0 0 4.646 0c.638-.572 1.236-1.26 1.33-2.112h-6.92Z"/>
 </svg>
 
         </button>
       <div class="relative group">
-        <button type="button" aria-label="User profile" class="p-2 rounded-full hover:bg-base-200 text-base-content/70 hover:text-primary transition-colors flex items-center justify-center border border-base-300" (click)="toggleUserMenu($event)">
+        <button type="button" aria-label="User profile" class="p-2 rounded-full hover:bg-base-200 text-base-content/70 hover:text-primary transition-colors flex items-center justify-center border border-base-content/30" (click)="toggleUserMenu($event)">
         <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 13 16h-2a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 12 21Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
 </svg>

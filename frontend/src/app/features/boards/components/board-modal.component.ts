@@ -4,39 +4,42 @@ import { FormsModule } from '@angular/forms';
 import { BoardStoreService } from '../data-access/board-store.service';
 import { Workspace } from '../../../core/models/workspace.model';
 import { NotificationService } from '../../../core/services/notification.service';
+import { LucideX } from '@lucide/angular';
 
 @Component({
   selector: 'app-board-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideX],
   template: `
     <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-10 p-2" (click)="close()">
-      <div class="bg-white rounded-lg shadow p-6 w-full max-w-md border border-gray-300" (click)="$event.stopPropagation()">
+      <div class="bg-base-100 rounded-lg shadow p-6 w-full max-w-md border border-base-content/30" (click)="$event.stopPropagation()">
         <div class="flex items-start justify-between gap-4 mb-4">
-          <h2 class="text-2xl font-semibold">Create New Board</h2>
-          <button type="button" class="text-gray-500 hover:text-gray-700" (click)="close()">Close</button>
+          <h2 class="text-2xl font-semibold text-base-content">Create New Board</h2>
+          <button type="button" class="text-base-content/70 hover:text-primary hover:bg-base-content/10 transition-colors p-2 rounded-full" (click)="close()">
+            <svg lucideX></svg>
+          </button>
         </div>
 
         <form (submit)="createBoard($event)">
           <div class="mb-4">
-            <label for="boardName" class="block text-gray-700 mb-2">Board Name</label>
+            <label for="boardName" class="block text-base-content mb-2">Board Name</label>
             <input
               type="text"
               id="boardName"
               [(ngModel)]="boardDraft.name"
               name="boardName"
-              class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-3 py-2 border border-base-content/30 text-base-content rounded-field focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
               placeholder="Enter board name"
             >
           </div>
 
           <div class="mb-4">
-            <label for="workspace" class="block text-gray-700 mb-2">Workspace</label>
+            <label for="workspace" class="block text-base-content mb-2">Workspace</label>
             <ng-container *ngIf="hasSelectedWorkspace(); else workspacePicker">
               <input
                 id="workspace"
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700"
+                class="w-full px-3 py-2 border border-base-content/30 rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
                 [value]="selectedWorkspaceName()"
                 readonly
               >
@@ -46,7 +49,7 @@ import { NotificationService } from '../../../core/services/notification.service
                 [(ngModel)]="boardDraft.workspaceId"
                 name="workspaceId"
                 id="workspace"
-                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full px-3 py-2 border border-base-content/30 rounded-field focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
               >
                 <option value="">Select workspace</option>
                 <option *ngFor="let workspace of availableWorkspaces()" [value]="workspace.id">
@@ -57,12 +60,12 @@ import { NotificationService } from '../../../core/services/notification.service
           </div>
 
           <div class="mb-4">
-            <label for="visibility" class="block text-gray-700 mb-2">Visibility</label>
+            <label for="visibility" class="block text-base-content mb-2">Visibility</label>
             <select
               [(ngModel)]="boardDraft.visibility"
               name="visibility"
               id="visibility"
-              class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-3 py-2 border border-base-content/30 rounded-field focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
             >
               <option value="private">Private</option>
               <option value="workspace">Workspace</option>
@@ -72,7 +75,7 @@ import { NotificationService } from '../../../core/services/notification.service
           <div class="mb-2">
             <button
               type="submit"
-              class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full disabled:opacity-50"
+              class="bg-secondary text-white px-4 py-2 rounded-box hover:bg-secondary/80 w-full disabled:opacity-50"
             >
               Create
             </button>

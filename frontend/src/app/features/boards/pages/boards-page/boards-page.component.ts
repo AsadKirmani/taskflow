@@ -6,11 +6,12 @@ import { Board } from '../../../../core/models/board.model';
 import { BoardModalComponent } from '../../components/board-modal.component';
 import { AuthStoreService } from '../../../auth/data-access/auth-store.service';
 import { InviteMemberModalComponent } from '../../components/invite-modal.component';
+import { LucideArrowRight } from '@lucide/angular';
 
 @Component({
   selector: 'app-board-page',
   standalone: true,
-  imports: [RouterLink, BoardModalComponent, InviteMemberModalComponent],
+  imports: [RouterLink, BoardModalComponent, InviteMemberModalComponent, LucideArrowRight],
   templateUrl: './boards-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

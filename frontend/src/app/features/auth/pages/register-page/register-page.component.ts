@@ -8,7 +8,7 @@ import { AuthStoreService } from '../../data-access/auth-store.service';
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   template: `
-    <section class="flex items-center justify-center mx-auto h-screen bg-base-200">
+    <section class="flex items-center justify-center mx-auto h-screen bg-base-200 px-4">
   <div class="p-8 bg-base-100 rounded-box shadow-xl border border-base-300 w-full max-w-md">
     <h1 class="text-2xl font-extrabold text-base-content mb-6">Create account</h1>
 
@@ -19,7 +19,7 @@ import { AuthStoreService } from '../../data-access/auth-store.service';
           id="name"
           type="text"
           formControlName="name"
-          class="w-full p-field border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all"
+          class="w-full p-2 border border-base-content/30 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
           placeholder="John Doe"
         />
       </div>
@@ -30,7 +30,7 @@ import { AuthStoreService } from '../../data-access/auth-store.service';
           id="email"
           type="email"
           formControlName="email"
-          class="w-full p-field border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all"
+          class="w-full p-2 border border-base-content/30 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
           placeholder="name@email.com"
         />
       </div>
@@ -41,14 +41,14 @@ import { AuthStoreService } from '../../data-access/auth-store.service';
           id="password"
           type="password"
           formControlName="password"
-          class="w-full p-field border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50 transition-all"
+          class="w-full p-2 border border-base-content/30 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
           placeholder="••••••••"
         />
       </div>
 
       <button
         type="submit"
-        class="w-full p-field rounded-field bg-primary text-primary-content font-bold cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 border-none"
+        class="w-full p-field rounded-box bg-primary text-primary-content font-bold cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 border-none"
       >
         Register
       </button>
