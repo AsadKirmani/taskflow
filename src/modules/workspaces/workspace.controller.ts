@@ -30,7 +30,7 @@ export const workspaceController = {
     async updateWorkSpace(req: Request, res: Response) {
         const userId = req.auth!.userId;
         const { workspaceId } = req.params as { workspaceId: string };
-        await PermissionService.ensure(workspaceId, userId, 'workspace:edit');
+        await PermissionService.ensure(userId, workspaceId, 'workspace:edit');
         const updatedWorkspace = await workspaceService.updateWorkSpace(workspaceId, req.body, userId);
         res.json({ success: true, data: updatedWorkspace });
     },
@@ -42,7 +42,7 @@ export const workspaceController = {
             email: string;
             role: string;
         };
-        await PermissionService.ensure(workspaceId, userId, 'member:invite');
+        await PermissionService.ensure(userId, workspaceId, 'member:invite');
         await PermissionService.ensureCanInviteRole(userId, workspaceId, role as WorkspaceRole);
         const result = await workspaceService.inviteWorkspaceMember(
             workspaceId,
@@ -68,13 +68,13 @@ export const workspaceController = {
     const userId = req.auth!.userId;
     const { workspaceId, memberId } = req.params as { workspaceId: string; memberId: string };
     const { newRole } = req.body as { newRole: string };
-    await PermissionService.ensure(workspaceId, userId, 'member:role_change');
+    await PermissionService.ensure(userId, workspaceId, 'member:role_change');
     await PermissionService.ensureCanChangeRole(userId, workspaceId, newRole as WorkspaceRole);
   },
   async removeWorkspaceMember(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { workspaceId, memberId } = req.params as { workspaceId: string; memberId: string };
-    await PermissionService.ensure(workspaceId, userId, 'member:remove');
+    await PermissionService.ensure(userId, workspaceId, 'member:remove');
     await PermissionService.ensureCanManageMember(userId, memberId, workspaceId);
     await workspaceService.removeWorkspaceMember(workspaceId, memberId, userId);
     res.json({ success: true, message: 'Member removed successfully' });
