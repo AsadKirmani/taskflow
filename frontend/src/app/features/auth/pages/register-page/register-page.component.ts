@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthStoreService } from '../../data-access/auth-store.service';
+import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-register-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, AutofocusDirective],
   template: `
     <section class="flex items-center justify-center mx-auto h-screen bg-base-200 px-4">
   <div class="p-8 bg-base-100 rounded-box shadow-xl border border-base-300 w-full max-w-md">
@@ -18,6 +19,7 @@ import { AuthStoreService } from '../../data-access/auth-store.service';
         <input
           id="name"
           type="text"
+          appAutofocus
           formControlName="name"
           class="w-full p-2 border border-base-content/30 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
           placeholder="John Doe"

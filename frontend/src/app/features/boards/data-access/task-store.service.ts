@@ -174,6 +174,7 @@ export class TaskStoreService {
               }
             }
           });
+          console.log('Updated task:', updatedTask);
           this.notificationService.success('Task updated successfully');
         }),
         catchError(() => {

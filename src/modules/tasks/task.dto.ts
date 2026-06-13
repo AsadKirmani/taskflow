@@ -7,7 +7,7 @@ const taskLabelDto = z.object({
 
 const checklistItemDto = z.object({
   title: z.string().min(1).max(120),
-  completed: z.boolean()
+  isCompleted: z.boolean().optional().default(false)
 });
 
 export const createTaskDto = z.object({

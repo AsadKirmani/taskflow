@@ -20,11 +20,11 @@ export const updateWorkspaceDto = z.object({
 
 export const inviteWorkspaceMemberDto = z.object({
   email: z.string().email(),
-  role: z.enum(['admin', 'team_lead', 'member'])
+  role: z.enum(['ADMIN', 'MEMBER', 'GUEST'])
 });
 
 export const updateWorkspaceMemberRoleDto = z.object({
-  role: z.enum(['admin', 'team_lead', 'member'])
+  role: z.enum(['ADMIN', 'MEMBER', 'GUEST'])
 });
 
 export type CreateWorkspaceDto = z.infer<typeof createWorkspaceDto>;

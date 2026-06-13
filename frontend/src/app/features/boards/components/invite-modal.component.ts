@@ -39,8 +39,8 @@ import { WorkspaceApiService } from '../../workspace/data-access/workspace-api.s
               name="role" 
               class="w-full px-4 py-2.5 border border-base-content/30 text-base-content rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all bg-base-100"
             >
-              <option value="member">Member (Can edit boards)</option>
-              <option value="viewer">Viewer (Read-only)</option>
+              <option value="MEMBER">Member (Can edit boards)</option>
+              <option value="GUEST">Guest (Read-only)</option>
             </select>
           </div>
 

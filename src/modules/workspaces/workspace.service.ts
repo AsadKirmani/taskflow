@@ -94,7 +94,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
     const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 48);
-    const status = 'INVITED';
+    const status = 'pending';
 
     await workspaceRepository.workspaceInvitation(
         workspaceId, 
@@ -158,7 +158,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
       throw new AppError('Workspace no longer exists', 404, 'NOT_FOUND');
     }
 
-    const isAlreadyMember = await WorkspaceMemberModel.exists({ workspaceId, userId, status: 'ACTIVE' });
+    const isAlreadyMember = await WorkspaceMemberModel.exists({ workspaceId, userId, status: 'active' });
 
     if (isAlreadyMember) {
       throw new AppError('You are already a member of this workspace', 400, 'ALREADY_MEMBER');
@@ -167,7 +167,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
     await workspaceRepository.addMemberToWorkspace(workspaceId, {
       userId,
       role: invitation.role,
-      status: 'ACTIVE',
+      status: 'accepted',
       invitedBy: invitation.invitedBy,
       joinedAt: new Date()
     });

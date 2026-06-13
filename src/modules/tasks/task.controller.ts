@@ -101,16 +101,30 @@ export const taskController = {
   },
   async updateTask(req: Request, res: Response) {
     const { taskId } = req.params as { taskId: string };
-    const { title, description, isCompleted } = req.body as {
+    const { title, description, isCompleted, labels, checklist, dueDate, startDate, priority,  archived, assigneeIds  } = req.body as {
         title?: string;
         description?: string;
       isCompleted?: boolean;
+      labels?: string[];
+      checklist?: string[];
+      dueDate?: string | null;
+      startDate?: string | null;
+      priority?: 'low' | 'medium' | 'high' | 'urgent';
+      archived?: boolean;
+      assigneeIds?: string[];
     };
     const updatePayload: {
       title?: string;
       description?: string;
       isCompleted?: boolean;
       completedAt?: Date | null;
+      labels?: string[];
+      checklist?: string[];
+      dueDate?: Date | null;
+      startDate?: Date | null;
+      priority?: 'low' | 'medium' | 'high' | 'urgent';
+      archived?: boolean;
+      assigneeIds?: string[];
     } = {};
 
     if (typeof title === 'string') {
@@ -121,6 +135,31 @@ export const taskController = {
       updatePayload.description = description;
     }
 
+    if (Array.isArray(labels)) {
+      updatePayload.labels = labels;
+    }
+
+    if (Array.isArray(checklist)) {
+      updatePayload.checklist = checklist;
+    }
+
+    if (typeof dueDate === 'string' || dueDate === null) {
+      updatePayload.dueDate = dueDate ? new Date(dueDate) : null;
+    }
+
+    if (typeof startDate === 'string' || startDate === null) {
+      updatePayload.startDate = startDate ? new Date(startDate) : null;
+    }
+
+    if (typeof priority === 'string') {
+      updatePayload.priority = priority;
+    }
+    if (typeof archived === 'boolean') {
+      updatePayload.archived = archived;
+    }
+    if (Array.isArray(assigneeIds)) {
+      updatePayload.assigneeIds = assigneeIds;
+    }
     if (typeof isCompleted === 'boolean') {
       updatePayload.isCompleted = isCompleted;
       updatePayload.completedAt = isCompleted ? new Date() : null;

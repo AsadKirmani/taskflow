@@ -13,11 +13,12 @@ import type { BoardFilterSelection } from '../filters/filter-selection.model';
 import { TaskOverlayComponent } from '../task-overlay/task-overlay.component';
 import { KanbanColumnComponent } from '../kanban-column/kanban-column.component';
 import { MatIconModule } from '@angular/material/icon';
+import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  imports: [ApplyFilterComponent, CommonModule, TaskOverlayComponent, KanbanColumnComponent, MatIconModule],
+  imports: [ApplyFilterComponent, CommonModule, TaskOverlayComponent, KanbanColumnComponent, MatIconModule, AutofocusDirective],
   templateUrl: './kanban-board.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

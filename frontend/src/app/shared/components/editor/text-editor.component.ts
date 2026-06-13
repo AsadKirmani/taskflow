@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
+import { AutofocusDirective } from '../../directives/autofocus.directive';
 
 @Component({
   selector: 'app-text-editor',
@@ -25,9 +26,11 @@ export class TextEditorComponent implements OnInit, OnDestroy {
     this.editor = new Editor({
       extensions: [StarterKit],
       content: this.value(),
+      autofocus: true,
       editorProps: {
         attributes: { 
-          class: 'focus:outline-none max-w-none prose prose-sm text-[#172b4d]' 
+          class: 'focus:outline-none max-w-none prose prose-sm text-base-content', 
+          spellcheck: 'true'
         }
       },
 
