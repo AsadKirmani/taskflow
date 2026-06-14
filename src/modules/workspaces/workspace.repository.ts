@@ -115,14 +115,11 @@ export const workspaceRepository = {
     {
       userId,
       role,
-      status,
-      invitedBy,
+      workspaceName,
     }: {
       userId: string;
       role: string;
-      status: string;
-      invitedBy: Object;
-      joinedAt: Date;
+      workspaceName: string;
     },
   ) {
     const existingMember = await WorkspaceMemberModel.findOne({
@@ -138,6 +135,7 @@ export const workspaceRepository = {
       workspaceId,
       userId,
       role,
+      workspaceName
     });
 
     return newMember;

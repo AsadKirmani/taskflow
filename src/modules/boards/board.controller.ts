@@ -23,8 +23,8 @@ export const boardController = {
       PERMISSION.BOARD_CREATE,
     );
     const board = await boardService.createBoard(req.body, userId);
-    await redisClient.del(`workspace:${workspaceId}:boards`);
-
+    await redisClient.del(`workspace:${workspaceId}:boards`); // Invalidate the cache for boards in this workspace
+    await redisClient.del(`user:${userId}:all_boards`); // Invalidate the cache for all boards for this user
     res.status(201).json({ success: true, data: board });
   },
 
@@ -41,10 +41,11 @@ export const boardController = {
 
     if (cachedData) {
       console.log(`🚀 Cache Hit: Board ${boardId}`);
-      responsePayload = cachedData; // Yaad rahe tera payload {success: true, data: board} format me hai
+      responsePayload = cachedData; 
       isCached = true;
     } else {
       console.log(`🐢 Cache Miss: Fetching Board ${boardId} from DB`);
+      // 🐌 2. Agar cache me nahi hai toh DB se laao
       const board = await boardService.getBoardById(userId, boardId);
       if (!board) {
         throw new AppError("Board not found", 404, "NOT_FOUND");
@@ -52,7 +53,7 @@ export const boardController = {
       responsePayload = { success: true, data: board };
     }
 
-    // 🛡️ 2. SECURITY CHECK FIRST (Cache se aaye ya DB se, yeh check hamesha hoga!)
+    // 🛡️ 3. SECURITY CHECK NOW (Cache se aane par bhi permission check hogi!)
     // Hum payload ke andar se workspaceId nikal rahe hain
     await PermissionService.ensureBoardPermission(
       userId,
@@ -60,22 +61,20 @@ export const boardController = {
       PERMISSION.BOARD_VIEW,
     );
 
-    // 💾 3. Agar data DB se laya tha (Cache Miss), toh agli baar ke liye Redis me daal do
+    // 💾 4. Agar data DB se laya tha, toh aage ke liye Redis me set kar do
     if (!isCached) {
-      await redisClient.set(cacheKey, responsePayload, {
-        ex: 3600, // 3600 seconds = 1 Hour
-      });
+      await redisClient.set(cacheKey, responsePayload, { ex: 3600 });
     }
 
-    // 4. Khushi-khushi user ko response bhej do
-    res.json(responsePayload);
+    // 5. Final response bhej do
+    return res.json(responsePayload);
   },
 
   async getBoardsInWorkspace(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { workspaceId } = req.params as { workspaceId: string };
     
-    // 🛡️ 1. SECURITY FIRST: Cache ya DB check karne se pehle Permission confirm karo
+    // 🛡️ 1. SECURITY FIRST: Pehle permission check karo
     await PermissionService.ensureBoardPermission(
       userId,
       { workspaceId },
@@ -87,22 +86,28 @@ export const boardController = {
     // ⚡ 2. Redis se check karo
     const cachedBoards = await redisClient.get(cacheKey);
     if (cachedBoards) {
-      console.log(`🚀 Cache Hit: Workspace ${workspaceId} boards`);
-      // Upstash khud parsed object deta hai, toh seedha bhej do
+      console.log(`🚀 Cache Hit: Workspace ${workspaceId}`);
       return res.status(200).json(cachedBoards); 
     }
 
-    console.log(`🐢 Cache Miss: Fetching workspace ${workspaceId} boards from DB`);
-    // 🐌 3. Agar Redis me nahi hai toh DB se lo
+    console.log(`🐢 Cache Miss: Fetching from DB`);
+    // 🐌 3. Agar Redis me nahi hai toh DB se laao
     const boards = await boardService.getBoardsInWorkspace(workspaceId, userId);
 
-    // 💾 4. Redis me set karo (BINA JSON.stringify ke)
+    // 📦 4. Frontend ka passandida format pack karo
     const responseData = { success: true, data: { items: boards } };
-    await redisClient.set(cacheKey, responseData, {
-      ex: 3600, // 3600 seconds = 1 Hour
-    });
 
-    res.json(responseData);
+    // 💾 5. Agli baar ke liye Redis me save karo (1 Ghante ke liye)
+    // 💾 5. REDIS LIE DETECTOR
+    console.log(`💾 Redis mein save karne ki koshish kar rahe hain. Key: ${cacheKey}`);
+    try {
+      const redisResponse = await redisClient.set(cacheKey, responseData, { ex: 3600 });
+      console.log(`✅ REDIS STATUS: ${redisResponse}`); // Agar successful hua toh "OK" aayega
+    } catch (redisError) {
+      console.error(`❌ REDIS ERROR: Data save nahi hua! Wajah:`, redisError);
+    }
+
+    return res.json(responseData);
   },
 
   async updateBoard(req: Request, res: Response) {
@@ -125,14 +130,35 @@ export const boardController = {
       req.body,
       userId,
     );
+    await redisClient.del(`board:${boardId}`); // Invalidate the cache for this specific board
     await redisClient.del(`workspace:${existingBoard.workspaceId.toString()}:boards`);
     res.json({ success: true, data: updatedBoard });
   },
 
-  async getBoards(req: Request, res: Response) {
+ async getBoards(req: Request, res: Response) {
     const userId = req.auth!.userId;
+    // Nayi Cache Key sabhi boards ke liye
+    const cacheKey = `user:${userId}:all_boards`; 
+
+    // ⚡ 1. Redis se check karo
+    const cachedBoards = await redisClient.get(cacheKey);
+    if (cachedBoards) {
+      console.log(`🚀 Cache Hit: All Boards for User ${userId}`);
+      return res.status(200).json(cachedBoards);
+    }
+
+    console.log(`🐢 Cache Miss: Fetching All Boards from DB`);
+    
+    // 🐌 2. Agar Redis me nahi hai, toh DB se laao
     const boards = await boardService.getBoards(userId);
-    res.json({ success: true, data: { items: boards } });
+    
+    // Tera purana format jo perfectly chal raha tha
+    const responseData = { success: true, data: { items: boards } };
+
+    // 💾 3. Agli baar ke liye Redis me save karo (1 Hour)
+    await redisClient.set(cacheKey, responseData, { ex: 3600 });
+
+    return res.json(responseData);
   },
 
   async reorderColumns(req: Request, res: Response) {
@@ -152,7 +178,6 @@ export const boardController = {
     );
 
     await boardService.reorderColumns(boardId, columnIds, userId);
-    await redisClient.del(`workspace:${board.workspaceId.toString()}:boards`);
     res.json({ success: true, message: "Column order updated" });
   },
   async deleteBoard(req: Request, res: Response) {
@@ -171,7 +196,11 @@ export const boardController = {
     );
 
     await boardService.deleteBoard(boardId, userId);
-    await redisClient.del(`workspace:${board.workspaceId.toString()}:boards`);
+    // Yeh line teri pehle se likhi hai:
+await redisClient.del(`board:${boardId}`);
+
+// 👇 YEH NAYI LINE ADD KAR DE (Taaki all_boards bhi refresh ho jaye):
+await redisClient.del(`user:${userId}:all_boards`);
     res.json({ success: true, message: "Board deleted successfully" });
   },
 };

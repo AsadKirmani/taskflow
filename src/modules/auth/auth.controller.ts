@@ -5,6 +5,7 @@ import { AppError } from "../../shared/errors/app-error";
 import { authService } from "./auth.service";
 import { WorkspaceMemberModel } from "../../models/workspace-member.model";
 import { redisClient } from "../../config/redis";
+import { hashToken } from "../../shared/utils/token";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -55,15 +56,33 @@ export const authController = {
     });
   },
 
-  async login(req: Request, res: Response) {
+  // Upar file me import zaroor karna: 
+// import { hashToken } from '../utils/hash'; (Ya jo bhi tera path ho)
+
+async login(req: Request, res: Response) {
+    // 1. Pehle user ko authenticate karo
     const result = await authService.login(req.body, {
       ip: req.ip,
       userAgent: req.headers["user-agent"],
     });
 
+    // 2. Redis ke liye Key aur Value tayyar karo (EXACTLY jaisa /refresh ko chahiye)
+    const tokenHash = hashToken(result.refreshToken);
+    const cacheKey = `refresh_token:${tokenHash}`;
+    const sessionData = {
+      sub: result.user.id.toString(), // (ya result.user.id, jo bhi tere DB ka format ho)
+      email: result.user.email,
+    };
+
+    // 3. 💾 REDIS MEIN SAVE KARO (Response bhejne se PEHLE!)
+    // 7 din = 604800 seconds
+    await redisClient.set(cacheKey, sessionData, { ex: 604800 });
+
+    // 4. Khushi-khushi Response bhej do
     res.cookie(jwtConfig.refreshCookieName, result.refreshToken, cookieOptions);
     res.cookie("accessToken", result.accessToken, accessTokenCookieOptions);
-    res.json({
+    
+    return res.json({
       success: true,
       message: "Login successful",
       data: {
@@ -71,7 +90,7 @@ export const authController = {
         accessToken: result.accessToken,
       },
     });
-  },
+},
 
   async me(req: Request, res: Response) {
     const userId = await authService.getCurrentUser(req.auth!.userId);

@@ -3,6 +3,7 @@ import { AppError } from '../../shared/errors/app-error';
 import { comparePassword, hashPassword } from '../../shared/utils/password';
 import { hashToken } from '../../shared/utils/token';
 import { authRepository } from './auth.repository';
+import { redisClient } from '../../config/redis';
 import {
   signAccessToken,
   signRefreshTokenJwt,
@@ -142,41 +143,67 @@ export const authService = {
     }
 
     const tokenHash = hashToken(refreshToken);
-    const existingToken = await authRepository.findRefreshTokenByHash(tokenHash);
+    const cacheKey = `refresh_token:${tokenHash}`;
 
-    if (!existingToken || existingToken.revokedAt || existingToken.expiresAt < new Date()) {
-      throw new AppError('Refresh token is invalid or expired', 401, 'REFRESH_TOKEN_EXPIRED');
+    let sessionData: any;
+
+    // ⚡ 1. REDIS SE CHECK KARO (Lightning Fast Read)
+    const cachedSession = await redisClient.get(cacheKey);
+
+    if (cachedSession) {
+      console.log('🚀 Cache Hit: Refresh Token Redis se mil gaya!');
+      sessionData = cachedSession; // Hamein user ka sub aur email yahin se mil jayega
+    } else {
+      console.log('🐢 Cache Miss: DB se check kar rahe hain...');
+      // Agar Redis me nahi mila, toh DB se parallel fetch karo
+      const [existingToken, user] = await Promise.all([
+        authRepository.findRefreshTokenByHash(tokenHash),
+        authRepository.findUserById(payload.sub)
+      ]);
+
+      if (!existingToken || existingToken.revokedAt || existingToken.expiresAt < new Date()) {
+        throw new AppError('Refresh token is invalid or expired', 401, 'REFRESH_TOKEN_EXPIRED');
+      }
+
+      if (!user) {
+        throw new AppError('User not found', 404, 'USER_NOT_FOUND');
+      }
+
+      // Redis me save karne ke liye data prepare karo
+      sessionData = { sub: user._id.toString(), email: user.email };
     }
 
-    const user = await authRepository.findUserById(payload.sub);
-
-    if (!user) {
-      throw new AppError('User not found', 404, 'USER_NOT_FOUND');
-    }
-
+    // 🎟️ 2. NAYE TOKENS BANAAO
     const newAccessToken = signAccessToken({
-      sub: user._id.toString(),
-      email: user.email,
+      sub: sessionData.sub,
+      email: sessionData.email,
       type: 'access'
     });
 
     const newRefreshToken = signRefreshTokenJwt({
-      sub: user._id.toString(),
+      sub: sessionData.sub,
       sessionTokenId: cryptoRandomId(),
       type: 'refresh'
     });
 
     const newRefreshTokenHash = hashToken(newRefreshToken);
+    const newCacheKey = `refresh_token:${newRefreshTokenHash}`;
+    const ttlSeconds = 7 * 24 * 60 * 60; // 7 Days in seconds (Refresh token ki expiry apne hisaab se adjust kar lena)
 
-    await authRepository.revokeRefreshToken(tokenHash, newRefreshTokenHash);
-
-    await authRepository.createRefreshToken({
-      userId: user._id.toString(),
-      tokenHash: newRefreshTokenHash,
-      expiresAt: buildRefreshExpiryDate(),
-      createdByIp: meta?.ip ?? null,
-      userAgent: meta?.userAgent ?? null
-    });
+    // 💾 3. REDIS AUR MONGODB KO EK SATH (PARALLEL) UPDATE KARO
+    // Isse user ko update ka wait nahi karna padega, response turant jayega
+    await Promise.all([
+      redisClient.del(cacheKey), // Purana token Redis se udao
+      redisClient.set(newCacheKey, sessionData, { ex: ttlSeconds }), // Naya token Redis me daalo
+      authRepository.revokeRefreshToken(tokenHash, newRefreshTokenHash), // DB update
+      authRepository.createRefreshToken({ // DB update
+        userId: sessionData.sub,
+        tokenHash: newRefreshTokenHash,
+        expiresAt: buildRefreshExpiryDate(),
+        createdByIp: meta?.ip ?? null,
+        userAgent: meta?.userAgent ?? null
+      })
+    ]);
 
     return {
       accessToken: newAccessToken,
