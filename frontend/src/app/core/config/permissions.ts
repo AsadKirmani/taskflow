@@ -1,0 +1,79 @@
+export const PERMISSION = {
+  WORKSPACE_DELETE: 'workspace:delete',
+  WORKSPACE_EDIT: 'workspace:edit',
+
+  BOARD_CREATE: 'board:create',
+  BOARD_DELETE: 'board:delete',
+  BOARD_EDIT: 'board:edit',
+  BOARD_VIEW: 'board:view',
+
+  COLUMN_CREATE: 'column:create',
+  COLUMN_EDIT: 'column:edit',
+  COLUMN_MOVE: 'column:move',
+  COLUMN_DELETE: 'column:delete',
+  COLUMN_VIEW: 'column:view',
+
+  TASK_CREATE: 'task:create',
+  TASK_EDIT: 'task:edit',
+  TASK_MOVE: 'task:move',
+  TASK_DELETE: 'task:delete',
+  TASK_VIEW: 'task:view',
+
+  COMMENT_CREATE: 'comment:create',
+  COMMENT_EDIT: 'comment:edit',
+  COMMENT_DELETE: 'comment:delete',
+
+  MEMBER_INVITE: 'member:invite',
+  MEMBER_REMOVE: 'member:remove',
+  MEMBER_ROLE_CHANGE: 'member:role_change',
+
+  ACTIVITY_LOG_VIEW: 'activity_log:view'
+} as const;
+
+export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
+  ADMIN: [
+    PERMISSION.WORKSPACE_EDIT,
+    PERMISSION.MEMBER_INVITE,
+    PERMISSION.MEMBER_REMOVE,
+    PERMISSION.BOARD_CREATE,
+    PERMISSION.BOARD_DELETE,
+    PERMISSION.BOARD_EDIT,
+    PERMISSION.BOARD_VIEW,
+    PERMISSION.COLUMN_CREATE,
+    PERMISSION.COLUMN_EDIT,
+    PERMISSION.COLUMN_MOVE,
+    PERMISSION.COLUMN_DELETE,
+    PERMISSION.COLUMN_VIEW,
+    PERMISSION.TASK_CREATE,
+    PERMISSION.TASK_EDIT,
+    PERMISSION.TASK_MOVE,
+    PERMISSION.TASK_DELETE,
+    PERMISSION.TASK_VIEW,
+    PERMISSION.COMMENT_CREATE,
+    PERMISSION.COMMENT_EDIT,
+    PERMISSION.COMMENT_DELETE,
+    PERMISSION.ACTIVITY_LOG_VIEW
+  ],
+  
+  MEMBER: [
+    PERMISSION.BOARD_VIEW,
+    PERMISSION.COLUMN_VIEW,
+    PERMISSION.TASK_CREATE,
+    PERMISSION.TASK_EDIT,
+    PERMISSION.TASK_MOVE,
+    PERMISSION.TASK_VIEW,
+    PERMISSION.COMMENT_CREATE,
+    PERMISSION.COMMENT_EDIT,
+    PERMISSION.ACTIVITY_LOG_VIEW
+  ],
+  
+  GUEST: [
+    PERMISSION.BOARD_VIEW,
+    PERMISSION.COLUMN_VIEW,
+    PERMISSION.TASK_VIEW,
+    PERMISSION.COMMENT_CREATE
+  ]
+};
+
+export type Permission = (typeof PERMISSION)[keyof typeof PERMISSION];
+export type WorkspaceRole = 'OWNER' | 'ADMIN' | 'MEMBER' | 'GUEST';

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createCommentDto = z.object({
-  content: z.string().min(1).max(5000)
+  content: z.string().min(1).max(5000),
 });
 
 export const updateCommentDto = z.object({

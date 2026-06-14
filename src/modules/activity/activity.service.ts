@@ -1,3 +1,4 @@
+import { workspaceRepository } from '../workspaces/workspace.repository';
 import { activityRepository } from './activity.repository';
 
 export const activityService = {
@@ -14,16 +15,26 @@ export const activityService = {
   }) {
     return activityRepository.logActivity(data);
   },
+  async getGlobalActivity(userId: string, page: number, limit: number) {
+    const userWorkspaces = await workspaceRepository.listUserWorkspaces(userId);
+    const workspaceIds = userWorkspaces.map(ws => ws._id.toString());
 
-  async getWorkspaceActivity(workspaceId: string, page: number, limit: number) {
-    return activityRepository.getWorkspaceActivity(workspaceId, page, limit);
+    if (workspaceIds.length === 0) {
+      return { items: [], total: 0 };
+    }
+
+    return activityRepository.getGlobalActivity(userId, workspaceIds, page, limit);
   },
 
-  async getBoardActivity(workspaceId: string, boardId: string, page: number, limit: number) {
+  async getWorkspaceActivity(userId: string, workspaceId: string, page: number, limit: number) {
+    return activityRepository.getWorkspaceActivity(userId, workspaceId, page, limit);
+  },
+
+  async getBoardActivity(userId: string, workspaceId: string, boardId: string, page: number, limit: number) {
     return activityRepository.getBoardActivity(workspaceId, boardId, page, limit);
   },
 
-  async getTaskActivity(taskId: string, page: number, limit: number) {
+  async getTaskActivity(userId: string, taskId: string, page: number, limit: number) {
     return activityRepository.getTaskActivity(taskId, page, limit);
   }
 };

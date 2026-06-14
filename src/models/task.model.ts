@@ -26,7 +26,7 @@ const TaskChecklistItemSchema = new Schema(
       trim: true,
       maxlength: 120
     },
-    completed: {
+    isCompleted: {
       type: Boolean,
       default: false
     }

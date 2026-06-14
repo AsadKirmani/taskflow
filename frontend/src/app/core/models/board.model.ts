@@ -7,4 +7,5 @@ export interface Board {
   visibility: 'private' | 'workspace';
   columnOrder: string[];
   archived: boolean;
+  createdBy: string;
 }

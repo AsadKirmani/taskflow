@@ -6,13 +6,14 @@ export const commentRepository = {
     taskId: string;
     boardId: string;
     workspaceId: string;
-    userId: string;
+    author: string;
+    authorId: string;
   }) {
     const newComment = await CommentModel.create(data);
     return newComment;
   },
     async getCommentsByTaskId(taskId: string) {
-    const comments = await CommentModel.find({ taskId });
+    const comments = await CommentModel.find({ taskId }).sort({ createdAt: -1 });
     return comments;
   },
   async updateComment(
@@ -25,4 +26,7 @@ export const commentRepository = {
   async getCommentById(commentId: string) {
     return CommentModel.findById(commentId);
   },
+  async deleteComment(commentId: string) {
+    await CommentModel.findByIdAndDelete(commentId);
+  }
 };

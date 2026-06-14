@@ -2,6 +2,8 @@ import { z } from "zod";
 
 export const createColumnDto = z.object({
   name: z.string().min(1).max(80),
+  boardId: z.string().min(1),
+  workspaceId: z.string().min(1),
 });
 
 export const updateColumnDto = z.object({

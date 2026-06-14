@@ -52,10 +52,13 @@ export const columnService = {
 
     return updatedColumn;
   },
-  async getColumnsByBoardId(boardId: string) {
+  async getColumnById(columnId: string) {
+    return columnRepository.getColumnById(columnId);
+  },
+  async getColumnsByBoardId(boardId: string, userId: string) {
     return columnRepository.getColumnsByBoardId(boardId);
   },
-  async reorderColumns(columnIds: string[]) {
-    return columnRepository.reorderColumns(columnIds);
-  },
+  async reorderTasks(columnId: string, taskIds: string[], userId: string) {
+    return await columnRepository.reorderTasks(columnId, taskIds);
+  }
 };

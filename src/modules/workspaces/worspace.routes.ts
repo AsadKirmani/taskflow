@@ -16,7 +16,13 @@ const router = Router();
 
 router.get('/', authMiddleware, asyncHandler(workspaceController.listWorkspaces));
 
-router.post('/', authMiddleware, validate(createWorkspaceDto), asyncHandler(workspaceController.createWorkspace))
+router.post('/', authMiddleware, validate(createWorkspaceDto), asyncHandler(workspaceController.createWorkspace));
+
+router.post(
+  '/invites/accept',
+  authMiddleware,
+  asyncHandler(workspaceController.acceptWorkspaceInvite)
+);
 
 router.get('/:workspaceId', authMiddleware, asyncHandler(workspaceController.getWorkspaceDetail));
 
@@ -30,7 +36,7 @@ router.post(
 );
 
 router.post(
-  '/:workspaceId/invitations',
+  '/:workspaceId/invites',
   authMiddleware,
   validate(inviteWorkspaceMemberDto),
   asyncHandler(workspaceController.inviteWorkspaceMember)

@@ -8,42 +8,45 @@ import { asyncHandler } from "../../shared/utils/async-handler";
 const router = Router();
 
 router.get(
-  "/",
-  authMiddleware,
-  asyncHandler(boardController.getBoards),
-);
-
-router.get(
-  "/:boardId",
-  authMiddleware,
-  asyncHandler(boardController.getBoardById),
-);
-
-router.post(
   "/workspaces/:workspaceId/boards",
+  authMiddleware,
+  asyncHandler(boardController.getBoardsInWorkspace),
+);
+router.post(
+  "/boards",
   authMiddleware,
   validate(createBoardDto),
   asyncHandler(boardController.createBoard),
 );
-
 router.get(
-  "/workspaces/:workspaceId/boards/:boardId",
+  "/boards",
+  authMiddleware,
+  asyncHandler(boardController.getBoards),
+);
+router.get(
+  "/boards/:boardId",
   authMiddleware,
   asyncHandler(boardController.getBoardById),
 );
 
 router.patch(
-  "/workspaces/:workspaceId/boards/:boardId",
+  "/boards/:boardId",
   authMiddleware,
   validate(updateBoardDto),
   asyncHandler(boardController.updateBoard),
 );
 
-// router.patch(
-//   "/workspaces/:workspaceId/boards/:boardId/reorder-columns",
-//   authMiddleware,
-//   validate(reorderColumnsDto),
-//   asyncHandler(boardController.reorderColumns),
-// );
+router.delete(
+  "/boards/:boardId",
+  authMiddleware,
+  asyncHandler(boardController.deleteBoard),
+);
+
+router.patch(
+  "/boards/:boardId/reorder-columns",
+  authMiddleware,
+  validate(reorderColumnsDto),
+  asyncHandler(boardController.reorderColumns),
+);
 
 export default router;

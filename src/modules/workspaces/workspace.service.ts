@@ -4,6 +4,11 @@ import { sendInvitationEmail } from '../../config/mailer';
 import { authService } from '../auth/auth.service';
 import { AppError } from '../../shared/errors/app-error';
 import { activityService } from '../activity/activity.service';
+import crypto from 'crypto';
+import { PermissionService } from '../../services/permission.service';
+import { WorkspaceMemberModel } from '../../models/workspace-member.model';
+import { PERMISSION } from '../../config/roles';
+import { addInvitationEmailJob } from '../../queues/email.queue';
 
 const createSlug = (value: string) => {
   const slug = value
@@ -18,21 +23,7 @@ const createSlug = (value: string) => {
 export const workspaceService = {
   async listUserWorkspaces(userId: string) {
     const workspaces = await workspaceRepository.listUserWorkspaces(userId);
-
-    return workspaces.map(workspace => {
-      const ownerId = workspace.ownerId?.toString();
-      const member = workspace.members?.find(memberItem => memberItem.userId?.toString() === userId);
-      const currentUserRole = ownerId === userId ? 'admin' : member?.role ?? 'member';
-
-      return {
-        id: workspace._id.toString(),
-        name: workspace.name,
-        slug: workspace.slug,
-        description: workspace.description ?? '',
-        memberCount: workspace.members?.length ?? 0,
-        currentUserRole
-      };
-    });
+    return workspaces;
   },
   async createWorkspace(input: CreateWorkspaceDto, userId: string) {
     const baseSlug = createSlug(input.name);
@@ -92,22 +83,31 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
         }
       });
     }
-    // Update logic here (e.g., update name, description)
-    // For simplicity, we will just return the existing workspace
     return updatedWorkspace;
   },
-  async inviteWorkspaceMember(workspaceId: string, email: string, userId: string, role: string, tokenHash: string, expiresAt: Date, status: string = 'pending') {
-    const inviteeName = await authService.getCurrentUser(userId);
-    const inviteeId = userId ;
-    // Placeholder for inviting a member to the workspace
-    // This would typically involve creating an invitation record and sending an email
+  async inviteWorkspaceMember(workspaceId: string, email: string, userId: string, role: string) {
+    const inviter = await authService.getCurrentUser(userId);
     const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
     if (!workspace) {
       throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
     }
-    await workspaceRepository.workspaceInvitation(workspaceId, email, role, inviteeId, status, tokenHash, expiresAt);
-    await sendInvitationEmail(email, workspace.name, inviteeName.name, role);
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 48);
+    const status = 'pending';
 
+    await workspaceRepository.workspaceInvitation(
+        workspaceId, 
+        email, 
+        role, 
+        userId,
+        status, 
+        tokenHash, 
+        expiresAt
+    );
+
+    await addInvitationEmailJob(email, workspace.name, inviter.name, role, rawToken);
     await activityService.logActivity({
       workspaceId,
       userId,
@@ -117,15 +117,110 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
       metadata: {
         email,
         role,
-        status: status ?? 'pending'
+        status
       }
     });
 
-    return { success: true, message: `Invitation sent to ${email} from ${inviteeName.name}` };
+    return { success: true, message: `Invitation sent to ${email} from ${inviter.name}` };
   },
+
   async updateWorkspaceMemberRole(workspaceId: string, memberId: string, newRole: string, userId: string) {
-    // Placeholder for updating a member's role in the workspace
-    // This would typically involve checking permissions and updating the member's role in the database
+    const updatedMember = await workspaceRepository.updateMemberRole(workspaceId, memberId, newRole);
+    if (updatedMember) {
+      await activityService.logActivity({
+        workspaceId,
+        userId,
+        actionType: 'workspace_member_role_updated',
+        entityType: 'workspace',
+        entityId: workspaceId,
+        metadata: { memberId, newRole }
+      });
+    }
     return { success: true, message: `Member ${memberId} role updated to ${newRole}` };
+  },
+
+  async acceptWorkspaceInvitation(token: string, userId: string) {
+    if (!token) {
+      throw new AppError('Invitation token is required', 400, 'BAD_REQUEST');
+    }
+
+    const cleanToken = token.trim();
+    const tokenHash = crypto.createHash('sha256').update(cleanToken).digest('hex');
+
+    const invitation = await workspaceRepository.getValidInvitationByHash(tokenHash);
+    if (!invitation) {
+      throw new AppError('Invalid or expired invitation link', 400, 'INVALID_INVITE');
+    }
+   
+    const workspaceId = invitation.workspaceId.toString();
+    const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
+    
+    if (!workspace) {
+      throw new AppError('Workspace no longer exists', 404, 'NOT_FOUND');
+    }
+
+    const isAlreadyMember = await WorkspaceMemberModel.exists({ workspaceId, userId, status: 'active' });
+
+    if (isAlreadyMember) {
+      throw new AppError('You are already a member of this workspace', 400, 'ALREADY_MEMBER');
+    }
+
+    await workspaceRepository.addMemberToWorkspace(workspaceId, {
+      userId,
+      role: invitation.role,
+      workspaceName: workspace.name
+    });
+
+    await workspaceRepository.markInvitationAsAccepted(invitation._id.toString());
+
+    await activityService.logActivity({
+      workspaceId,
+      userId,
+      actionType: 'workspace_member_joined',
+      entityType: 'workspace',
+      entityId: workspaceId,
+      metadata: { role: invitation.role }
+    });
+
+    return { 
+      success: true, 
+      message: 'Successfully joined the workspace',
+      workspaceId 
+    };
+  },
+  async removeWorkspaceMember(workspaceId: string, memberId: string, userId: string) {
+    const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+    }
+    const member = await WorkspaceMemberModel.findOne({ workspaceId, userId: memberId });
+    if (!member) {
+      throw new AppError('Member not found in workspace', 404, 'MEMBER_NOT_FOUND');
+    }
+    await workspaceRepository.removeMemberFromWorkspace(workspaceId, memberId);
+    await activityService.logActivity({
+      workspaceId,
+      userId,
+      actionType: 'workspace_member_removed',
+      entityType: 'workspace',
+      entityId: workspaceId,
+      metadata: { memberId }
+    });
+  },
+  async deleteWorkspace(workspaceId: string, userId: string) {
+    const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+    }
+    await workspaceRepository.deleteWorkspace(workspaceId);
+    await activityService.logActivity({
+      workspaceId,
+      userId,
+      actionType: 'workspace_deleted',
+      entityType: 'workspace',
+      entityId: workspaceId,
+      metadata: {}
+    });
+    return { success: true, message: 'Workspace deleted successfully' };
   }
 };

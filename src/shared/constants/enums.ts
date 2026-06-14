@@ -1,7 +1,7 @@
-export const WORKSPACE_ROLES = ['admin', 'team_lead', 'member'] as const;
+export const WORKSPACE_ROLES = ["OWNER", "ADMIN", "MEMBER", "GUEST"] as const;
 export const BOARD_VISIBILITY = ['private', 'workspace'] as const;
 export const TASK_PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
-export const INVITATION_STATUS = ['pending', 'accepted', 'expired', 'revoked'] as const;
+export const INVITATION_STATUS = ['pending', 'accepted', 'active', 'expired', 'revoked'] as const;
 export const THEMES = ['light', 'dark', 'system'] as const;
 
 export type WorkspaceRole = (typeof WORKSPACE_ROLES)[number];

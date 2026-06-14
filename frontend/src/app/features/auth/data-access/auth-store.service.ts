@@ -1,76 +1,94 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, finalize, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
+import { inject, Injectable, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
+import { Observable, of, tap, switchMap, catchError, shareReplay, throwError } from 'rxjs';
 import { SessionState, LoginRequest, RegisterRequest } from '../../../core/models/auth.model';
 import { AuthApiService } from './auth-api.service';
 import { TokenService } from '../../../core/services/token.service';
-
-const initialSessionState: SessionState = {
-  user: null,
-  accessToken: null,
-  isAuthenticated: false,
-  loading: false,
-  initialized: false
-};
 
 @Injectable({ providedIn: 'root' })
 export class AuthStoreService {
   private readonly authApi = inject(AuthApiService);
   private readonly tokenService = inject(TokenService);
   private readonly router = inject(Router);
-  private refreshRequest$: Observable<unknown> | null = null;
+  
+  private refreshRequest$: Observable<any> | null = null;
 
-  private readonly stateSubject = new BehaviorSubject<SessionState>(initialSessionState);
-  readonly state$ = this.stateSubject.asObservable();
+  private readonly state = signal<SessionState>({
+    user: null,
+    accessToken: null,
+    isAuthenticated: false,
+    loading: false,
+    initialized: false
+  });
 
-  readonly user$ = this.state$.pipe(map(state => state.user));
-  readonly isAuthenticated$ = this.state$.pipe(map(state => state.isAuthenticated));
-  readonly initialized$ = this.state$.pipe(map(state => state.initialized));
-  readonly accessToken$ = this.state$.pipe(map(state => state.accessToken));
-  readonly loading$ = this.state$.pipe(map(state => state.loading));
+  readonly currentUser = computed(() => this.state().user);
+  readonly isAuthenticated = computed(() => this.state().isAuthenticated);
+  readonly isInitialized = computed(() => this.state().initialized);
+  readonly isLoading = computed(() => this.state().loading);
+  readonly activeToken = computed(() => this.state().accessToken);
 
-  login(payload: LoginRequest) {
-    this.patchState({ loading: true });
+  login(payload: LoginRequest): Observable<any> {
+    this.updateState({ loading: true });
 
     return this.authApi.login(payload).pipe(
       tap(response => {
         this.setSession(response.data.user, response.data.accessToken);
+        this.updateState({ loading: false });
       }),
-      finalize(() => this.patchState({ loading: false }))
-    );
-  }
-
-  register(payload: RegisterRequest) {
-    this.patchState({ loading: true });
-
-    return this.authApi.register(payload).pipe(
-      tap(response => {
-        this.setSession(response.data.user, response.data.accessToken);
-      }),
-      finalize(() => this.patchState({ loading: false }))
-    );
-  }
-
-  initializeSession(): Observable<unknown> {
-    return this.refreshAccessToken().pipe(
-      switchMap(() => this.authApi.me()),
-      tap(response => {
-        this.patchState({
-          user: response.data.user,
-          accessToken: this.tokenService.getAccessToken(),
-          isAuthenticated: true,
-          initialized: true
-        });
-      }),
-      catchError(() => {
-        this.clearSession(false);
-        this.patchState({ initialized: true });
-        return of(null);
+      catchError(err => {
+        this.updateState({ loading: false });
+        return throwError(() => err);
       })
     );
   }
 
-  refreshAccessToken() {
+  register(payload: RegisterRequest): Observable<any> {
+    this.updateState({ loading: true });
+
+    return this.authApi.register(payload).pipe(
+      tap(response => {
+        this.setSession(response.data.user, response.data.accessToken);
+        this.updateState({ loading: false });
+      }),
+      catchError(err => {
+        this.updateState({ loading: false });
+        return throwError(() => err);
+      })
+    );
+  }
+
+  initializeSession(): Observable<any> {
+  if (this.state().initialized && this.state().isAuthenticated) {
+    return of(null);
+  }
+
+  return this.refreshAccessToken().pipe(
+    switchMap((refreshResponse) => {
+      const freshToken = refreshResponse?.data?.accessToken || this.tokenService.getAccessToken();
+      
+      if (!freshToken) {
+        throw new Error('No fresh token available');
+      }
+      return this.authApi.me();
+    }),
+    tap(response => {
+      this.updateState({
+        user: response.data.user,
+        accessToken: this.tokenService.getAccessToken(),
+        isAuthenticated: true,
+        initialized: true
+      });
+    }),
+    catchError((err) => {
+      console.error('Initialization failed:', err);
+      this.clearSession(false);
+      this.updateState({ initialized: true });
+      return of(null);
+    })
+  );
+}
+
+  refreshAccessToken(): Observable<any> {
     if (this.refreshRequest$) {
       return this.refreshRequest$;
     }
@@ -79,13 +97,21 @@ export class AuthStoreService {
       tap(response => {
         const token = response.data.accessToken;
         this.tokenService.setAccessToken(token);
-        this.patchState({
+        
+        this.updateState({
           accessToken: token,
           isAuthenticated: true
         });
       }),
-      finalize(() => {
+      catchError(err => {
         this.refreshRequest$ = null;
+        return throwError(() => err);
+      }),
+      tap({
+        subscribe: () => {},
+        finalize: () => {
+          this.refreshRequest$ = null;
+        }
       }),
       shareReplay({ bufferSize: 1, refCount: true })
     );
@@ -94,18 +120,23 @@ export class AuthStoreService {
   }
 
   logout(navigate = true): void {
-    this.authApi.logout().subscribe({
-      next: () => this.clearSession(navigate),
-      error: () => this.clearSession(navigate)
-    });
+    this.authApi.logout().pipe(
+      tap({
+        next: () => this.clearSession(navigate),
+        error: () => this.clearSession(navigate)
+      })
+    ).subscribe();
   }
 
   clearSession(navigate = true): void {
-    // Clear only the access token, not the refresh token
     this.tokenService.setAccessToken(null);
-    this.stateSubject.next({
-      ...initialSessionState,
-      initialized: true
+    
+    this.state.set({
+      user: null,
+      accessToken: null,
+      isAuthenticated: false,
+      loading: false,
+      initialized: true 
     });
 
     if (navigate) {
@@ -113,10 +144,10 @@ export class AuthStoreService {
     }
   }
 
-  private setSession(user: SessionState['user'], accessToken: string): void {
+  private setSession(user: any, accessToken: string): void {
     this.tokenService.setAccessToken(accessToken);
 
-    this.patchState({
+    this.updateState({
       user,
       accessToken,
       isAuthenticated: true,
@@ -124,10 +155,7 @@ export class AuthStoreService {
     });
   }
 
-  private patchState(partial: Partial<SessionState>): void {
-    this.stateSubject.next({
-      ...this.stateSubject.getValue(),
-      ...partial
-    });
+  private updateState(partial: Partial<SessionState>): void {
+    this.state.update(current => ({ ...current, ...partial }));
   }
 }

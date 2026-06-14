@@ -6,6 +6,7 @@ import { Board } from '../../../core/models/board.model';
 import { BoardColumn } from '../../../core/models/column.model';
 import { Task } from '../../../core/models/task.model';
 import { environment } from '../../../../environments/environment';
+import { TaskComment } from '../../../core/models/comment.model';
 
 export interface BoardDetailResponse {
   board: Board;
@@ -50,7 +51,7 @@ export class BoardApiService {
 
   createBoard(name: string, workspaceName: string, workspaceId: string, visibility: 'private' | 'workspace'): Observable<ApiResponse<Board>> {
     return this.http.post<ApiResponse<Board>>(
-      `${this.baseUrl}/workspaces/${workspaceId}/boards`,
+      `${this.baseUrl}/boards`,
       { name, workspaceName, workspaceId, visibility },
       { withCredentials: true }
     );
@@ -81,8 +82,8 @@ export class BoardApiService {
 
   createColumn(boardId: string, workspaceId: string, name: string): Observable<ApiResponse<BoardColumn>> {
     return this.http.post<ApiResponse<BoardColumn>>(
-      `${this.baseUrl}/workspaces/${workspaceId}/boards/${boardId}/columns`,
-      { name },
+      `${this.baseUrl}/columns`,
+      { name, boardId, workspaceId },
       { withCredentials: true }
     );
   }
@@ -106,15 +107,15 @@ export class BoardApiService {
   }
   addTask(boardId: string, columnId: string, title: string, workspaceId: string, position?: number): Observable<ApiResponse<Task>> {
     return this.http.post<ApiResponse<Task>>(
-      `${this.baseUrl}/boards/${boardId}/columns/${columnId}/tasks`,
-      { title, workspaceId, position },
+      `${this.baseUrl}/tasks`,
+      { title, workspaceId, boardId, columnId, position },
       { withCredentials: true }
     );
   }
 
-  updateTask(boardId: string, taskId: string, payload: UpdateTaskPayload): Observable<ApiResponse<Task>> {
+  updateTask(taskId: string, payload: UpdateTaskPayload): Observable<ApiResponse<Task>> {
     return this.http.patch<ApiResponse<Task>>(
-      `${this.baseUrl}/boards/${boardId}/tasks/${taskId}`,
+      `${this.baseUrl}/tasks/${taskId}`,
       payload,
       { withCredentials: true }
     );
@@ -127,4 +128,21 @@ export class BoardApiService {
       { withCredentials: true }
     );
   }
+  getCommentsForTask(taskId: string): Observable<ApiResponse<{ comments: TaskComment[] }>> {
+    return this.http.get<ApiResponse<{ comments: TaskComment[] }>>(`${this.baseUrl}/tasks/${taskId}/comments`, {
+      withCredentials: true
+    });
+  }
+  postCommentToTask(taskId: string, content: string): Observable<ApiResponse<{ comment: TaskComment }>> {
+    return this.http.post<ApiResponse<{ comment: TaskComment }>>(
+      `${this.baseUrl}/tasks/${taskId}/comments`,
+      { content },
+      { withCredentials: true }
+    );
+}
+deleteComment(commentId: string): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(`${this.baseUrl}/comments/${commentId}`, {
+      withCredentials: true
+    });
+}
 }

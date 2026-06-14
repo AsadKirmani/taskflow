@@ -6,6 +6,12 @@ import { activityController } from './activity.controller';
 const router = Router();
 
 router.get(
+  '/',
+  authMiddleware,
+  asyncHandler(activityController.getGlobalActivity)
+);
+
+router.get(
   '/workspaces/:workspaceId/activity',
   authMiddleware,
   asyncHandler(activityController.getWorkspaceActivity)

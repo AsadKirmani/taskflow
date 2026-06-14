@@ -6,16 +6,15 @@ export const boardService = {
   async createBoard(
     input: CreateBoardDto,
     userId: string,
-    workspaceId: string,
   ) {
     const board = await boardRepository.createBoard({
       ...input,
       createdBy: userId,
-      workspaceId,
     });
 
+
     await activityService.logActivity({
-      workspaceId,
+      workspaceId: board.workspaceId.toString(),
       boardId: board._id.toString(),
       userId,
       actionType: 'board_created',
@@ -29,12 +28,12 @@ export const boardService = {
 
     return board;
   },
-  async getBoardById(boardId: string) {
+  async getBoardById(userId: string, boardId: string) {
     const board = await boardRepository.getBoardById(boardId);
     return board;
   },
   async getBoardsInWorkspace(workspaceId: string, userId: string) {
-    const boards = await boardRepository.getBoardsInWorkspace(workspaceId);
+    const boards = await boardRepository.getBoardsInWorkspace(workspaceId, userId);
     return boards;
   },
   async updateBoard(
@@ -68,5 +67,11 @@ export const boardService = {
   async getBoards(userId: string) {
     const boards = await boardRepository.getBoardsForUser(userId);
     return boards;
-  }
+  },
+  async reorderColumns(boardId: string, columnIds: string[], userId: string) {
+      return await boardRepository.reorderColumns(boardId, columnIds);
+    },
+    async deleteBoard(boardId: string, userId: string) {
+      const deletedBoard = await boardRepository.deleteBoard(boardId);
+    }
 };

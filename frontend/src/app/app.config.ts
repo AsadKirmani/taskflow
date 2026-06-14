@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideAppInitializer } from '@angular/core';
+import { ApplicationConfig, inject, provideAppInitializer } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { appRoutes } from './app.routes';
@@ -7,6 +7,8 @@ import { refreshTokenInterceptor } from './core/interceptors/refresh-token.inter
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { initializeApp } from './core/config/app.initializer';
+import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
+import { AuthStoreService } from './features/auth/data-access/auth-store.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,11 +16,13 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([
         loadingInterceptor,
-        authInterceptor,
-        refreshTokenInterceptor,
-        errorInterceptor
+        errorInterceptor,
+        authInterceptor
       ])
     ),
-    provideAppInitializer(initializeApp)
+    provideAppInitializer(() => {
+      const authStore = inject(AuthStoreService);
+      return firstValueFrom(authStore.initializeSession());
+    })
   ]
 };

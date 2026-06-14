@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Subject, catchError, debounceTime, distinctUntilChanged, map, of, tap } from 'rxjs';
+import { inject, Injectable, signal, computed } from '@angular/core';
+import { Subject, catchError, debounceTime, distinctUntilChanged, map, of, tap } from 'rxjs';
 import { BoardColumn } from '../../../core/models/column.model';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Task } from '../../../core/models/task.model';
@@ -7,6 +7,7 @@ import { TaskDropEventPayload } from '../models/drag-drop.model';
 import { BoardApiService } from './board-api.service';
 import { BoardFilters } from './board-state.model';
 import { TaskState, initialTaskState } from './task-state.model';
+import { TaskComment } from '../../../core/models/comment.model';
 
 @Injectable({ providedIn: 'root' })
 export class TaskStoreService {
@@ -16,9 +17,11 @@ export class TaskStoreService {
   private readonly loadedTaskBoardIds = new Set<string>();
   private readonly loadingTaskBoardIds = new Set<string>();
   private readonly filterTrigger$ = new Subject<string>();
+  comments = signal<TaskComment[]>([]);
 
-  private readonly stateSubject = new BehaviorSubject<TaskState>(initialTaskState);
-  readonly state$ = this.stateSubject.asObservable();
+  private readonly stateSignal = signal<TaskState>(initialTaskState);
+
+  readonly state = this.stateSignal.asReadonly();
 
   constructor() {
     this.filterTrigger$
@@ -30,13 +33,14 @@ export class TaskStoreService {
       });
   }
 
-  readonly vm$ = this.state$.pipe(
-    map(state => ({
-      loading: state.loading,
-      saving: state.saving,
-      error: state.error
-    }))
-  );
+  readonly vm = computed(() => {
+    const s = this.stateSignal();
+    return {
+      loading: s.loading,
+      saving: s.saving,
+      error: s.error
+    };
+  });
 
   getTasksInBoard(boardId: string, columns: BoardColumn[] = [], force = false): void {
     if (!boardId?.trim()) {
@@ -141,12 +145,11 @@ export class TaskStoreService {
   }
 
   updateTask(
-    boardId: string,
     taskId: string,
     updates: { title?: string; description?: string; isCompleted?: boolean }
   ): void {
-    if (!boardId?.trim() || !taskId?.trim()) {
-      this.notificationService.error('Board ID and Task ID are required');
+    if (!taskId?.trim()) {
+      this.notificationService.error('Task ID is required');
       return;
     }
 
@@ -158,7 +161,7 @@ export class TaskStoreService {
     }
 
     this.api
-      .updateTask(boardId, taskId, updates)
+      .updateTask(taskId, updates)
       .pipe(
         map(response => this.normalizeTasks([response.data as Task & { _id?: string }])[0]),
         tap(updatedTask => {
@@ -171,6 +174,7 @@ export class TaskStoreService {
               }
             }
           });
+          console.log('Updated task:', updatedTask);
           this.notificationService.success('Task updated successfully');
         }),
         catchError(() => {
@@ -204,7 +208,7 @@ export class TaskStoreService {
           this.notificationService.success('Task moved successfully');
         }),
         catchError(() => {
-          this.stateSubject.next(snapshot);
+          this.stateSignal.set(snapshot);
           this.notificationService.error('Failed to move task');
           return of(null);
         })
@@ -239,8 +243,8 @@ export class TaskStoreService {
     );
   }
 
-  toggleTaskCompletion(boardId: string, taskId: string, isCompleted: boolean): void {
-    this.updateTask(boardId, taskId, { isCompleted });
+  toggleTaskCompletion(taskId: string, isCompleted: boolean): void {
+    this.updateTask(taskId, { isCompleted });
   }
 
   private applyOptimisticTaskMove(event: TaskDropEventPayload): void {
@@ -406,14 +410,14 @@ export class TaskStoreService {
   }
 
   private patchState(partial: Partial<TaskState>): void {
-    this.stateSubject.next({
-      ...this.getState(),
+    this.stateSignal.update(current => ({
+      ...current,
       ...partial
-    });
+    }));
   }
 
   private getState(): TaskState {
-    return this.stateSubject.getValue();
+    return this.stateSignal();
   }
 
   private normalizeTasks(tasks: (Task & { _id?: string })[]): Task[] {
@@ -478,4 +482,52 @@ export class TaskStoreService {
       currentUserId: filters.currentUserId
     });
   }
+  getCommentsForTask(taskId: string) {
+    this.api.getCommentsForTask(taskId).subscribe({
+      next: (response) => {
+        const rawComments = Array.isArray(response) ? response : [];
+        const mappedComments = rawComments.map((comment: any) => ({
+          ...comment,
+          id: comment._id,
+        })) as TaskComment[];
+        this.comments.set(mappedComments);
+      },
+      error: () => {
+        this.notificationService.error('Failed to fetch comments');
+      }
+    });
+}
+postCommentToTask(taskId: string, content: string){
+    this.api.postCommentToTask(taskId, content).subscribe({
+     next: (response: any) => {
+      let rawNewComment = response.data || response; 
+
+      if (Array.isArray(rawNewComment)) {
+        rawNewComment = rawNewComment[0]; 
+      }
+
+      const newComment: TaskComment = {
+        ...rawNewComment,
+        id: rawNewComment._id
+      };
+
+      this.comments.update(existingComments => [newComment, ...existingComments]);
+      
+    },
+    error: (err) => console.error('Failed to post comment:', err)
+    });
+}
+deleteComment(commentId: string){
+    if (!commentId?.trim()) {
+      this.notificationService.error('Comment ID is required');
+      return of(null);
+    }
+    return this.api.deleteComment(commentId).pipe(
+      map(response => response.data ?? null),
+      catchError(() => {
+        this.notificationService.error('Failed to delete comment');
+        return of(null);
+      })
+    );
+}
 }

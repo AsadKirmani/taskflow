@@ -4,9 +4,6 @@ import { archiveService } from './archive.service';
 
 export const archiveController = {
   async archiveEntity(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-    }
 
     const { workspaceId, entityType, entityId, reason } = req.body as {
       workspaceId: string;
@@ -20,7 +17,7 @@ export const archiveController = {
       entityType,
       entityId,
       reason,
-      userId: req.auth.userId
+      userId: req.auth!.userId
     });
 
     if (!result) {
@@ -31,9 +28,6 @@ export const archiveController = {
   },
 
   async restoreEntity(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-    }
 
     const { workspaceId, entityType, entityId } = req.body as {
       workspaceId: string;
@@ -45,7 +39,7 @@ export const archiveController = {
       workspaceId,
       entityType,
       entityId,
-      userId: req.auth.userId
+      userId: req.auth!.userId
     });
 
     if (!updated) {
@@ -56,9 +50,6 @@ export const archiveController = {
   },
 
   async listArchived(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
-    }
 
     const { workspaceId } = req.params as { workspaceId: string };
     const entityType = req.query.entityType as 'board' | 'column' | 'task' | undefined;

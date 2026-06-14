@@ -260,4 +260,11 @@ export const taskRepository = {
       await TaskModel.bulkWrite(updates);
     }
   },
+  async deleteTask(taskId: string) {    const task = await TaskModel.findByIdAndDelete(taskId);
+    if (task) {
+      await ColumnModel.findByIdAndUpdate(task.columnId, {
+        $pull: { taskOrder: task._id },
+      });
+    }
+  }
 };

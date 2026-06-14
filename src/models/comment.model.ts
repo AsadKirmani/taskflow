@@ -20,7 +20,13 @@ const CommentSchema = new Schema(
       required: true,
       index: true
     },
-    userId: {
+    author: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 255
+    },
+    authorId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true

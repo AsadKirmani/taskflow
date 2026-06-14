@@ -1,0 +1,81 @@
+<section
+  class="kanban-column self-start bg-base-300 p-2 w-[85vw] sm:w-64 rounded-xl shadow"
+  draggable="true"
+  (dragstart)="onColumnDragStart($event)"
+  (dragover)="onColumnDragOver($event)"
+  (drop)="onColumnDrop($event)"
+>
+  <div class="flex flex-col p-2 gap-1 mb-2">
+    <div class="flex items-center justify-between text-base-content/50">
+      <header class="kanban-column__header cursor-grab flex items-center gap-2" cdkDragHandle>
+        <h3 class="font-bold m-0 text-base-content">{{ column().name }}</h3>
+        <span
+          class="bg-base-200 text-base-content/70 px-2 py-0.5 rounded-full text-xs font-semibold"
+          >{{ tasks().length }}</span
+        >
+      </header>
+      <svg
+        class="cursor-pointer"
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="1"></circle>
+        <circle cx="19" cy="12" r="1"></circle>
+        <circle cx="5" cy="12" r="1"></circle>
+      </svg>
+    </div>
+    @if (hasActiveFilters()) {
+      <span class="text-xs text-primary font-semibold">{{ tasks().length }} matching tasks</span>
+    }
+  </div>
+  <div
+    class="kanban-column__task-list min-h-[50px] p-1 rounded transition-colors"
+    [class.bg-base-200]="isDragOver"
+    (dragover)="onTaskDragOver($event)"
+    (dragleave)="onTaskDragLeave($event)"
+    (drop)="onTaskDrop($event)"
+  >
+    @for (task of tasks(); track task.id) {
+      <app-task-card
+        [task]="task"
+        [columnIndex]="columnIndex()"
+        [sourceColumnId]="column().id"
+        (updateTitle)="taskUpdated.emit({ taskId: task.id, title: $event })"
+        (toggleCompletion)="taskCompletionToggled.emit(task)"
+        (openOverlay)="taskClicked.emit(task)"
+      ></app-task-card>
+    }
+  </div>
+
+  <div
+    class="add-task p-1 flex items-center justify-start gap-1 text-base-content/70 transition-colors mt-1"
+  >
+    @if (!isInputOpen) {
+      <button
+        class="add-task__button cursor-pointer hover:bg-base-content/10 border border-base-content/20 w-full text-center p-1 rounded-field bg-transparent transition-colors"
+        (click)="isInputOpen = true"
+      >
+        + Add a task
+      </button>
+    } @else {
+      <input
+        type="text"
+        class="add-task__input p-1 text-base-content rounded-field w-full h-10 outline-none ring-1 ring-accent focus:ring-2 focus:ring-accent focus:outline-none"
+        placeholder="Task title..."
+        [value]="inputValue"
+        (input)="onInput($event)"
+        (blur)="cancelInput()"
+        (keydown.enter)="submitTask()"
+        (keydown.escape)="cancelInput()"
+        appAutofocus
+      />
+    }
+  </div>
+</section>

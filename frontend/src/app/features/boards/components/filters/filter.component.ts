@@ -28,7 +28,6 @@ export class ApplyFilterComponent {
   isOpen = model<boolean>(false);
   close(): void {
     this.isOpen.set(false);
-    console.log('Filter view closed');
   }
 
   toggleFlag(key: 'noMembers' | 'me' | 'completed' | 'incomplete', checked: boolean): void {

@@ -3,51 +3,54 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI;
-const MONGODB_URI_FALLBACK = process.env.MONGODB_URI_FALLBACK;
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME;
 
-let connectionPromise: Promise<typeof mongoose> | null = null;
+let cachedConnection: typeof mongoose | null = null;
+
+function getConnectionString(): string {
+  if (IS_PRODUCTION) {
+    if (!process.env.MONGODB_URI) throw new Error('CRITICAL: MONGODB_URI is missing');
+    return process.env.MONGODB_URI;
+  }
+  const localUri = process.env.MONGODB_URI_LOCAL || process.env.MONGODB_URI;
+  if (!localUri) throw new Error('DEVELOPMENT ERROR: MONGODB_URI is missing');
+  return localUri;
+}
 
 export async function connectToDatabase(): Promise<typeof mongoose> {
-  const connectionUri = process.env.MONGODB_URI_LOCAL || MONGODB_URI;
-
-  if (!connectionUri) {
-    throw new Error('MONGODB_URI is not set');
-  }
-
+  console.time("PROD Database Connection Time");
   if (!MONGODB_DB_NAME) {
-    throw new Error('MONGODB_DB_NAME is not set');
+    throw new Error('DATABASE ERROR: MONGODB_DB_NAME is completely missing');
   }
 
-  if (mongoose.connection.readyState === 1) {
-    return mongoose;
+  if (cachedConnection && mongoose.connection.readyState === 1) {
+    return cachedConnection;
   }
 
-  if (!connectionPromise) {
-    connectionPromise = mongoose
-      .connect(connectionUri, { dbName: MONGODB_DB_NAME })
-      .catch(async (error: NodeJS.ErrnoException) => {
-        const isSrvRefused =
-          error?.code === 'ECONNREFUSED' &&
-          error?.syscall === 'querySrv' &&
-          typeof MONGODB_URI_FALLBACK === 'string' &&
-          MONGODB_URI_FALLBACK.trim().length > 0;
-
-        if (isSrvRefused) {
-          console.warn(
-            'MongoDB SRV lookup failed. Retrying with MONGODB_URI_FALLBACK.'
-          );
-          return mongoose.connect(MONGODB_URI_FALLBACK!, { dbName: MONGODB_DB_NAME });
-        }
-
-        throw error;
-      })
-      .catch((error) => {
-        connectionPromise = null;
-        throw error;
-      });
+  if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
+    console.log('⚠️ Stale or disconnected socket detected. Wiping connection cache...');
+    cachedConnection = null;
   }
 
-  return connectionPromise;
+  const primaryUri = getConnectionString();
+
+  try {
+    console.log('🔄 Opening fresh database pool connection sockets...');
+    
+    cachedConnection = await mongoose.connect(primaryUri, {
+      dbName: MONGODB_DB_NAME,
+      serverSelectionTimeoutMS: 5000, 
+      socketTimeoutMS: 45000,
+    });
+
+    const dbHost = mongoose.connection.host;
+    console.log(`✅ MongoDB Connected securely to: [${dbHost}]`);
+    console.timeEnd("PROD Database Connection Time");
+    return cachedConnection;
+  } catch (error) {
+    cachedConnection = null;
+    console.error('❌ MongoDB Connection failed during socket allocation:', error);
+    throw error;
+  }
 }

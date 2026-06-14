@@ -1,84 +1,226 @@
-<!-- Fixed background dim backdrop layer -->
-<div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-2 sm:p-4 animate-fade-in">
+<div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-2 sm:p-4 animate-fade-in" (click)="close()">
   
-  <!-- Main Dialog Window Box Container -->
-  <article class="bg-[#f1f2f4] w-full max-w-3xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] text-[#172b4d] overflow-hidden">
+  <article class="bg-base-300 w-full max-w-6xl rounded-xl shadow-2xl flex flex-col max-h-[95vh] text-[#172b4d] overflow-hidden" (click)="$event.stopPropagation()">
     
-    <!-- Modal Control Header -->
-    <header class="p-4 sm:p-6 flex items-start justify-between pb-0">
-      <div class="flex gap-3 items-start min-w-0 flex-1">
-        <mat-icon class="mt-1 text-gray-600">payment</mat-icon>
-        <div class="min-w-0 flex-1">
-          <!-- Task Title Title Element -->
-          <h2 class="text-xl font-semibold leading-tight break-words">{{ task()?.title }}</h2>
-          <p class="text-xs text-gray-500 mt-1">
-            in list <span class="underline cursor-pointer font-medium hover:text-gray-800">{{ columnName() }}</span>
-          </p>
-        </div>
+    <header class="flex items-center justify-between px-5 py-3 border-b border-base-content/20">
+      <div class="bg-base-100 hover:bg-base-200 cursor-pointer px-3 py-1.5 rounded-md text-sm font-semibold text-base-content flex items-center gap-1 transition-colors">
+        {{ columnName() }} <mat-icon class="text-[16px] w-4 h-4 leading-none">keyboard_arrow_down</mat-icon>
       </div>
-      <!-- Close Trigger Node -->
-      <button (click)="close()" class="p-1.5 rounded-full hover:bg-black/10 transition-colors text-gray-600" aria-label="Close dialog">
-        <mat-icon>close</mat-icon>
-      </button>
-    </header>
-
-    <!-- Scrollable Dialog Panel Body -->
-    <div class="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
       
-      <!-- Main Content Flow Body Columns (70%) -->
-      <div class="md:col-span-3 flex flex-col gap-6">
+      <div class="flex items-center gap-1 text-base-content/70">
+        <button class="p-1.5 hover:bg-base-100 rounded-box transition-colors flex items-center justify-center"><mat-icon class="text-[20px] w-5 h-5">image</mat-icon></button>
+        <button class="p-1.5 hover:bg-base-100 rounded-box transition-colors flex items-center justify-center"><mat-icon class="text-[20px] w-5 h-5">more_horiz</mat-icon></button>
+        <button (click)="close()" class="p-1.5 hover:bg-base-100 rounded-box transition-colors flex items-center justify-center ml-2"><mat-icon class="text-[20px] w-5 h-5">close</mat-icon></button>
+      </div>
+    </header>                                           
+
+    <div class="flex flex-col md:flex-row flex-1 overflow-hidden min-h-[500px]">
+      
+      <div class="flex-1 p-5 sm:p-8 flex flex-col gap-8 bg-base-200 overflow-y-auto">
         
-        <!-- Action Configuration Ribbon Pills -->
-        <div class="flex items-center flex-wrap gap-2 text-xs font-semibold pl-9">
-          <button class="flex items-center gap-1 bg-black/5 hover:bg-black/10 px-3 py-1.5 rounded-sm transition-colors"><mat-icon class="text-sm w-4 h-4">add</mat-icon>Add</button>
-          <button class="flex items-center gap-1 bg-black/5 hover:bg-black/10 px-3 py-1.5 rounded-sm transition-colors"><mat-icon class="text-sm w-4 h-4">label</mat-icon>Labels</button>
-          <button class="flex items-center gap-1 bg-black/5 hover:bg-black/10 px-3 py-1.5 rounded-sm transition-colors"><mat-icon class="text-sm w-4 h-4">schedule</mat-icon>Dates</button>
-          <button class="flex items-center gap-1 bg-black/5 hover:bg-black/10 px-3 py-1.5 rounded-sm transition-colors"><mat-icon class="text-sm w-4 h-4">select_check_box</mat-icon>Checklist</button>
-          <button class="flex items-center gap-1 bg-black/5 hover:bg-black/10 px-3 py-1.5 rounded-sm transition-colors"><mat-icon class="text-sm w-4 h-4">person</mat-icon>Members</button>
-        </div>
+        <div>
+          <div class="flex items-start gap-3">
+            <mat-icon class=" mt-1 w-6 h-6 flex-shrink-0">radio_button_unchecked</mat-icon>
+            <h2 class="text-2xl font-bold m-0 leading-tight text-base-content">{{ task().title || 'Task Title' }}</h2>
+          </div>
+          
+          <div class="flex flex-wrap gap-2 pl-9 mt-4">
+              <app-task-labels 
+              [appliedLabels]="currentTask()?.labels || []" 
+              (labelToggled)="toggleLabel($event)">
+            </app-task-labels>
+            <div class="relative">
+            <button 
+  (click)="isChecklistPickerOpen.set(!isChecklistPickerOpen())" 
+  [ngClass]="isChecklistPickerOpen() ? 'bg-base-content text-base-100 hover:bg-base-content/90' : 'bg-base-100 text-base-content hover:bg-base-300'"
+  class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-content/10">
+  <mat-icon class="text-[18px] w-[18px] h-[18px]">check_box</mat-icon> Checklist
+</button>
 
-        <!-- Description Box Control Slot -->
-        <div class="flex gap-3 items-start">
-          <mat-icon class="mt-1 text-gray-600">subject</mat-icon>
-          <div class="flex-1">
-            <h3 class="font-semibold text-sm mb-2">Description</h3>
-            <div class="bg-black/5 hover:bg-black/10 min-h-16 rounded-md p-3 text-sm text-gray-500 cursor-pointer transition-colors">
-              Add a more detailed description...
-            </div>
+            @if (isChecklistPickerOpen()) {
+              <div class="fixed inset-0 z-40" (click)="isChecklistPickerOpen.set(false)"></div>
+              
+              <div class="absolute top-full left-0 mt-2 w-64 bg-base-100 border border-base-content/10 shadow-2xl rounded-lg z-50 p-3 animate-in fade-in zoom-in-95 duration-200">
+                <h4 class="text-xs font-bold text-base-content/70 uppercase mb-3 text-center">Add Checklist</h4>
+                
+                <div class="flex flex-col gap-3 relative z-50">
+                  <input 
+                    #newMenuInput 
+                    type="text" 
+                    placeholder="Add an item..." 
+                    class="input input-sm input-bordered w-full bg-base-200" 
+                    (keyup.enter)="addChecklistFromMenu(newMenuInput.value)"
+                    autofocus
+                  />
+                  <button 
+                    (click)="addChecklistFromMenu(newMenuInput.value)" 
+                    class="bg-primary hover:bg-primary/90 text-primary-content w-full py-1.5 rounded text-sm font-medium transition-colors">
+                    Add Item
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+          <div class="relative overflow-hidden group">
+            <input 
+              #datePicker
+              type="date" 
+              [value]="getFormattedDate(currentTask()?.dueDate)"
+              (change)="changeDueDate($event)"
+              class="absolute opacity-0 w-0 h-0 pointer-events-none"
+            />
+            <button (click)="openDatePicker(datePicker)" class="flex items-center gap-1.5 bg-base-100 group-hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-content/10 w-full">
+              <mat-icon class="text-[18px] w-[18px] h-[18px]">schedule</mat-icon> Dates
+            </button>
+          </div>
+            <button class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+              <mat-icon class="text-[18px] w-[18px] h-[18px]">person_outline</mat-icon> Members
+            </button>
+            <button (click)="triggerAttachmentUpload()" class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+              <mat-icon class="text-[18px] w-[18px] h-[18px]">attach_file</mat-icon> Attach
+            </button>
+            <input type="file" #fileInput class="hidden" (change)="onFileSelected($event)" />
           </div>
         </div>
-
-        <!-- Comments Logging Loop Flow -->
-        <div class="flex gap-3 items-start">
-          <mat-icon class="mt-1 text-gray-600">toc</mat-icon>
-          <div class="flex-1">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="font-semibold text-sm">Comments and activity</h3>
-              <button class="text-xs bg-black/5 hover:bg-black/10 font-medium px-3 py-1.5 rounded-sm transition-colors">Show details</button>
+        @if (currentTask()?.dueDate) {
+          <div class="mb-6">
+            <h3 class="text-xs font-bold text-base-content/70 uppercase mb-2">Due Date</h3>
+            <div class="flex items-center gap-2 group w-fit">
+              <div class="flex items-center gap-2 bg-base-200/50 border border-base-content/10 px-3 py-1.5 rounded-md">
+                <mat-icon class="text-base-content/70 text-[18px] w-[18px] h-[18px]">schedule</mat-icon>
+                
+                <span class="text-sm font-medium text-base-content">
+                  {{ currentTask()?.dueDate | date:'mediumDate' }}
+                </span>
+              </div>
+              
+              <button 
+                (click)="removeDueDate()" 
+                class="opacity-0 group-hover:opacity-100 hover:bg-error/20 text-error p-1 rounded transition-all">
+                <mat-icon class="text-[18px] w-[18px] h-[18px]">close</mat-icon>
+              </button>
             </div>
+          </div>
+        }
+
+        <div class="flex items-start gap-3">
+          <mat-icon class="text-base-content w-6 h-6 flex-shrink-0">subject</mat-icon>
+          <div class="flex-1 w-full relative">
+            <h3 class="font-semibold text-base mb-3 text-base-content">Description</h3>
             
-            <!-- Comment Form Node Field -->
-            <div class="flex gap-3 items-start mb-4">
-              <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-sm flex-shrink-0">
-                AK
+            @if (!isEditingDesc()) {
+              <div 
+                (click)="enableDescEdit()"
+                class="bg-base-100 hover:bg-base-200 border border-base-content/10 hover:border-base-content/30 min-h-[5rem] rounded-md p-4 text-sm cursor-pointer transition-colors prose prose-sm max-w-none text-base-content"
+                [innerHTML]="descValue() || 'Add a more detailed description...'">
               </div>
-              <div class="flex-1 bg-white shadow-sm ring-1 ring-black/10 rounded-md p-2">
-                <input type="text" placeholder="Write a comment..." class="w-full text-sm outline-none px-1 py-1 text-gray-700 placeholder-gray-400" />
+            } @else {
+              <div class="flex flex-col gap-2 animate-in fade-in duration-200">
+                <app-text-editor 
+                  [(value)]="descValue" 
+                  placeholder="Write a detailed description..."
+                  minHeight="150px">
+                </app-text-editor>
+                
+                <div class="flex gap-2 mt-1">
+                  <button (click)="saveDescription()" class="bg-primary hover:bg-primary-/20 text-base-100 text-sm font-medium px-4 py-1.5 rounded-box transition-colors">Save</button>
+                  <button (click)="cancelDescEdit()" class="hover:bg-base-300 text-base-content text-sm font-medium px-4 py-1.5 rounded-box transition-colors">Cancel</button>
+                </div>
               </div>
-            </div>
+            }
           </div>
         </div>
 
+        @if (attachments().length > 0) {
+          <div class="flex items-start gap-3">
+            <mat-icon class="text-base-content w-6 h-6 flex-shrink-0">attachment</mat-icon>
+            <div class="flex-1">
+              <h3 class="font-semibold text-base mb-3 text-base-content">Attachments</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                @for (file of attachments(); track file.name) {
+                  <div class="flex items-center gap-3 p-2 rounded-md border border-base-content/10 hover:bg-base-200 transition-colors cursor-pointer group">
+                    <div class="w-12 h-12 bg-base-200 rounded flex items-center justify-center flex-shrink-0 text-base-content/70 group-hover:text-base-content transition-colors">
+                      <mat-icon>insert_drive_file</mat-icon>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <p class="text-sm font-semibold text-base-content truncate m-0 group-hover:underline">{{ file.name }}</p>
+                      <p class="text-xs text-base-content/70 m-0 mt-0.5">Added just now</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+         @if (currentTask()?.checklist?.length || isChecklistVisible()) {
+          <app-task-checklist 
+            [checklist]="currentTask()?.checklist || []"
+            (itemAdded)="addChecklistItem($event)"
+            (itemToggled)="toggleChecklistItem($event.index, $event.isCompleted)"
+            (itemDeleted)="deleteChecklistItem($event)">
+          </app-task-checklist>
+        }
       </div>
 
-      <!-- Secondary Utility Quick Action Right Panels (30%) -->
-      <div class="md:col-span-1 flex flex-col gap-2">
-        <h4 class="text-xs font-bold text-gray-500 tracking-wider uppercase mb-1">Actions</h4>
-        <button class="flex items-center gap-2 bg-[#e2e4e6] hover:bg-[#d6d8da] w-full text-left px-3 py-2 rounded-sm text-sm font-medium transition-colors"><mat-icon class="text-base w-4 h-4">bolt</mat-icon>Power-ups</button>
-        <button class="flex items-center gap-2 bg-[#e2e4e6] hover:bg-[#d6d8da] w-full text-left px-3 py-2 rounded-sm text-sm font-medium transition-colors"><mat-icon class="text-base w-4 h-4">offline_bolt</mat-icon>Automations</button>
-        <button class="flex items-center gap-2 bg-[#e2e4e6] hover:bg-[#d6d8da] w-full text-left px-3 py-2 rounded-sm text-sm font-medium transition-colors"><mat-icon class="text-base w-4 h-4">chat</mat-icon>Comments</button>
-      </div>
+      <div class="w-full md:w-[380px] lg:w-[420px] bg-base-100 border-l border-base-content/10 p-5 sm:p-8 flex flex-col gap-6 overflow-y-auto">
+        
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <mat-icon class="text-base-content w-5 h-5">chat_bubble_outline</mat-icon>
+            <h3 class="font-semibold text-base text-base-content m-0">Comments and activity</h3>
+          </div>
+          <button class="bg-base-200 hover:bg-base-300 text-base-content text-xs px-3 py-1.5 rounded-md font-medium transition-colors">Show details</button>
+        </div>
 
+        <div class="flex flex-col gap-2 mt-4 relative">
+          
+          @if (!isWritingComment()) {
+            <div 
+              (click)="startWritingComment()"
+              class="w-full bg-base-100 border border-base-content/10 rounded-md p-3 shadow-sm text-sm text-base-content/70 cursor-text hover:bg-base-200 transition-colors">
+              Write a comment...
+            </div>
+          } @else {
+            <div class="flex flex-col gap-2 animate-in fade-in duration-200">
+              <app-text-editor 
+                [(value)]="newComment" 
+                placeholder="Write a comment..."
+                minHeight="80px">
+              </app-text-editor>
+
+              <div class="flex items-center gap-2 mt-2">
+                <button 
+                  [disabled]="newComment().trim() === '' || newComment().trim() === '<p></p>'"
+                  (click)="postComment()" 
+                  class="bg-primary hover:bg-primary/30 disabled:opacity-50 disabled:cursor-not-allowed text-base-300 text-xs font-medium px-4 py-1.5 rounded-box transition-colors">
+                  Save
+                </button>
+                <button (click)="cancelComment()" class="text-base-content/70 hover:text-base-content text-xs font-medium px-3 py-1.5 rounded-box hover:bg-base-200 transition-colors">Cancel</button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="flex flex-col gap-5 mt-2">
+          @for (comment of comments(); track comment.id) {
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-full bg-base-200 border border-base-content/10 text-accent flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-sm">
+                {{ comment.author.charAt(0).toUpperCase() }}
+              </div>
+              <div class="flex flex-col flex-1">
+                <div class="text-sm text-base-content leading-tight">
+                  <span class="font-bold text-accent">{{ comment.author }}</span> 
+                  <span class="text-base-content/70 mx-1">added a comment</span>
+                </div>
+                <div class="text-xs text-base-content/70 mb-1.5 mt-0.5">{{ comment.createdAt | date:'short' }}</div>
+                <div class="bg-base-300 border border-base-content/10 shadow-sm rounded-md p-3 text-sm text-base-content prose prose-sm max-w-none" [innerHTML]="comment.content">
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
     </div>
   </article>
 </div>

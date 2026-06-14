@@ -11,6 +11,12 @@ import { columnController } from "./column.controller";
 
 const router = Router();
 
+router.post(
+  "/columns",
+  authMiddleware,
+  validate(createColumnDto),
+  asyncHandler(columnController.createColumn),
+);
 router.get(
   "/boards/:boardId/columns",
   authMiddleware,
@@ -18,27 +24,14 @@ router.get(
 );
 
 router.patch(
-  "/boards/:boardId/columns/reorder",
-  authMiddleware,
-  asyncHandler(columnController.reorderColumns),
-);
-
-router.post(
-  "/workspaces/:workspaceId/boards/:boardId/columns",
-  authMiddleware,
-  validate(createColumnDto),
-  asyncHandler(columnController.createColumn),
-);
-
-router.patch(
-  "/workspaces/:workspaceId/boards/:boardId/columns/:columnId",
+  "/columns/:columnId",
   authMiddleware,
   validate(updateColumnDto),
   asyncHandler(columnController.updateColumn),
 );
 
 router.patch(
-  "/workspaces/:workspaceId/boards/:boardId/columns/:columnId/reorder-tasks",
+  "/columns/:columnId/reorder-tasks",
   authMiddleware,
   validate(reorderTasksDto),
   asyncHandler(columnController.reorderTasks),

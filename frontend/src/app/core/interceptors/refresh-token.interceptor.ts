@@ -1,11 +1,11 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { BehaviorSubject, catchError, filter, switchMap, take, throwError } from 'rxjs';
+import { Subject, catchError, filter, switchMap, take, throwError } from 'rxjs';
 import { AuthStoreService } from '../../features/auth/data-access/auth-store.service';
 import { TokenService } from '../services/token.service';
 
 let isRefreshing = false;
-const refreshTokenSubject = new BehaviorSubject<string | null>(null);
+const refreshQueue$ = new Subject<string>();
 
 export const refreshTokenInterceptor: HttpInterceptorFn = (req, next) => {
   const authStore = inject(AuthStoreService);
@@ -14,6 +14,7 @@ export const refreshTokenInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       const isUnauthorized = error.status === 401;
+      
       const isAuthEndpoint =
         req.url.includes('/auth/login') ||
         req.url.includes('/auth/register') ||
@@ -25,19 +26,22 @@ export const refreshTokenInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (!isRefreshing) {
         isRefreshing = true;
-        refreshTokenSubject.next(null);
 
         return authStore.refreshAccessToken().pipe(
-          switchMap(response => {
+          switchMap(() => {
             const newToken = tokenService.getAccessToken();
             isRefreshing = false;
-            refreshTokenSubject.next(newToken);
+            
+            if (!newToken) {
+              authStore.clearSession(true);
+              return throwError(() => new Error('Token assignment mismatch'));
+            }
+
+            refreshQueue$.next(newToken);
 
             return next(
               req.clone({
-                setHeaders: newToken
-                  ? { Authorization: `Bearer ${newToken}` }
-                  : {}
+                setHeaders: { Authorization: `Bearer ${newToken}` }
               })
             );
           }),
@@ -49,15 +53,12 @@ export const refreshTokenInterceptor: HttpInterceptorFn = (req, next) => {
         );
       }
 
-      return refreshTokenSubject.pipe(
-        filter(token => token !== null),
-        take(1),
+      return refreshQueue$.pipe(
+        take(1), 
         switchMap(token =>
           next(
             req.clone({
-              setHeaders: {
-                Authorization: `Bearer ${token}`
-              }
+              setHeaders: { Authorization: `Bearer ${token}` }
             })
           )
         )

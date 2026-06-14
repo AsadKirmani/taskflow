@@ -1,53 +1,55 @@
-<section class="flex items-center justify-center mx-auto h-screen">
-  <div class="p-8 bg-gray-100 rounded-lg shadow-md w-full max-w-md">
-    <h1>Login</h1>
+<section class="flex items-center justify-center mx-auto h-screen bg-base-200 px-4">
+  <div class="p-8 bg-base-100 rounded-box shadow-xl border border-base-300 w-full max-w-md">
+    <h1 class="text-2xl font-extrabold text-base-content mb-6">Login</h1>
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="mb-5">
-        <label for="email" class="block mb-2.5 text-sm font-medium text-heading">Your email</label>
+        <label for="email" class="block mb-1.5 text-sm font-semibold text-base-content/90">Your email</label>
         <input
           type="email"
           id="email"
+          appAutofocus
           formControlName="email"
-          class="border border-gray-300 rounded-lg invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500 disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-500 disabled:shadow-none dark:disabled:border-gray-700 dark:disabled:bg-gray-800/20 w-full px-3 py-2.5 shadow-xs placeholder:text-body"
+          class="w-full p-2 border border-base-content/30 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
           placeholder="name@email.com"
-          />
-        </div>
-        <div class="mb-5">
-            <label for="password" class="block mb-2.5 text-sm font-medium text-heading"
-            >Your password</label
-            >
-            <input
-            type="password"
-            id="password"
-            formControlName="password"
-            class="border border-gray-300 rounded-lg invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500 disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-500 disabled:shadow-none dark:disabled:border-gray-700 dark:disabled:bg-gray-800/20 w-full px-3 py-2.5 shadow-xs placeholder:text-body"
-            placeholder="••••••••"
         />
       </div>
-      <label for="remember" class="flex items-center mb-5">
+      
+      <div class="mb-5">
+        <label for="password" class="block mb-1.5 text-sm font-semibold text-base-content/90">Your password</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="w-full p-2 border border-base-content/30 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
+          placeholder="••••••••"
+        />
+      </div>
+      
+      <label for="remember" class="flex items-center mb-6 cursor-pointer">
         <input
           id="remember"
           type="checkbox"
           value=""
-          class="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"
+          class="w-4 h-4 rounded-sm border border-base-300 bg-base-100 checked:bg-primary"
         />
-        <p class="ms-2 text-sm font-medium text-heading select-none">
+        <p class="ms-2 text-sm font-medium text-base-content select-none">
           I agree with the
-          <a href="#" class="text-fg-brand hover:underline">terms and conditions</a>.
+          <a href="#" class="text-primary hover:text-primary/80 hover:underline transition-colors">terms and conditions</a>.
         </p>
       </label>
+      
       <button
         type="submit"
-        class="cursor-pointer text-white hover:bg-blue-500 bg-blue-600 box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded text-sm px-4 py-2.5 focus:outline-none"
+        class="w-full p-field rounded-field bg-primary text-primary-content font-bold cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 border-none"
       >
         Submit
       </button>
     </form>
 
-    <p>
+    <p class="mt-6 text-sm text-center text-base-content/70">
       Don’t have an account?
-      <a routerLink="/auth/register">Register</a>
+      <a routerLink="/auth/register" class="text-primary font-semibold hover:underline transition-colors">Register</a>
     </p>
   </div>
 </section>

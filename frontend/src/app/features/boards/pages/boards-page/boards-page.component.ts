@@ -1,75 +1,91 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, HostListener, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { map } from 'rxjs';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router'; 
 import { BoardStoreService } from '../../data-access/board-store.service';
-import { MatIconModule } from '@angular/material/icon';
+import { WorkspaceStoreService } from '../../../../features/workspace/data-access/workspace-store.service';
 import { Board } from '../../../../core/models/board.model';
 import { BoardModalComponent } from '../../components/board-modal.component';
-
-
+import { AuthStoreService } from '../../../auth/data-access/auth-store.service';
+import { InviteMemberModalComponent } from '../../components/invite-modal.component';
+import { LucideArrowRight } from '@lucide/angular';
 
 @Component({
   selector: 'app-board-page',
   standalone: true,
-  imports: [CommonModule, MatIconModule, BoardModalComponent],
+  imports: [RouterLink, BoardModalComponent, InviteMemberModalComponent, LucideArrowRight],
   templateUrl: './boards-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BoardsPageComponent {
-  private readonly boardStore = inject(BoardStoreService);
+export class BoardsPageComponent implements OnInit {
+  protected readonly boardStore = inject(BoardStoreService);
+  protected readonly workspaceStore = inject(WorkspaceStoreService);
+  protected readonly authStore = inject(AuthStoreService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   
-  readonly state$ = this.boardStore.state$;
+  isBoardModalOpen = signal(false);
+  isInviteModalOpen = signal(false);
+
+  readonly currentWorkspaceId = computed(() => this.workspaceStore.activeWorkspace()?.id ?? null);
   
-  // Kept as fallback static string functions since your modal might expect them
-  selectedWorkspaceId = () => '';
-  selectedWorkspaceName = () => '';
-  
-  // Renamed with a '$' suffix to explicitly denote an RxJS Observable stream
-  readonly availableWorkspaces$ = this.state$.pipe(
-    map(state => {
-      const workspaceMap: Record<string, string> = {};
-      state.boards.forEach(board => {
-        if (board.workspaceId && board.workSpaceName) {
-          workspaceMap[board.workspaceId] = board.workSpaceName;
-        }
-      });
-      return Object.entries(workspaceMap).map(([id, name]) => ({ id, name }));
-    })
-  );
+  readonly availableWorkspaces = computed(() => {
+    return this.workspaceStore.workspaces().map(ws => ({ id: ws.id, name: ws.name }));
+  });
 
-  isBoardModalOpen = false;
+  readonly isWorkspaceMode = computed(() => !!this.currentWorkspaceId());
 
-  readonly workSpaceName$ = this.state$.pipe(
-    map(state => {
-      const uniqueWorkspaceNames = [
-        ...new Set(
-          state.boards
-            .map(board => board.workSpaceName?.trim())
-            .filter((name): name is string => Boolean(name))
-        )
-      ];
-      return uniqueWorkspaceNames[0] ?? '';
-    })
-  );
+  readonly displayedWorkspaces = computed(() => {
+    const activeWs = this.workspaceStore.activeWorkspace();
 
-  constructor() {
-    this.loadBoards();
+    return activeWs ? [activeWs] : this.workspaceStore.workspaces();
+  });
+
+  ngOnInit(): void {
+    this.boardStore.loadAllBoards();
+    this.route.paramMap.subscribe(params => {
+      const wId = params.get('workspaceId');
+      
+      this.workspaceStore.setActiveWorkspace(wId);
+    });
   }
 
-  private loadBoards(): void {
-    this.boardStore.getAllBoards();
+  getBoardsByWorkspace(workspaceId: string): Board[] {
+    const currentUser = this.authStore.currentUser();
+    const boardsList = this.boardStore.allBoards;
+
+    const filteredBoards = boardsList.filter((board: Board) => {
+      if (board.workspaceId !== workspaceId) return false;
+      if (board.visibility === 'private') {
+        const isCreator = board.createdBy === currentUser?.id;
+        return isCreator;
+      }
+      
+      return true;
+    });
+    return filteredBoards;
   }
 
-  readonly openBoard = (board: Board & { _id?: string }): void => {
-    const boardId = board.id || board._id;
-    if (!boardId) {
-      console.error('Open board failed: board id is undefined', board);
-      return;
-    }
+  openBoard(board: Board): void {
+    const boardId = board.id;
+    if (!boardId) return;
     this.router.navigate(['/boards', boardId, this.toSlug(board.name)]);
-  };
+  }
+
+  toggleBoardModal(event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.isBoardModalOpen.set(true);
+  }
+  
+  closeBoardModal(): void {
+    this.isBoardModalOpen.set(false);
+  }
+  
+  openInviteModal(): void {
+    this.isInviteModalOpen.set(true);
+  }
+  
+  closeInviteModal(): void {
+    this.isInviteModalOpen.set(false);
+  }
 
   private toSlug(value: string): string {
     return value
@@ -77,10 +93,5 @@ export class BoardsPageComponent {
       .trim()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '') || 'board';
-  }
-
-  createBoardModal(event?: MouseEvent): void {
-    event?.stopPropagation();
-    this.isBoardModalOpen = !this.isBoardModalOpen;
   }
 }

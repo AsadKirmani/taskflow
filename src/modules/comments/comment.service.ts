@@ -8,14 +8,16 @@ export const commentService = {
     taskId: string,
     boardId: string,
     workspaceId: string,
-    userId: string,
+    author: string,
+    authorId: string,
   ) {
     const newComment = await commentRepository.createComment({
         content,
         taskId,
         boardId,
         workspaceId,
-        userId,
+        author,
+        authorId,
     });
     const task = await taskRepository.getTaskById(taskId);
     await taskRepository.updateTask(taskId, { commentCount: (task?.commentCount ?? 0) + 1 });
@@ -24,7 +26,8 @@ export const commentService = {
       workspaceId,
       boardId,
       taskId,
-      userId,
+      columnId: task!.columnId.toString(),
+      userId: authorId,
       actionType: 'comment_created',
       entityType: 'comment',
       entityId: newComment._id.toString(),
@@ -35,7 +38,7 @@ export const commentService = {
 
     return newComment;
   },
-  async getCommentsByTaskId(taskId: string) {
+  async getCommentsByTaskId(userId: string, taskId: string) {
     const comments = await commentRepository.getCommentsByTaskId(taskId);
     return comments;
   },
@@ -65,4 +68,26 @@ export const commentService = {
 
     return updatedComment;
   },
-};
+  getCommentById(commentId: string) {
+    return commentRepository.getCommentById(commentId);
+  },
+  async deleteComment(commentId: string, userId: string) {
+    const existingComment = await commentRepository.getCommentById(commentId);
+    await commentRepository.updateComment(commentId, { archived: true });
+
+    if (existingComment) {
+      await activityService.logActivity({
+        workspaceId: existingComment.workspaceId.toString(),
+        boardId: existingComment.boardId.toString(),
+        taskId: existingComment.taskId.toString(),
+        userId,
+        actionType: 'comment_deleted',
+        entityType: 'comment',
+        entityId: commentId,
+        metadata: {
+          previousContentPreview: existingComment.content?.slice(0, 120)
+        }
+      });
+    }
+  }
+  };

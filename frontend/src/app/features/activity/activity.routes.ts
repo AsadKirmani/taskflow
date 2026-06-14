@@ -5,5 +5,9 @@ export const ACTIVITY_ROUTES: Routes = [
   {
     path: '',
     component: ActivityPageComponent
+  },
+  {
+    path: 'w/:workspaceId',
+    component: ActivityPageComponent
   }
 ];

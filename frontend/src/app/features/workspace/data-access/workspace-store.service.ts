@@ -1,96 +1,89 @@
-import { Injectable, Input, inject } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { WorkspaceApiService } from './workspace-api.service';
-import { BehaviorSubject, EMPTY } from 'rxjs';
-import { Workspace } from '../../../core/models/workspace.model';
+import { Workspace, WorkspaceRole } from '../../../core/models/workspace.model';
 import { AuthStoreService } from '../../auth/data-access/auth-store.service';
-import { filter, switchMap, take } from 'rxjs/operators';
-
+import { PermissionService } from '../../../core/services/permission.service';
 
 interface WorkspaceState {
   workspaces: Workspace[];
+  activeWorkspaceId: string | null;
   loading: boolean;
   loaded: boolean;
   error: string | null;
 }
 
-const initialWorkspaceState: WorkspaceState = {
-  workspaces: [],
-  loading: false,
-  loaded: false,
-  error: null
-};
-
 @Injectable({ providedIn: 'root' })
 export class WorkspaceStoreService {
   private readonly authStore = inject(AuthStoreService);
   private readonly workspaceApi = inject(WorkspaceApiService);
+  private readonly permissionService = inject(PermissionService);
   
-  private readonly stateSubject = new BehaviorSubject<WorkspaceState>(initialWorkspaceState);
-  
-  readonly state$ = this.stateSubject.asObservable();
-  readonly workspaceName$ = this.state$.pipe(
-    filter(state => state.loaded),
-    switchMap(state => {
-      const names = state.workspaces.map(ws => ws.name);
-      return [names];
-    })
+  private readonly state = signal<WorkspaceState>({
+    workspaces: [],
+    activeWorkspaceId: null,
+    loading: false,
+    loaded: false,
+    error: null
+  });
+
+  readonly workspaces = computed(() => this.state().workspaces);
+  readonly activeWorkspace = computed(() => 
+    this.state().workspaces.find(w => w.id === this.state().activeWorkspaceId) || null
   );
-  
+  readonly isLoading = computed(() => this.state().loading);
+  readonly isLoaded = computed(() => this.state().loaded);
 
   loadWorkspaces(force = false): void {
-    if (this.stateSubject.value.loading) {
-      return;
-    }
+    if (this.state().loading) return;
+    if (this.state().loaded && !force) return;
+    if (!this.authStore.isAuthenticated()) return;
 
-    if (this.stateSubject.value.loaded && !force) {
-      return;
-    }
+    this.updateState({ loading: true, error: null });
 
-    this.stateSubject.next({
-      ...this.stateSubject.value,
-      loading: true,
-      error: null
+    this.workspaceApi.getMeContext().subscribe({
+      next: (response: any) => {
+        const userWorkspaces = response?.data?.workspaces || [];
+
+        const mappedWorkspaces: Workspace[] = userWorkspaces.map((ws: any) => ({
+          id: ws.id,                           
+          name: ws.name,                      
+          slug: ws.name.toLowerCase().replace(/\s+/g, '-'), 
+          description: '', 
+          currentUserRole: ws.role
+        }));
+
+        this.updateState({
+          workspaces: mappedWorkspaces,
+          loading: false,
+          loaded: true,
+          error: null
+        });
+      },
+      error: (error: any) => {
+        this.updateState({ 
+          loading: false, 
+          loaded: true, 
+          error: error?.message || 'Failed to load workspaces' 
+        });
+      }
     });
+  }
 
-    this.authStore.state$
-      .pipe(
-        filter(state => state.initialized),
-        take(1),
-        switchMap(state => {
-          if (!state.isAuthenticated) {
-            this.stateSubject.next({
-              ...this.stateSubject.value,
-              loading: false,
-              loaded: true,
-              error: 'Unauthorized'
-            });
-            return EMPTY;
-          }
+  setActiveWorkspace(workspaceId: string | null): void {
+    this.updateState({ activeWorkspaceId: workspaceId });
 
-          return this.workspaceApi.getWorkspaces();
-        })
-      )
-      .subscribe({
-        next: response => {
-          const payload = response.data as Workspace[] | { items?: Workspace[] };
-          const workspaces = Array.isArray(payload) ? payload : (payload.items ?? []);
-          
-          this.stateSubject.next({
-            ...this.stateSubject.value,
-            workspaces,
-            loading: false,
-            loaded: true,
-            error: null
-          });
-        },
-        error: error => {
-          this.stateSubject.next({
-            ...this.stateSubject.value,
-            loading: false,
-            loaded: true,
-            error: error?.message ?? 'Failed to load workspaces'
-          });
-        }
-      });
+    if (workspaceId) {
+      const selectedWs = this.activeWorkspace();
+      if (selectedWs && selectedWs.currentUserRole) {
+
+        this.permissionService.setRole(selectedWs.currentUserRole.toUpperCase() as WorkspaceRole);
+      }
+    } else {
+      this.permissionService.setRole(null);
+    }
+  }
+
+  private updateState(partial: Partial<WorkspaceState>): void {
+    this.state.update(current => ({ ...current, ...partial }));
   }
 }

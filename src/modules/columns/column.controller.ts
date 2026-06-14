@@ -1,70 +1,112 @@
-import { columnService } from "./column.service";
 import { Request, Response } from "express";
 import { AppError } from "../../shared/errors/app-error";
+import { PermissionService } from "../../services/permission.service";
+import { PERMISSION } from "../../config/roles";
+import { columnService } from "./column.service";
+import { boardService } from "../boards/board.service";
 
 export const columnController = {
   async createColumn(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
-    }
-    const { boardId, workspaceId } = req.params as {
+    const userId = req.auth!.userId;
+    const { name, boardId, workspaceId } = req.body as {
+      name: string;
       boardId: string;
       workspaceId: string;
     };
-    const { name } = req.body as { name: string };
+
+    if (!boardId || !workspaceId) {
+      throw new AppError(
+        "boardId and workspaceId are required in the request body",
+        400,
+        "BAD_REQUEST",
+      );
+    }
+
+    const board = await boardService.getBoardById(userId, boardId);
+    if (!board || board.workspaceId.toString() !== workspaceId) {
+      throw new AppError(
+        "Invalid Board or Workspace combination",
+        400,
+        "BAD_REQUEST",
+      );
+    }
+
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId },
+      PERMISSION.COLUMN_CREATE,
+    );
     const column = await columnService.createColumn(
       name,
       boardId,
       workspaceId,
-      req.auth.userId,
+      userId,
     );
     res.status(201).json({ success: true, data: column });
   },
+
   async updateColumn(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-        throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
-    }
+    const userId = req.auth!.userId;
     const { columnId } = req.params as { columnId: string };
     const { name, archived } = req.body as {
       name?: string;
       archived?: boolean;
     };
-    const updatedColumn = await columnService.updateColumn(columnId, {
-      name,
-      archived,
-    }, req.auth.userId);
-    res.json(updatedColumn);
-  },
-  async reorderTasks(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-        throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
+
+    const column = await columnService.getColumnById(columnId);
+    if (!column) {
+      throw new AppError("Column not found", 404, "NOT_FOUND");
     }
-    const { columnId } = req.params as { columnId: string };
-    const { taskIds } = req.body as { taskIds: string[] };
-    // Placeholder for reordering tasks logic
-    res.json({
-      success: true,
-      message: "Tasks reordered successfully",
-      data: null,
-    });
+
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId: column.workspaceId.toString() },
+      PERMISSION.COLUMN_EDIT,
+    );
+
+    const updatedColumn = await columnService.updateColumn(
+      columnId,
+      { name, archived },
+      userId,
+    );
+    res.json({ success: true, data: updatedColumn });
   },
+
   async getColumnsByBoardId(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-        throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
-    }
+    const userId = req.auth!.userId;
     const { boardId } = req.params as { boardId: string };
-    const columns = await columnService.getColumnsByBoardId(boardId);
+
+    const board = await boardService.getBoardById(userId, boardId);
+    if (!board) {
+      throw new AppError("Board not found", 404, "NOT_FOUND");
+    }
+
+    await PermissionService.ensureColumnPermission(
+      userId,
+      { workspaceId: board.workspaceId.toString() },
+      PERMISSION.COLUMN_VIEW,
+    );
+
+    const columns = await columnService.getColumnsByBoardId(boardId, userId);
     res.json({ success: true, data: { columns } });
   },
-  async reorderColumns(req: Request, res: Response) {
-    if (!req.auth?.userId) {
-      throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
+
+  async reorderTasks(req: Request, res: Response) {
+    const userId = req.auth!.userId;
+    const { columnId } = req.params as { columnId: string };
+    const { taskIds } = req.body as { taskIds: string[] };
+
+    const column = await columnService.getColumnById(columnId);
+    if (!column) {
+      throw new AppError("Column not found", 404, "NOT_FOUND");
     }
-    const { columnIds } = req.body as { columnIds: string[] };
-    if (!Array.isArray(columnIds) || columnIds.length === 0) {
-      throw new AppError("columnIds must be a non-empty array", 400, "BAD_REQUEST");
-    }
-    await columnService.reorderColumns(columnIds);
-    res.json({ success: true, data: null });
-  }
+
+    await PermissionService.ensureBoardPermission(
+      userId,
+      { workspaceId: column.workspaceId.toString() },
+      PERMISSION.TASK_EDIT,
+    );
+    await columnService.reorderTasks(columnId, taskIds, userId);
+    res.json({ success: true });
+  },
 };

@@ -1,14 +1,18 @@
-import { ActivityLogModel } from '../../models/activity-log.model';
-import { ColumnModel } from '../../models/column.model';
+import { ActivityLogModel } from "../../models/activity-log.model";
+import { ColumnModel } from "../../models/column.model";
+import { BoardModel } from "../../models/board.model";
+import { WorkspaceMemberModel } from "../../models/workspace-member.model";
 
-const applyActivityPopulation = <T>(query: T & {
-  populate: (args: Array<{ path: string; select: string }>) => T;
-}) =>
+const applyActivityPopulation = <T>(
+  query: T & {
+    populate: (args: Array<{ path: string; select: string }>) => T;
+  },
+) =>
   query.populate([
-    { path: 'userId', select: 'name email avatarUrl' },
-    { path: 'taskId', select: 'title columnId boardId' },
-    { path: 'boardId', select: 'name workspaceId' },
-    { path: 'columnId', select: 'name boardId' }
+    { path: "userId", select: "name email avatarUrl" },
+    { path: "taskId", select: "title columnId boardId" },
+    { path: "boardId", select: "name workspaceId" },
+    { path: "columnId", select: "name boardId" },
   ]);
 
 export const activityRepository = {
@@ -16,7 +20,7 @@ export const activityRepository = {
     workspaceId: string;
     userId: string;
     actionType: string;
-    entityType: 'workspace' | 'board' | 'column' | 'task' | 'comment';
+    entityType: "workspace" | "board" | "column" | "task" | "comment";
     entityId: string;
     boardId?: string;
     columnId?: string;
@@ -32,30 +36,40 @@ export const activityRepository = {
       actionType: data.actionType,
       entityType: data.entityType,
       entityId: data.entityId,
-      metadata: data.metadata ?? {}
+      metadata: data.metadata ?? {},
     });
   },
 
-  async getWorkspaceActivity(workspaceId: string, page: number, limit: number) {
+  async getGlobalActivity(
+    userId: string,
+    workspaceIds: string[],
+    page: number,
+    limit: number,
+  ) {
     const skip = (page - 1) * limit;
 
-    const [items, total] = await Promise.all([
-      applyActivityPopulation(
-        ActivityLogModel.find({ workspaceId })
-          .sort({ createdAt: -1 })
-          .skip(skip)
-          .limit(limit)
-      ),
-      ActivityLogModel.countDocuments({ workspaceId })
-    ]);
+    const allowedBoards = await BoardModel.find({
+      $or: [
+        { createdBy: userId },
+        { memberIds: userId },
+        {
+          workspaceId: { $in: workspaceIds },
+          visibility: "workspace",
+        },
+      ],
+    }).select("_id");
 
-    const enrichedItems = await enrichMoveColumnNames(items as Array<Record<string, unknown>>);
-    return { items: enrichedItems, total };
-  },
+    const allowedBoardIds = allowedBoards.map((b) => b._id.toString());
 
-  async getBoardActivity(workspaceId: string, boardId: string, page: number, limit: number) {
-    const skip = (page - 1) * limit;
-    const query = { workspaceId, boardId };
+    const query = {
+      workspaceId: { $in: workspaceIds },
+      $or: [
+        { boardId: { $in: allowedBoardIds } },
+
+        { boardId: { $exists: false } },
+        { boardId: null },
+      ],
+    };
 
     const [items, total] = await Promise.all([
       applyActivityPopulation(
@@ -63,17 +77,117 @@ export const activityRepository = {
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
+          .lean(),
       ),
-      ActivityLogModel.countDocuments(query)
+      ActivityLogModel.countDocuments(query),
     ]);
 
-    const enrichedItems = await enrichMoveColumnNames(items as Array<Record<string, unknown>>);
-    return { items: enrichedItems, total };
+    return {
+      items: await enrichMoveColumnNames(items),
+      total,
+    };
+  },
+
+  async getWorkspaceActivity(
+    userId: string,
+    workspaceId: string,
+    page: number,
+    limit: number,
+  ) {
+    const skip = (page - 1) * limit;
+
+    const membership = await WorkspaceMemberModel.findOne({
+      workspaceId,
+      userId,
+    }).lean();
+
+    if (!membership) {
+      return { items: [], total: 0 };
+    }
+
+    const isGuest = membership.role === "GUEST";
+
+    let boardQuery: any = { workspaceId };
+
+    if (isGuest) {
+      boardQuery.$or = [{ memberIds: userId }, { createdBy: userId }];
+    } else {
+      boardQuery.$or = [
+        { visibility: "workspace" },
+        { memberIds: userId },
+        { createdBy: userId },
+      ];
+    }
+
+    const allowedBoards = await BoardModel.find(boardQuery).select("_id");
+    const allowedBoardIds = allowedBoards.map((b) => b._id.toString());
+
+    const query: any = { workspaceId };
+
+    if (isGuest) {
+      query.boardId = { $in: allowedBoardIds };
+    } else {
+      query.$or = [
+        { boardId: { $in: allowedBoardIds } },
+        { boardId: { $exists: false } },
+        { boardId: null },
+      ];
+    }
+
+    const [items, total] = await Promise.all([
+      applyActivityPopulation(
+        ActivityLogModel.find(query)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+      ),
+      ActivityLogModel.countDocuments(query),
+    ]);
+
+    return {
+      items: await enrichMoveColumnNames(items),
+      total,
+    };
+  },
+
+  async getBoardActivity(
+    workspaceId: string,
+    boardId: string,
+    page: number,
+    limit: number,
+  ) {
+    const skip = (page - 1) * limit;
+
+    const query = {
+      workspaceId,
+      boardId,
+    };
+
+    const [items, total] = await Promise.all([
+      applyActivityPopulation(
+        ActivityLogModel.find(query)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+      ),
+
+      ActivityLogModel.countDocuments(query),
+    ]);
+
+    return {
+      items: await enrichMoveColumnNames(items),
+      total,
+    };
   },
 
   async getTaskActivity(taskId: string, page: number, limit: number) {
     const skip = (page - 1) * limit;
-    const query = { taskId };
+
+    const query = {
+      taskId,
+    };
 
     const [items, total] = await Promise.all([
       applyActivityPopulation(
@@ -81,66 +195,83 @@ export const activityRepository = {
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
+          .lean(),
       ),
-      ActivityLogModel.countDocuments(query)
+
+      ActivityLogModel.countDocuments(query),
     ]);
 
-    const enrichedItems = await enrichMoveColumnNames(items as Array<Record<string, unknown>>);
-    return { items: enrichedItems, total };
-  }
+    return {
+      items: await enrichMoveColumnNames(items),
+      total,
+    };
+  },
 };
 
-const enrichMoveColumnNames = async (items: Array<Record<string, unknown>>) => {
+async function enrichMoveColumnNames(items: Array<Record<string, unknown>>) {
   const columnIds = new Set<string>();
 
   for (const item of items) {
-    const actionType = String(item['actionType'] ?? '');
-    const metadata = (item['metadata'] ?? {}) as Record<string, unknown>;
-
-    if (actionType !== 'task_moved') {
+    if (item.actionType !== "task_moved") {
       continue;
     }
 
-    const sourceId = typeof metadata['sourceColumnId'] === 'string' ? metadata['sourceColumnId'] : null;
-    const destinationId = typeof metadata['destinationColumnId'] === 'string' ? metadata['destinationColumnId'] : null;
+    const metadata = (item.metadata ?? {}) as Record<string, unknown>;
 
-    if (sourceId) {
-      columnIds.add(sourceId);
+    const sourceColumnId = metadata.sourceColumnId as string | undefined;
+
+    const destinationColumnId = metadata.destinationColumnId as
+      | string
+      | undefined;
+
+    if (sourceColumnId) {
+      columnIds.add(sourceColumnId);
     }
 
-    if (destinationId) {
-      columnIds.add(destinationId);
+    if (destinationColumnId) {
+      columnIds.add(destinationColumnId);
     }
   }
 
-  if (columnIds.size === 0) {
+  if (!columnIds.size) {
     return items;
   }
 
-  const columns = await ColumnModel.find({ _id: { $in: [...columnIds] } }).select('_id name');
-  const columnNameById = new Map(columns.map(column => [column._id.toString(), column.name]));
+  const columns = await ColumnModel.find({
+    _id: {
+      $in: [...columnIds],
+    },
+  })
+    .select("_id name")
+    .lean();
+
+  const columnMap = new Map(
+    columns.map((column) => [column._id.toString(), column.name]),
+  );
 
   for (const item of items) {
-    const actionType = String(item['actionType'] ?? '');
-    const metadata = (item['metadata'] ?? {}) as Record<string, unknown>;
-
-    if (actionType !== 'task_moved') {
+    if (item.actionType !== "task_moved") {
       continue;
     }
 
-    const sourceId = typeof metadata['sourceColumnId'] === 'string' ? metadata['sourceColumnId'] : null;
-    const destinationId = typeof metadata['destinationColumnId'] === 'string' ? metadata['destinationColumnId'] : null;
+    const metadata = (item.metadata ?? {}) as Record<string, unknown>;
 
-    if (!metadata['sourceColumnName'] && sourceId && columnNameById.has(sourceId)) {
-      metadata['sourceColumnName'] = columnNameById.get(sourceId);
+    const sourceColumnId = metadata.sourceColumnId as string | undefined;
+
+    const destinationColumnId = metadata.destinationColumnId as
+      | string
+      | undefined;
+
+    if (sourceColumnId && !metadata.sourceColumnName) {
+      metadata.sourceColumnName = columnMap.get(sourceColumnId);
     }
 
-    if (!metadata['destinationColumnName'] && destinationId && columnNameById.has(destinationId)) {
-      metadata['destinationColumnName'] = columnNameById.get(destinationId);
+    if (destinationColumnId && !metadata.destinationColumnName) {
+      metadata.destinationColumnName = columnMap.get(destinationColumnId);
     }
 
-    item['metadata'] = metadata;
+    item.metadata = metadata;
   }
 
   return items;
-};
+}

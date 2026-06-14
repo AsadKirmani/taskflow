@@ -1,87 +1,118 @@
-<section *ngIf="state$ | async as state">
-  <!-- <h1>Boards</h1>
-
-  <p *ngIf="state.loading">Loading boards...</p>
-
-  <ul *ngIf="!state.loading && state.boards.length > 0">
-    <li *ngFor="let board of state.boards">{{ board.name }}</li>
-  </ul>
-
-  <p *ngIf="!state.loading && state.boards.length === 0">No boards found.</p>
-  <p *ngIf="state.error">{{ state.error }}</p>
-
-  <p>Board list placeholder page.</p> -->
-  <div class="boards-page p-3 sm:p-4 flex flex-col bg-gray-50 rounded-xl gap-2">
-    <h1>Your Workspaces</h1>
+<div class="bg-base-100 w-full flex flex-col gap-2 select-none rounded-box overflow-y-auto max-h-[calc(85vh)] pt-0">
+  
+  <div class="header bg-base-200 w-full text-base-content sticky top-0 z-1 p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-300">
     <div>
-      <p *ngIf="state.loading">Loading boards...</p>
-
-      <div class="gap-2 flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-xl">
-        <p
-          class="p-2 flex items-center gap-2 min-w-0"
-          *ngIf="workSpaceName$ | async as workspaceName"
+      @if (isWorkspaceMode()) {
+        <h1 class="text-2xl font-bold tracking-tight text-base-content">Workspace Boards</h1>
+        <p class="text-sm text-base-content/70">Viewing boards for this workspace context only</p>
+      } @else {
+        <h1 class="text-2xl font-bold tracking-tight text-base-content">All Your Boards</h1>
+        <p class="text-sm text-base-content/70">Categorized across your active team workspaces</p>
+      }
+    </div>
+    
+    <div class="flex items-center gap-3 mt-3 sm:mt-0">
+      @if (isWorkspaceMode()) {
+        <button 
+          (click)="openInviteModal()"
+          class="bg-secondary hover:bg-secondary/90 text-secondary-content focus:ring-2 focus:ring-offset-2 focus:ring-offset-secondary/70 focus:ring-secondary/50 px-3 h-10 text-xs rounded-box font-semibold transition-colors flex items-center gap-2"
         >
-          <span
-            class="p-2 rounded-full bg-red-900 text-white h-8 w-8 flex items-center justify-center"
-            *ngIf="workSpaceName$ | async as workspaceName"
-            >{{ workspaceName.toUpperCase() | slice: 0 : 1 }}</span
-          >
-          <span class="truncate">{{ workspaceName || 'No workspace name found' }}</span>
-        </p>
-        <div class="buttons flex flex-wrap gap-2">
-          <button
-            class="btn btn-primary bg-gray-200 p-2 rounded flex items-center gap-1 text-sm sm:text-base"
-          >
-            <mat-icon>dashboard</mat-icon> Boards
-          </button>
-          <button
-            class="btn btn-secondary bg-gray-200 p-2 rounded flex items-center gap-1 text-sm sm:text-base"
-          >
-            <mat-icon>group</mat-icon> Members
-          </button>
-          <button
-            class="btn btn-secondary bg-gray-200 p-2 rounded flex items-center gap-1 text-sm sm:text-base"
-          >
-            <mat-icon>settings</mat-icon>Settings
-          </button>
-        </div>
-      </div>
-      <div class="boards-list mt-4 gap-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-        <a
-          class="board-card rounded-xl bg-white shadow w-full h-full cursor-pointer"
-          *ngFor="let board of state.boards"
-          (click)="openBoard(board)"
-        >
-          <img
-            src="https://img.magnific.com/free-photo/abstract-3d-geometric-square-shape_23-2150832953.jpg?t=st=1779796177~exp=1779799777~hmac=7db7aae5ab742199d5ca3534c2a5fb5cef14f811ab8119c435a8ac670bd03fa9&w=2000"
-            alt="{{ board.name }}"
-            class="w-full h-20 sm:h-16 object-cover rounded-t-xl"
-          />
-          <div class="p-2">
-            <h2 class="font-semibold">{{ board.name }}</h2>
-          </div>
-        </a>
-        <div class="emptycards">
-          <div
-            class="add-board-card rounded-xl bg-white shadow w-full flex items-center justify-center h-full min-h-24"
-          >
-            <button
-              class="btn btn-dashed border-gray-400 text-gray-400 p-2 rounded flex items-center gap-1"
-              (click)="createBoardModal($event)"
-            >
-              <mat-icon>add</mat-icon> Create New Board
-            </button>
-          </div>
-          <app-board-modal
-            *ngIf="isBoardModalOpen"
-            [selectedWorkspaceId]="selectedWorkspaceId()"
-            [selectedWorkspaceName]="selectedWorkspaceName()"
-            [availableWorkspaces]="(availableWorkspaces$ | async) ?? []"
-            (modalClosed)="isBoardModalOpen = false"
-          >
-          </app-board-modal>
-        </div>
-      </div>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+          Invite Member
+        </button>
+      }
+      <button 
+        (click)="toggleBoardModal($event)"
+        class="bg-primary hover:bg-primary/70 text-primary-content focus:ring-2 focus:ring-offset-2 focus:ring-offset-primary/70 focus:ring-primary/50 h-10 px-3 text-xs rounded-box font-semibold transition-colors flex items-center gap-2"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        New Board
+      </button>
     </div>
   </div>
-</section>
+
+  @if (boardStore.state().loading) {
+    <div class="flex items-center justify-center py-12">
+      <p class="text-sm text-base-content/70 animate-pulse">Syncing boards data pipeline...</p>
+    </div>
+  }
+
+  <div class="rounded-b-box bg-base-200">
+    <div class="space-y-8 p-3">
+      @for (workspace of displayedWorkspaces(); track workspace.id) {
+        <section class="bg-base-300 p-6 rounded-box border border-base-content/20">
+          
+          <div class="flex items-center justify-between border-b border-base-content/10 pb-3 mb-5">
+            <div class="flex items-center gap-3">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-xs font-bold uppercase text-accent-content shadow-sm">
+                {{ workspace.name[0] }}
+              </span>
+              <h2 class="text-xs font-bold text-base-content">{{ workspace.name }}</h2>
+              <span class="text-xs bg-info text-info-content rounded-lg font-medium px-2 py-0.5">
+                {{ workspace.slug }}
+              </span>
+            </div>
+            
+            @if (!isWorkspaceMode()) {
+              <a 
+                [routerLink]="['/w', workspace.id, 'boards']"
+                class="text-xs font-semibold text-base-content hover:text-base-content/70 transition-colors flex items-center gap-1"
+              >
+                <svg lucideArrowRight></svg>
+              </a>
+            }
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-base-300">
+            @for (board of getBoardsByWorkspace(workspace.id); track board.id) {
+              <button 
+                type="button"
+                (click)="openBoard(board)"
+                class="group text-left w-full p-4 h-28 bg-base-content/5 rounded-box transition-all relative overflow-hidden cursor-pointer border border-base-content/20 hover:border-base-content focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-base-content"
+              >
+                <div class="absolute -right-6 -top-6 w-16 h-16 bg-accent/20 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <h3 class="font-semibold text-base-content truncate pr-6">{{ board.name }}</h3>
+                
+                <div class="absolute bottom-3 right-3 flex items-center gap-1 text-xs text-base-content group-hover:text-base-content/70 transition-colors font-medium">
+                  <span>View</span>
+                  <svg class="w-3 h-3 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </button>
+            } @empty {
+              <div class="col-span-full border-2 border-dashed border-base-300 rounded-xl p-6 text-center text-sm text-base-content/50 font-medium bg-base-100/50">
+                No boards active in this workspace category.
+              </div>
+            }
+          </div>
+        </section>
+      } @empty {
+        <div class="text-center py-16 bg-base-100 rounded-2xl border border-base-300 shadow-sm max-w-md mx-auto mt-12">
+          <div class="text-4xl mb-3">📁</div>
+          <h3 class="text-base font-bold text-base-content mb-1">No Workspaces Active</h3>
+          <p class="text-sm text-base-content/60 px-6">There are no matching workspace targets available for the selected view state context.</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@if (isBoardModalOpen()) {
+  <app-board-modal 
+    [availableWorkspaces]="availableWorkspaces()"
+    [selectedWorkspaceId]="currentWorkspaceId() ?? ''"
+    (modalClosed)="closeBoardModal()">
+  </app-board-modal>
+}
+
+@if (isInviteModalOpen()) {
+  <app-invite-member-modal 
+    [workspaceId]="currentWorkspaceId() ?? ''"
+    (close)="closeInviteModal()">
+  </app-invite-member-modal>
+}

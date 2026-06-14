@@ -1,38 +1,122 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, Output } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Output,
+  computed,
+  inject,
+  input,
+  signal
+} from '@angular/core';
+
+import {
+  RouterLink,
+  RouterLinkActive
+} from '@angular/router';
+
 import { WorkspaceStoreService } from '../../../features/workspace/data-access/workspace-store.service';
-import { CommonModule } from '@angular/common';
-import { map } from 'rxjs';
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, MatIconModule, CommonModule],
+  imports: [
+    RouterLink,
+    RouterLinkActive
+  ],
   templateUrl: './sidebar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent {
-  @Output() navigate = new EventEmitter<void>();
-  openWorkspaceId: string | null = null;
-  private readonly workspaceStoreService = inject(WorkspaceStoreService);
+
+  @Output()
+  navigate = new EventEmitter<void>();
+
+  readonly isCollapsed =
+    input<boolean>(false);
+
+  protected readonly workspaceStore =
+    inject(WorkspaceStoreService);
+
+  private readonly openWorkspaceId =
+    signal<string | null>(null);
+
+  readonly navItems = [
+    {
+      label: 'Dashboard',
+      route: '/dashboard',
+      icon: 'dashboard'
+    },
+    {
+      label: 'Boards',
+      route: '/boards',
+      icon: 'boards'
+    },
+    {
+      label: 'Activity',
+      route: '/activity',
+      icon: 'activity'
+    },
+    {
+      label: 'Settings',
+      route: '/settings',
+      icon: 'settings'
+    }
+  ] as const;
+
+  readonly workspaceLinks = [
+    {
+      label: 'Boards',
+      path: 'boards'
+    },
+    {
+      label: 'Activity',
+      path: 'activity'
+    },
+    {
+      label: 'Settings',
+      path: 'settings'
+    }
+  ] as const;
 
   constructor() {
-    this.workspaceStoreService.loadWorkspaces();
+    this.workspaceStore.loadWorkspaces();
   }
 
-  readonly workspaces$ = this.workspaceStoreService.state$.pipe(
-    map(state => state.workspaces)
-  );
-  
-  onNavigate() {
+  toggleWorkspace(
+    workspaceId: string
+  ): void {
+
+    this.openWorkspaceId.update(
+      current =>
+        current === workspaceId
+          ? null
+          : workspaceId
+    );
+  }
+
+  isWorkspaceOpen(
+    workspaceId: string
+  ): boolean {
+
+    return (
+      this.openWorkspaceId() ===
+      workspaceId
+    );
+  }
+
+  selectWorkspace(
+    workspaceId: string
+  ): void {
+
+    this.workspaceStore
+      .setActiveWorkspace(
+        workspaceId
+      );
+
     this.navigate.emit();
   }
 
-  toggleWorkspace(workspaceId: string): void {
-    this.openWorkspaceId = this.openWorkspaceId === workspaceId ? null : workspaceId;
-  }
-
-  isWorkspaceOpen(workspaceId: string): boolean {
-    return this.openWorkspaceId === workspaceId;
+  onNavigate(): void {
+    this.navigate.emit();
   }
 }
