@@ -25,6 +25,7 @@ const sanitizeUser = (user: any) => ({
 });
 
 export const authService = {
+  
   async register(input: { name: string; email: string; password: string }, meta?: { ip?: string; userAgent?: string }) {
     const normalizedEmail = input.email.trim().toLowerCase();
     const existingUser = await authRepository.findUserByEmail(normalizedEmail);
@@ -124,7 +125,14 @@ export const authService = {
   },
 
   async getCurrentUser(userId: string) {
+    const userStart = Date.now();
     const user = await authRepository.findUserById(userId);
+
+console.log(
+  "FIND_USER",
+  Date.now() - userStart,
+  "ms"
+);
 
     if (!user) {
       throw new AppError('User not found', 404, 'USER_NOT_FOUND');

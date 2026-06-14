@@ -27,12 +27,12 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
   if (cachedConnection && mongoose.connection.readyState === 1) {
     return cachedConnection;
   }
-
+  
+  console.log('ReadyState:', mongoose.connection.readyState);
   if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
     console.log('⚠️ Stale or disconnected socket detected. Wiping connection cache...');
     cachedConnection = null;
   }
-
   const primaryUri = getConnectionString();
 
   try {

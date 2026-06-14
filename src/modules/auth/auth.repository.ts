@@ -2,12 +2,13 @@ import { UserModel } from '../../models/user.model';
 import { RefreshTokenModel } from '../../models/refresh-token.model';
 
 export const authRepository = {
+  
   findUserByEmail(email: string) {
     return UserModel.findOne({ email: email.trim().toLowerCase() }).select('+passwordHash');
   },
 
   findUserById(userId: string) {
-    return UserModel.findById(userId);
+    return UserModel.findById(userId).lean();
   },
 
   createUser(data: {
@@ -29,7 +30,7 @@ export const authRepository = {
   },
 
   findRefreshTokenByHash(tokenHash: string) {
-    return RefreshTokenModel.findOne({ tokenHash });
+    return RefreshTokenModel.findOne({ tokenHash }).lean();
   },
 
   revokeRefreshToken(tokenHash: string, replacedByTokenHash?: string) {
