@@ -33,12 +33,14 @@ const BoardSchema = new Schema(
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true
+      required: true,
+      index: true
     },
     memberIds: {
       type: [Schema.Types.ObjectId],
       ref: 'User',
-      default: []
+      default: [],
+      index: true
     },
     columnOrder: {
       type: [Schema.Types.ObjectId],
