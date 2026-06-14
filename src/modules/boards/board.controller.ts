@@ -144,6 +144,7 @@ export const boardController = {
     const cachedBoards = await redisClient.get(cacheKey);
     if (cachedBoards) {
       console.log(`🚀 Cache Hit: All Boards for User ${userId}`);
+      console.log(`BOARD SERVICE (Cache): ${Math.round(performance.now() - start)} ms`);
       return res.status(200).json(cachedBoards);
     }
 
@@ -151,14 +152,16 @@ export const boardController = {
     
     // 🐌 2. Agar Redis me nahi hai, toh DB se laao
     const boards = await boardService.getBoards(userId);
-      console.log(" PROD GET /Boards (All)", Math.round(performance.now() - start), "ms");
+    const dbDone = performance.now();
+    console.log(`✅ BOARD SERVICE: ${Math.round(dbDone - start)} ms`);
     
     // Tera purana format jo perfectly chal raha tha
     const responseData = { success: true, data: { items: boards } };
-
+    
     // 💾 3. Agli baar ke liye Redis me save karo (1 Hour)
     await redisClient.set(cacheKey, responseData, { ex: 3600 });
-
+    
+    console.log("BOARD TOTAL", Math.round(performance.now() - start), "ms");
     return res.json(responseData);
   },
 

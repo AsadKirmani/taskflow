@@ -93,14 +93,14 @@ async login(req: Request, res: Response) {
 },
 
   async me(req: Request, res: Response) {
-    const userId = await authService.getCurrentUser(req.auth!.userId);
-    const cacheKey = `user:${userId}:profile`;
+    const user = await authService.getCurrentUser(req.auth!.userId);
+    const cacheKey = `user:${user}:profile`;
     
     // 1. ⚡ Check in Redis
     const cachedProfile = await redisClient.get(cacheKey);
 
     if (cachedProfile) {
-      console.log(`🚀 Cache hit for user profile: ${userId}`);
+      console.log(`🚀 Cache hit for user profile: ${user.id}`);
       return res.status(200).json(cachedProfile);
     }
 
