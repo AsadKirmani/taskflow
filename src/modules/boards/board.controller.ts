@@ -9,7 +9,7 @@ export const boardController = {
   async createBoard(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { name, description, visibility, workspaceId } = req.body;
-
+    
     if (!workspaceId) {
       throw new AppError(
         "workspaceId is required in the request body",
@@ -32,13 +32,13 @@ export const boardController = {
     const userId = req.auth!.userId;
     const { boardId } = req.params as { boardId: string };
     const cacheKey = `board:${boardId}`;
-
+    
     let responsePayload: any;
     let isCached = false;
-
+    
     // ⚡ 1. Pehle Redis se check karo
     const cachedData = await redisClient.get(cacheKey);
-
+    
     if (cachedData) {
       console.log(`🚀 Cache Hit: Board ${boardId}`);
       responsePayload = cachedData; 
@@ -60,16 +60,16 @@ export const boardController = {
       { workspaceId: responsePayload.data.workspaceId.toString() },
       PERMISSION.BOARD_VIEW,
     );
-
+    
     // 💾 4. Agar data DB se laya tha, toh aage ke liye Redis me set kar do
     if (!isCached) {
       await redisClient.set(cacheKey, responsePayload, { ex: 3600 });
     }
-
+    
     // 5. Final response bhej do
     return res.json(responsePayload);
   },
-
+  
   async getBoardsInWorkspace(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { workspaceId } = req.params as { workspaceId: string };
@@ -80,23 +80,23 @@ export const boardController = {
       { workspaceId },
       PERMISSION.BOARD_VIEW,
     );
-
+    
     const cacheKey = `workspace:${workspaceId}:boards`;
-
+    
     // ⚡ 2. Redis se check karo
     const cachedBoards = await redisClient.get(cacheKey);
     if (cachedBoards) {
       console.log(`🚀 Cache Hit: Workspace ${workspaceId}`);
       return res.status(200).json(cachedBoards); 
     }
-
+    
     console.log(`🐢 Cache Miss: Fetching from DB`);
     // 🐌 3. Agar Redis me nahi hai toh DB se laao
     const boards = await boardService.getBoardsInWorkspace(workspaceId, userId);
-
+    
     // 📦 4. Frontend ka passandida format pack karo
     const responseData = { success: true, data: { items: boards } };
-
+    
     // 💾 5. Agli baar ke liye Redis me save karo (1 Ghante ke liye)
     // 💾 5. REDIS LIE DETECTOR
     console.log(`💾 Redis mein save karne ki koshish kar rahe hain. Key: ${cacheKey}`);
@@ -106,25 +106,24 @@ export const boardController = {
     } catch (redisError) {
       console.error(`❌ REDIS ERROR: Data save nahi hua! Wajah:`, redisError);
     }
-
     return res.json(responseData);
   },
-
+  
   async updateBoard(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { boardId } = req.params as { boardId: string };
-
+    
     const existingBoard = await boardService.getBoardById(userId, boardId);
     if (!existingBoard) {
       throw new AppError("Board not found", 404, "NOT_FOUND");
     }
-
+    
     await PermissionService.ensureBoardPermission(
       userId,
       { workspaceId: existingBoard.workspaceId.toString() },
       PERMISSION.BOARD_EDIT,
     );
-
+    
     const updatedBoard = await boardService.updateBoard(
       boardId,
       req.body,
@@ -134,8 +133,9 @@ export const boardController = {
     await redisClient.del(`workspace:${existingBoard.workspaceId.toString()}:boards`);
     res.json({ success: true, data: updatedBoard });
   },
-
- async getBoards(req: Request, res: Response) {
+  
+  async getBoards(req: Request, res: Response) {
+   const start = performance.now();
     const userId = req.auth!.userId;
     // Nayi Cache Key sabhi boards ke liye
     const cacheKey = `user:${userId}:all_boards`; 
@@ -151,6 +151,7 @@ export const boardController = {
     
     // 🐌 2. Agar Redis me nahi hai, toh DB se laao
     const boards = await boardService.getBoards(userId);
+      console.log(" PROD GET /Boards (All)", Math.round(performance.now() - start), "ms");
     
     // Tera purana format jo perfectly chal raha tha
     const responseData = { success: true, data: { items: boards } };

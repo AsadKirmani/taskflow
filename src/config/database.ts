@@ -19,6 +19,7 @@ function getConnectionString(): string {
 }
 
 export async function connectToDatabase(): Promise<typeof mongoose> {
+  console.time("PROD Database Connection Time");
   if (!MONGODB_DB_NAME) {
     throw new Error('DATABASE ERROR: MONGODB_DB_NAME is completely missing');
   }
@@ -45,7 +46,7 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
 
     const dbHost = mongoose.connection.host;
     console.log(`✅ MongoDB Connected securely to: [${dbHost}]`);
-    
+    console.timeEnd("PROD Database Connection Time");
     return cachedConnection;
   } catch (error) {
     cachedConnection = null;
