@@ -4,6 +4,7 @@ import { jwtConfig } from "../../config/jwt.config";
 import { AppError } from "../../shared/errors/app-error";
 import { authService } from "./auth.service";
 import { WorkspaceMemberModel } from "../../models/workspace-member.model";
+import { redisClient } from "../../config/redis";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -73,22 +74,43 @@ export const authController = {
   },
 
   async me(req: Request, res: Response) {
-    const user = await authService.getCurrentUser(req.auth!.userId);
+    const userId = await authService.getCurrentUser(req.auth!.userId);
+    const cacheKey = `user:${userId}:profile`;
+    
+    // 1. ⚡ Check in Redis
+    const cachedProfile = await redisClient.get(cacheKey);
+
+    if (cachedProfile) {
+      console.log(`🚀 Cache hit for user profile: ${userId}`);
+      return res.status(200).json(cachedProfile);
+    }
+
+    console.log(`🐢 Cache miss. Fetching from MongoDB...`);
+    // 2. 🐌 Fetch from MongoDB
     const memberships = await WorkspaceMemberModel.find({
       userId: req.auth!.userId,
     }).populate("workspaceId");
-    res.json({
+
+    // 3. 📦 Response ka format taiyar karo
+    const responsePayload = {
       success: true,
       data: {
-        user,
+        userId,
         workspaces: memberships.map((m) => ({
           id: m.workspaceId._id,
-          name: m.workspaceName,
+          name: m.workspaceName, // Ensure workspaceName exists on m, or use m.workspaceId.name
           role: m.role,
         })),
       },
-    });
-  },
+    };
+
+    // 4. 💾 REDIS MEIN SAVE KARO (Yeh missing tha)
+    // ex: 86400 matlab 24 ghante ke liye cache hoga
+    await redisClient.set(cacheKey, responsePayload, { ex: 86400 });
+
+    // 5. User ko response bhejo
+    return res.status(200).json(responsePayload);
+},
 
   async refresh(req: Request, res: Response) {
     const refreshToken = req.cookies?.[jwtConfig.refreshCookieName];

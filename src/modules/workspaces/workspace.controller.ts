@@ -3,6 +3,7 @@ import { workspaceService } from './workspace.service';
 import { AppError } from '../../shared/errors/app-error';
 import { PermissionService } from '../../services/permission.service';
 import { WorkspaceRole } from '../../shared/constants/enums';
+import { redisClient } from '../../config/redis';
 
 export const workspaceController = {
     async listWorkspaces(req: Request, res: Response) {
@@ -70,6 +71,9 @@ export const workspaceController = {
     const { newRole } = req.body as { newRole: string };
     await PermissionService.ensure(userId, workspaceId, 'member:role_change');
     await PermissionService.ensureCanChangeRole(userId, workspaceId, newRole as WorkspaceRole);
+    const updatedMember = await workspaceService.updateWorkspaceMemberRole(workspaceId, memberId, newRole, userId);
+    await redisClient.del(`user:${userId}:profile`);
+    res.json({ success: true, data: updatedMember });
   },
   async removeWorkspaceMember(req: Request, res: Response) {
     const userId = req.auth!.userId;
@@ -77,6 +81,7 @@ export const workspaceController = {
     await PermissionService.ensure(userId, workspaceId, 'member:remove');
     await PermissionService.ensureCanManageMember(userId, memberId, workspaceId);
     await workspaceService.removeWorkspaceMember(workspaceId, memberId, userId);
+    await redisClient.del(`user:${userId}:profile`);
     res.json({ success: true, message: 'Member removed successfully' });
   }
 };
