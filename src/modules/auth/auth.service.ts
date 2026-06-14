@@ -133,83 +133,171 @@ export const authService = {
     return sanitizeUser(user);
   },
 
-  async refresh(refreshToken: string, meta?: { ip?: string; userAgent?: string }) {
-    let payload: ReturnType<typeof verifyRefreshTokenJwt>;
+  async refresh(
+  refreshToken: string,
+  meta?: { ip?: string; userAgent?: string }
+) {
+  const totalStart = Date.now();
 
-    try {
-      payload = verifyRefreshTokenJwt(refreshToken);
-    } catch {
-      throw new AppError('Invalid refresh token', 401, 'INVALID_REFRESH_TOKEN');
-    }
+  let payload: ReturnType<typeof verifyRefreshTokenJwt>;
 
-    const tokenHash = hashToken(refreshToken);
-    const cacheKey = `refresh_token:${tokenHash}`;
+  try {
+    payload = verifyRefreshTokenJwt(refreshToken);
+  } catch {
+    throw new AppError(
+      'Invalid refresh token',
+      401,
+      'INVALID_REFRESH_TOKEN'
+    );
+  }
 
-    let sessionData: any;
+  const tokenHash = hashToken(refreshToken);
+  const cacheKey = `refresh_token:${tokenHash}`;
 
-    // ⚡ 1. REDIS SE CHECK KARO (Lightning Fast Read)
-    const cachedSession = await redisClient.get(cacheKey);
+  let sessionData: any;
 
-    if (cachedSession) {
-      console.log('🚀 Cache Hit: Refresh Token Redis se mil gaya!');
-      sessionData = cachedSession; // Hamein user ka sub aur email yahin se mil jayega
-    } else {
-      console.log('🐢 Cache Miss: DB se check kar rahe hain...');
-      // Agar Redis me nahi mila, toh DB se parallel fetch karo
-      const [existingToken, user] = await Promise.all([
-        authRepository.findRefreshTokenByHash(tokenHash),
-        authRepository.findUserById(payload.sub)
-      ]);
+  // =========================
+  // REDIS GET
+  // =========================
+  const redisGetStart = Date.now();
 
-      if (!existingToken || existingToken.revokedAt || existingToken.expiresAt < new Date()) {
-        throw new AppError('Refresh token is invalid or expired', 401, 'REFRESH_TOKEN_EXPIRED');
-      }
+  const cachedSession = await redisClient.get(cacheKey);
 
-      if (!user) {
-        throw new AppError('User not found', 404, 'USER_NOT_FOUND');
-      }
+  console.log(
+    '⏱️ REDIS_GET',
+    Date.now() - redisGetStart,
+    'ms'
+  );
 
-      // Redis me save karne ke liye data prepare karo
-      sessionData = { sub: user._id.toString(), email: user.email };
-    }
+  if (cachedSession) {
+    console.log(
+      '🚀 Cache Hit: Refresh Token Redis se mil gaya!'
+    );
 
-    // 🎟️ 2. NAYE TOKENS BANAAO
-    const newAccessToken = signAccessToken({
-      sub: sessionData.sub,
-      email: sessionData.email,
-      type: 'access'
-    });
+    sessionData = cachedSession;
+  } else {
+    console.log(
+      '🐢 Cache Miss: DB se check kar rahe hain...'
+    );
 
-    const newRefreshToken = signRefreshTokenJwt({
-      sub: sessionData.sub,
-      sessionTokenId: cryptoRandomId(),
-      type: 'refresh'
-    });
+    const dbFetchStart = Date.now();
 
-    const newRefreshTokenHash = hashToken(newRefreshToken);
-    const newCacheKey = `refresh_token:${newRefreshTokenHash}`;
-    const ttlSeconds = 7 * 24 * 60 * 60; // 7 Days in seconds (Refresh token ki expiry apne hisaab se adjust kar lena)
-
-    // 💾 3. REDIS AUR MONGODB KO EK SATH (PARALLEL) UPDATE KARO
-    // Isse user ko update ka wait nahi karna padega, response turant jayega
-    await Promise.all([
-      redisClient.del(cacheKey), // Purana token Redis se udao
-      redisClient.set(newCacheKey, sessionData, { ex: ttlSeconds }), // Naya token Redis me daalo
-      authRepository.revokeRefreshToken(tokenHash, newRefreshTokenHash), // DB update
-      authRepository.createRefreshToken({ // DB update
-        userId: sessionData.sub,
-        tokenHash: newRefreshTokenHash,
-        expiresAt: buildRefreshExpiryDate(),
-        createdByIp: meta?.ip ?? null,
-        userAgent: meta?.userAgent ?? null
-      })
+    const [existingToken, user] = await Promise.all([
+      authRepository.findRefreshTokenByHash(tokenHash),
+      authRepository.findUserById(payload.sub)
     ]);
 
-    return {
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken
+    console.log(
+      '⏱️ DB_FETCH',
+      Date.now() - dbFetchStart,
+      'ms'
+    );
+
+    if (
+      !existingToken ||
+      existingToken.revokedAt ||
+      existingToken.expiresAt < new Date()
+    ) {
+      throw new AppError(
+        'Refresh token is invalid or expired',
+        401,
+        'REFRESH_TOKEN_EXPIRED'
+      );
+    }
+
+    if (!user) {
+      throw new AppError(
+        'User not found',
+        404,
+        'USER_NOT_FOUND'
+      );
+    }
+
+    sessionData = {
+      sub: user._id.toString(),
+      email: user.email
     };
-  },
+  }
+
+  // =========================
+  // TOKEN GENERATION
+  // =========================
+
+  const tokenStart = Date.now();
+
+  const newAccessToken = signAccessToken({
+    sub: sessionData.sub,
+    email: sessionData.email,
+    type: 'access'
+  });
+
+  const newRefreshToken = signRefreshTokenJwt({
+    sub: sessionData.sub,
+    sessionTokenId: cryptoRandomId(),
+    type: 'refresh'
+  });
+
+  console.log(
+    '⏱️ TOKEN_GENERATION',
+    Date.now() - tokenStart,
+    'ms'
+  );
+
+  const newRefreshTokenHash =
+    hashToken(newRefreshToken);
+
+  const newCacheKey =
+    `refresh_token:${newRefreshTokenHash}`;
+
+  const ttlSeconds =
+    7 * 24 * 60 * 60;
+
+  // =========================
+  // REDIS + DB WRITES
+  // =========================
+
+  const writeStart = Date.now();
+
+  await Promise.all([
+    redisClient.del(cacheKey),
+
+    redisClient.set(
+      newCacheKey,
+      sessionData,
+      { ex: ttlSeconds }
+    ),
+
+    authRepository.revokeRefreshToken(
+      tokenHash,
+      newRefreshTokenHash
+    ),
+
+    authRepository.createRefreshToken({
+      userId: sessionData.sub,
+      tokenHash: newRefreshTokenHash,
+      expiresAt: buildRefreshExpiryDate(),
+      createdByIp: meta?.ip ?? null,
+      userAgent: meta?.userAgent ?? null
+    })
+  ]);
+
+  console.log(
+    '⏱️ WRITE_PHASE',
+    Date.now() - writeStart,
+    'ms'
+  );
+
+  console.log(
+    '🔥 TOTAL_REFRESH_SERVICE',
+    Date.now() - totalStart,
+    'ms'
+  );
+
+  return {
+    accessToken: newAccessToken,  
+    refreshToken: newRefreshToken
+  };
+},
 
   async logout(refreshToken: string) {
     const tokenHash = hashToken(refreshToken);
