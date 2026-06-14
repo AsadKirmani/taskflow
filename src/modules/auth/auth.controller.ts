@@ -94,7 +94,7 @@ async login(req: Request, res: Response) {
 
   async me(req: Request, res: Response) {
     const user = await authService.getCurrentUser(req.auth!.userId);
-    const cacheKey = `user:${user}:profile`;
+    const cacheKey = `user:${user.id}:profile`;
     
     // 1. ⚡ Check in Redis
     const cachedProfile = await redisClient.get(cacheKey);
@@ -114,7 +114,11 @@ async login(req: Request, res: Response) {
     const responsePayload = {
       success: true,
       data: {
-        userId,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
         workspaces: memberships.map((m) => ({
           id: m.workspaceId._id,
           name: m.workspaceName, // Ensure workspaceName exists on m, or use m.workspaceId.name
