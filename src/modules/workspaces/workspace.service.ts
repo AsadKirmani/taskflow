@@ -8,6 +8,7 @@ import crypto from 'crypto';
 import { PermissionService } from '../../services/permission.service';
 import { WorkspaceMemberModel } from '../../models/workspace-member.model';
 import { PERMISSION } from '../../config/roles';
+import { addInvitationEmailJob } from '../../queues/email.queue';
 
 const createSlug = (value: string) => {
   const slug = value
@@ -106,7 +107,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
         expiresAt
     );
 
-    await sendInvitationEmail(email, workspace.name, inviter.name, role, rawToken);
+    await addInvitationEmailJob(email, workspace.name, inviter.name, role, rawToken);
     await activityService.logActivity({
       workspaceId,
       userId,
@@ -144,7 +145,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
     }
 
     const cleanToken = token.trim();
-    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const tokenHash = crypto.createHash('sha256').update(cleanToken).digest('hex');
 
     const invitation = await workspaceRepository.getValidInvitationByHash(tokenHash);
     if (!invitation) {

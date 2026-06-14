@@ -8,9 +8,10 @@ async function bootstrap() {
     await connectToDatabase();
     console.log('MongoDB connected');
 
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
+
   } catch (error) {
     console.error('Failed to start server', error);
     process.exit(1);

@@ -10,6 +10,7 @@ import commentRoutes from './modules/comments/comment.routes';
 import activityRoutes from './modules/activity/activity.routes';
 import archiveRoutes from './modules/archive/archive.routes';
 import searchRoutes from './modules/search/search.routes';
+import webhookRoutes from './routes/webhook.routes';
 import { errorMiddleware } from './middleware/error.middleware';
 console.log('Server started', new Date().toISOString());
 
@@ -73,6 +74,7 @@ app.use('/api/v1', commentRoutes);
 app.use('/api/v1', activityRoutes);
 app.use('/api/v1', archiveRoutes);
 app.use('/api/v1', searchRoutes);
+app.use('/api/v1/webhooks', webhookRoutes);
 
 app.use(errorMiddleware);
 
