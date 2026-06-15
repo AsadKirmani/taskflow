@@ -3,6 +3,7 @@ import { AppError } from '../../shared/errors/app-error';
 import { comparePassword, hashPassword } from '../../shared/utils/password';
 import { hashToken } from '../../shared/utils/token';
 import { authRepository } from './auth.repository';
+import { redisClient } from '../../config/redis';
 import {
   signAccessToken,
   signRefreshTokenJwt,
@@ -24,6 +25,7 @@ const sanitizeUser = (user: any) => ({
 });
 
 export const authService = {
+  
   async register(input: { name: string; email: string; password: string }, meta?: { ip?: string; userAgent?: string }) {
     const normalizedEmail = input.email.trim().toLowerCase();
     const existingUser = await authRepository.findUserByEmail(normalizedEmail);
@@ -123,7 +125,14 @@ export const authService = {
   },
 
   async getCurrentUser(userId: string) {
+    const userStart = Date.now();
     const user = await authRepository.findUserById(userId);
+
+console.log(
+  "FIND_USER",
+  Date.now() - userStart,
+  "ms"
+);
 
     if (!user) {
       throw new AppError('User not found', 404, 'USER_NOT_FOUND');
@@ -132,57 +141,171 @@ export const authService = {
     return sanitizeUser(user);
   },
 
-  async refresh(refreshToken: string, meta?: { ip?: string; userAgent?: string }) {
-    let payload: ReturnType<typeof verifyRefreshTokenJwt>;
+  async refresh(
+  refreshToken: string,
+  meta?: { ip?: string; userAgent?: string }
+) {
+  const totalStart = Date.now();
 
-    try {
-      payload = verifyRefreshTokenJwt(refreshToken);
-    } catch {
-      throw new AppError('Invalid refresh token', 401, 'INVALID_REFRESH_TOKEN');
+  let payload: ReturnType<typeof verifyRefreshTokenJwt>;
+
+  try {
+    payload = verifyRefreshTokenJwt(refreshToken);
+  } catch {
+    throw new AppError(
+      'Invalid refresh token',
+      401,
+      'INVALID_REFRESH_TOKEN'
+    );
+  }
+
+  const tokenHash = hashToken(refreshToken);
+  const cacheKey = `refresh_token:${tokenHash}`;
+
+  let sessionData: any;
+
+  // =========================
+  // REDIS GET
+  // =========================
+  const redisGetStart = Date.now();
+
+  const cachedSession = await redisClient.get(cacheKey);
+
+  console.log(
+    '⏱️ REDIS_GET',
+    Date.now() - redisGetStart,
+    'ms'
+  );
+
+  if (cachedSession) {
+    console.log(
+      '🚀 Cache Hit: Refresh Token Redis se mil gaya!'
+    );
+
+    sessionData = cachedSession;
+  } else {
+    console.log(
+      '🐢 Cache Miss: DB se check kar rahe hain...'
+    );
+
+    const dbFetchStart = Date.now();
+
+    const [existingToken, user] = await Promise.all([
+      authRepository.findRefreshTokenByHash(tokenHash),
+      authRepository.findUserById(payload.sub)
+    ]);
+
+    console.log(
+      '⏱️ DB_FETCH',
+      Date.now() - dbFetchStart,
+      'ms'
+    );
+
+    if (
+      !existingToken ||
+      existingToken.revokedAt ||
+      existingToken.expiresAt < new Date()
+    ) {
+      throw new AppError(
+        'Refresh token is invalid or expired',
+        401,
+        'REFRESH_TOKEN_EXPIRED'
+      );
     }
-
-    const tokenHash = hashToken(refreshToken);
-    const existingToken = await authRepository.findRefreshTokenByHash(tokenHash);
-
-    if (!existingToken || existingToken.revokedAt || existingToken.expiresAt < new Date()) {
-      throw new AppError('Refresh token is invalid or expired', 401, 'REFRESH_TOKEN_EXPIRED');
-    }
-
-    const user = await authRepository.findUserById(payload.sub);
 
     if (!user) {
-      throw new AppError('User not found', 404, 'USER_NOT_FOUND');
+      throw new AppError(
+        'User not found',
+        404,
+        'USER_NOT_FOUND'
+      );
     }
 
-    const newAccessToken = signAccessToken({
+    sessionData = {
       sub: user._id.toString(),
-      email: user.email,
-      type: 'access'
-    });
+      email: user.email
+    };
+  }
 
-    const newRefreshToken = signRefreshTokenJwt({
-      sub: user._id.toString(),
-      sessionTokenId: cryptoRandomId(),
-      type: 'refresh'
-    });
+  // =========================
+  // TOKEN GENERATION
+  // =========================
 
-    const newRefreshTokenHash = hashToken(newRefreshToken);
+  const tokenStart = Date.now();
 
-    await authRepository.revokeRefreshToken(tokenHash, newRefreshTokenHash);
+  const newAccessToken = signAccessToken({
+    sub: sessionData.sub,
+    email: sessionData.email,
+    type: 'access'
+  });
 
-    await authRepository.createRefreshToken({
-      userId: user._id.toString(),
+  const newRefreshToken = signRefreshTokenJwt({
+    sub: sessionData.sub,
+    sessionTokenId: cryptoRandomId(),
+    type: 'refresh'
+  });
+
+  console.log(
+    '⏱️ TOKEN_GENERATION',
+    Date.now() - tokenStart,
+    'ms'
+  );
+
+  const newRefreshTokenHash =
+    hashToken(newRefreshToken);
+
+  const newCacheKey =
+    `refresh_token:${newRefreshTokenHash}`;
+
+  const ttlSeconds =
+    7 * 24 * 60 * 60;
+
+  // =========================
+  // REDIS + DB WRITES
+  // =========================
+
+  const writeStart = Date.now();
+
+  await Promise.all([
+    redisClient.del(cacheKey),
+
+    redisClient.set(
+      newCacheKey,
+      sessionData,
+      { ex: ttlSeconds }
+    ),
+
+    authRepository.revokeRefreshToken(
+      tokenHash,
+      newRefreshTokenHash
+    ),
+
+    authRepository.createRefreshToken({
+      userId: sessionData.sub,
       tokenHash: newRefreshTokenHash,
       expiresAt: buildRefreshExpiryDate(),
       createdByIp: meta?.ip ?? null,
       userAgent: meta?.userAgent ?? null
-    });
+    })
+  ]);
 
-    return {
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken
-    };
-  },
+  console.log(
+    '⏱️ WRITE_PHASE',
+    Date.now() - writeStart,
+    'ms'
+  );
+
+  console.log(
+    '🔥 TOTAL_REFRESH_SERVICE',
+    Date.now() - totalStart,
+    'ms'
+  );
+
+  return {
+    accessToken: newAccessToken,  
+    refreshToken: newRefreshToken
+  };
+},
 
   async logout(refreshToken: string) {
     const tokenHash = hashToken(refreshToken);

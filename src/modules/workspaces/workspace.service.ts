@@ -168,9 +168,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
     await workspaceRepository.addMemberToWorkspace(workspaceId, {
       userId,
       role: invitation.role,
-      status: 'accepted',
-      invitedBy: invitation.invitedBy,
-      joinedAt: new Date()
+      workspaceName: workspace.name
     });
 
     await workspaceRepository.markInvitationAsAccepted(invitation._id.toString());
