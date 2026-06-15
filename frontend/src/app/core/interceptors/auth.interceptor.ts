@@ -1,6 +1,6 @@
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injector } from '@angular/core';
-import { catchError, switchMap, throwError, Subject, Observable } from 'rxjs';
+import { catchError, switchMap, throwError, Subject, Observable, filter, take } from 'rxjs';
 import { TokenService } from '../services/token.service';
 import { AuthStoreService } from '../../features/auth/data-access/auth-store.service';
 
@@ -54,6 +54,8 @@ function handle401Error(
 ): Observable<any> {
   if (isRefreshing) {
     return refreshTokenSubject.pipe(
+      filter(token => token !== null), // Null tokens aane par ruk jao
+      take(1),
       switchMap((newToken) => {
         return next(request.clone({
           setHeaders: { Authorization: `Bearer ${newToken}` }
@@ -70,6 +72,12 @@ function handle401Error(
       isRefreshing = false;
       const newAccessToken = response.data?.accessToken;
       
+      // 🚨 YEH SABSE ZAROORI LINE HAI: Naye token ko aage ki requests ke liye save karo!
+      if (newAccessToken) {
+         // (Apne TokenService ke method ka naam check kar lena, shayad setAccessToken ya saveAccessToken ho)
+         tokenService.setAccessToken(newAccessToken); 
+      }
+
       refreshTokenSubject.next(newAccessToken);
 
       return next(request.clone({
