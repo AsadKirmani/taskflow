@@ -1,12 +1,14 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'app-user-menu',
+    imports: [RouterLink],
     template: `
     <div class="absolute right-0 mt-2 w-48 bg-base-300 rounded-box shadow-md z-20 p-2 shadow-primary">
-      <a href="#" class="block px-4 py-2 text-base-content hover:bg-base-100 rounded-field">Profile</a>
-        <a href="/settings" class="block px-4 py-2 text-base-content hover:bg-base-100 rounded-field">Settings</a>
-                <a href="#" class="block px-4 py-2 text-base-content hover:bg-base-100 rounded-field" (click)="onLogout($event)">Logout</a>
+      <a routerLink="/profile" class="block px-4 py-2 text-base-content hover:bg-base-100 rounded-field">Profile</a>
+      <a routerLink="/settings" class="block px-4 py-2 text-base-content hover:bg-base-100 rounded-field">Settings</a>
+      <a routerLink="/logout" class="block px-4 py-2 text-base-content hover:bg-base-100 rounded-field" (click)="onLogout($event)">Logout</a>
     </div>
     `
 })
