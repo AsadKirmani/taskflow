@@ -222,5 +222,12 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
       metadata: {}
     });
     return { success: true, message: 'Workspace deleted successfully' };
+  },
+  async listWorkspaceMembers(workspaceId: string, userId: string) {
+    const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+    }
+    return workspaceRepository.listWorkspaceMembers(workspaceId);
   }
 };

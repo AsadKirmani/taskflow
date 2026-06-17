@@ -19,6 +19,11 @@ export class WorkspaceApiService {
       withCredentials: true
     });
   }
+  getWorkspaceMembers(workspaceId: string): Observable<ApiResponse<{ members: any[] }>> {
+    return this.http.get<ApiResponse<{ members: any[] }>>(`${this.baseUrl}/workspaces/${workspaceId}/members`, {
+      withCredentials: true
+    });
+  }
  
   inviteWorkspaceMember(workspaceId: string, email: string, role: string) {
     return this.http.post<{ success: boolean; message: string }>(

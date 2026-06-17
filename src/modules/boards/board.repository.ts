@@ -18,7 +18,7 @@ export const boardRepository = {
   },
 
   async getBoardById(boardId: string) {
-    const board = await BoardModel.findById(boardId);
+    const board = await BoardModel.findById(boardId).populate('memberIds', 'name email avatarUrl');
     return board;
   },
 

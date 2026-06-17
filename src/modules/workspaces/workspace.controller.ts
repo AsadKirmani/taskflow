@@ -83,5 +83,19 @@ export const workspaceController = {
     await workspaceService.removeWorkspaceMember(workspaceId, memberId, userId);
     await redisClient.del(`user:${userId}:profile`);
     res.json({ success: true, message: 'Member removed successfully' });
-  }
+  },
+  async deleteWorkspace(req: Request, res: Response) {
+        const userId = req.auth!.userId;
+        const { workspaceId } = req.params as { workspaceId: string };
+        await PermissionService.ensure(userId, workspaceId, 'workspace:delete');
+        const result = await workspaceService.deleteWorkspace(workspaceId, userId);
+        res.json(result);
+   },
+    async listWorkspaceMembers(req: Request, res: Response) {
+    const userId = req.auth!.userId;
+    const { workspaceId } = req.params as { workspaceId: string };
+    await PermissionService.ensure(userId, workspaceId, 'workspace:view');
+    const members = await workspaceService.listWorkspaceMembers(workspaceId, userId);
+    res.json({ success: true, data: members });
+    }
 };

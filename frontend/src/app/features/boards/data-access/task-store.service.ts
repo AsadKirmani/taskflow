@@ -99,7 +99,7 @@ export class TaskStoreService {
 
           this.loadedTaskBoardIds.add(boardId);
           this.loadingTaskBoardIds.delete(boardId);
-          this.patchState({ tasksById, taskIdsByColumn, loading: false, error: null });
+          this.patchState({ tasksById, taskIdsByColumn, loading: false, error: null, filters: initialTaskState.filters });
           this.notificationService.success('Board tasks loaded successfully');
         }),
         catchError(() => {
@@ -174,7 +174,6 @@ export class TaskStoreService {
               }
             }
           });
-          console.log('Updated task:', updatedTask);
           this.notificationService.success('Task updated successfully');
         }),
         catchError(() => {

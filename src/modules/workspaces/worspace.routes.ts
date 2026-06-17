@@ -42,17 +42,17 @@ router.post(
   asyncHandler(workspaceController.inviteWorkspaceMember)
 );
 
-router.get('/:workspaceId/members', authMiddleware, (_req, res) => {
-  res.json({ success: true, data: { items: [] } });
-});
+router.get(
+  '/:workspaceId/members',
+  authMiddleware,
+  asyncHandler(workspaceController.listWorkspaceMembers)
+);
 
 router.patch(
   '/:workspaceId/members/:memberId/role',
   authMiddleware,
   validate(updateWorkspaceMemberRoleDto),
-  (_req, res) => {
-    res.json({ success: true, message: 'Update member role placeholder', data: null });
-  }
+  asyncHandler(workspaceController.updateWorkspaceMemberRole)
 );
 
 export default router;

@@ -1,10 +1,10 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { TaskLabel } from '../../../../../core/models/task.model'; // Path theek kar lena
+import { TaskLabel } from '../../../../../../core/models/task.model'; // Path theek kar lena
 
 @Component({
-  selector: 'app-task-labels',
+  selector: 'app-action-label',
   standalone: true,
   imports: [CommonModule, MatIconModule],
   template: `
@@ -42,7 +42,7 @@ import { TaskLabel } from '../../../../../core/models/task.model'; // Path theek
     </div>
   `
 })
-export class TaskLabelsComponent {
+export class ActionLabelComponent {
   // 📥 Parent se aane wala data (Kaunse labels abhi lage hue hain)
   appliedLabels = input<TaskLabel[]>([]); 
   

@@ -4,6 +4,7 @@ import { BoardStoreService } from '../../data-access/board-store.service';
 import { TaskStoreService } from '../../data-access/task-store.service';
 import { KanbanDndFacade } from '../../data-access/kanban-dnd.facade';
 import { KanbanBoardComponent } from '../../components/kanban-board/kanban-board.component';
+import { distinctUntilChanged, map } from 'rxjs';
 import { 
   TaskDropEventPayload, 
   ColumnDropEventPayload, 
@@ -67,13 +68,15 @@ export class BoardDetailPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const boardId = params.get('boardId');
+    this.route.paramMap.pipe(
+      map(params => params.get('boardId')),
+      distinctUntilChanged() 
+    ).subscribe(boardId => {
       this.activeBoardId.set(boardId);
       if (boardId) {
         this.boardStore.loadBoard(boardId);
         this.boardStore.loadBoardColumns(boardId);
-        this.taskStore.getTasksInBoard(boardId);
+        this.taskStore.getTasksInBoard(boardId, this.currentColumns(), true);
       }
     });
   }

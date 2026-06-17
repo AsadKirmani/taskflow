@@ -1,4 +1,6 @@
 export const PERMISSION = {
+  WORKSPACE_CREATE: 'workspace:create',
+  WORKSPACE_VIEW: 'workspace:view',
   WORKSPACE_DELETE: 'workspace:delete',
   WORKSPACE_EDIT: 'workspace:edit',
 
@@ -33,6 +35,7 @@ export const PERMISSION = {
 export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
   ADMIN: [
     PERMISSION.WORKSPACE_EDIT,
+    PERMISSION.WORKSPACE_VIEW,
     PERMISSION.MEMBER_INVITE,
     PERMISSION.MEMBER_REMOVE,
     PERMISSION.BOARD_CREATE,
@@ -56,6 +59,7 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
   ],
   
   MEMBER: [
+    PERMISSION.WORKSPACE_VIEW,
     PERMISSION.BOARD_VIEW,
     PERMISSION.COLUMN_VIEW,
     PERMISSION.TASK_CREATE,
@@ -64,7 +68,7 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSION.TASK_VIEW,
     PERMISSION.COMMENT_CREATE,
     PERMISSION.COMMENT_EDIT,
-    PERMISSION.ACTIVITY_LOG_VIEW
+    PERMISSION.ACTIVITY_LOG_VIEW,
   ],
   
   GUEST: [

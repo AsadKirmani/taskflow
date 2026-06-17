@@ -154,4 +154,7 @@ export const workspaceRepository = {
   async deleteWorkspace(workspaceId: string) {
     return WorkspaceModel.findByIdAndDelete(workspaceId);
   },
+  async listWorkspaceMembers(workspaceId: string) {
+    return WorkspaceMemberModel.find({ workspaceId }).lean();
+  }
 };
