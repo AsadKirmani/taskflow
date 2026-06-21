@@ -1,7 +1,7 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { TextEditorComponent } from '../../../../../shared/components/editor/text-editor.component';
+import { TextEditorComponent } from '../../../shared/components/editor/text-editor.component';
 
 @Component({
   selector: 'app-task-description',

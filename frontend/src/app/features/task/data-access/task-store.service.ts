@@ -3,9 +3,9 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, map, of, tap }
 import { BoardColumn } from '../../../core/models/column.model';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Task } from '../../../core/models/task.model';
-import { TaskDropEventPayload } from '../models/drag-drop.model';
-import { BoardApiService } from './board-api.service';
-import { BoardFilters } from './board-state.model';
+import { TaskDropEventPayload } from '../../boards/models/drag-drop.model';
+import { BoardApiService } from '../../boards/data-access/board-api.service';
+import { BoardFilters } from '../../boards/data-access/board-state.model';
 import { TaskState, initialTaskState } from './task-state.model';
 import { TaskComment } from '../../../core/models/comment.model';
 

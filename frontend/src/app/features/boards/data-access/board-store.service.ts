@@ -174,13 +174,14 @@ export class BoardStoreService {
             }
           );
           const columns = this.normalizeColumns((payload as { columns?: (BoardColumn & { _id?: string })[] })?.columns ?? []);
-
+          const members = (board.memberIds || []).map(member => this.normalizeBoardMembers(member));
           this.loadedBoardIdsCache.add(boardId);
 
           this.patchState({
             board,
             columns,
             loading: false,
+            members,
             error: null
           });
         }),
@@ -273,7 +274,12 @@ export class BoardStoreService {
       id: board.id ?? board._id ?? ''
     };
   }
-
+  private normalizeBoardMembers(member: any) {
+  return {
+    ...member,
+    id: member.id ?? member._id
+  };
+}
   private normalizeColumns(columns: (BoardColumn & { _id?: string })[]): BoardColumn[] {
     return columns.map(column => this.normalizeColumn(column));
   }

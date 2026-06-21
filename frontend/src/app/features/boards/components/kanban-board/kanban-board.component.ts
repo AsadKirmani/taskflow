@@ -4,13 +4,13 @@ import { BoardColumn } from '../../../../core/models/column.model';
 import { Task } from '../../../../core/models/task.model';
 import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, AddColumnEventPayload, UpdateTaskEventPayload, ToggleTaskCompletionEventPayload } from '../../models/drag-drop.model';
 import { CommonModule } from '@angular/common';
-import { TaskStoreService } from '../../data-access/task-store.service';
+import { TaskStoreService } from '../../../task/data-access/task-store.service';
 import { AuthStoreService } from '../../../auth/data-access/auth-store.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApplyFilterComponent } from '../filters/filter.component';
 import type { BoardFilterSelection } from '../filters/filter-selection.model';
-import { TaskOverlayComponent } from '../task-overlay/task-overlay.component';
+import { TaskComponent } from '../../../task/task.component';
 import { KanbanColumnComponent } from '../kanban-column/kanban-column.component';
 import { MatIconModule } from '@angular/material/icon';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
@@ -18,7 +18,7 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  imports: [ApplyFilterComponent, CommonModule, TaskOverlayComponent, KanbanColumnComponent, MatIconModule, AutofocusDirective],
+  imports: [ApplyFilterComponent, CommonModule, TaskComponent, KanbanColumnComponent, MatIconModule, AutofocusDirective],
   templateUrl: './kanban-board.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

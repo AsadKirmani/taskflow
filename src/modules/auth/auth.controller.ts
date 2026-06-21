@@ -100,11 +100,8 @@ async login(req: Request, res: Response) {
     const cachedProfile = await redisClient.get(cacheKey);
 
     if (cachedProfile) {
-      console.log(`🚀 Cache hit for user profile: ${user.id}`);
       return res.status(200).json(cachedProfile);
     }
-
-    console.log(`🐢 Cache miss. Fetching from MongoDB...`);
     // 2. 🐌 Fetch from MongoDB
     const memberships = await WorkspaceMemberModel.find({
       userId: req.auth!.userId,

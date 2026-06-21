@@ -1,6 +1,7 @@
 import { Board } from '../../../core/models/board.model';
 import { BoardColumn } from '../../../core/models/column.model';
 import { Task, TaskPriority } from '../../../core/models/task.model';
+import { User } from '../../../core/models/user.model';
 
 export type BoardDueType = 'all' | 'none' | 'overdue' | 'today' | 'this_week';
 export type BoardMemberScope = 'all' | 'no_members' | 'me';
@@ -27,8 +28,7 @@ export interface BoardState {
   boards: Board[];
   board: Board | null;
   columns: BoardColumn[];
-  tasksById: Record<string, Task>;
-  taskIdsByColumn: Record<string, string[]>;
+  members: User[];
   filters: BoardFilters;
   loading: boolean;
   saving: boolean;
@@ -39,8 +39,7 @@ export const initialBoardState: BoardState = {
   boards: [],
   board: null,
   columns: [],
-  tasksById: {},
-  taskIdsByColumn: {},
+  members: [],
   filters: {
     search: '',
     priorities: [],

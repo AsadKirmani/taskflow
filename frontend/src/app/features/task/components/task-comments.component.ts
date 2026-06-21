@@ -1,8 +1,8 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { TextEditorComponent } from '../../../../../shared/components/editor/text-editor.component';
-import { TaskComment } from '../../../../../core/models/comment.model';
+import { TextEditorComponent } from '../../../shared/components/editor/text-editor.component';
+import { TaskComment } from '../../../core/models/comment.model';
 
 @Component({
   selector: 'app-task-comments',
@@ -55,6 +55,7 @@ import { TaskComment } from '../../../../../core/models/comment.model';
 export class TaskCommentsComponent {
   comments = input.required<TaskComment[]>();
   commentPosted = output<string>();
+  commentDeleted = output<string>();
 
   isWriting = signal(false);
   newComment = signal('');

@@ -6,9 +6,9 @@ import { Task } from '../../../../core/models/task.model';
   selector: 'app-task-card',
   standalone: true,
   imports: [MatIconModule],
-  templateUrl: './task-card.component.html'
+  templateUrl: './kanban-task.component.html'
 })
-export class TaskCardComponent {
+export class KanbanTaskComponent {
   task = input.required<Task>();
   columnIndex = input.required<number>();
   sourceColumnId = input.required<string>();

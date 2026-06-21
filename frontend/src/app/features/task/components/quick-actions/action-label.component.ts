@@ -1,7 +1,7 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { TaskLabel } from '../../../../../../core/models/task.model'; // Path theek kar lena
+import { TaskLabel } from '../../../../core/models/task.model';
 
 @Component({
   selector: 'app-action-label',
@@ -44,7 +44,7 @@ import { TaskLabel } from '../../../../../../core/models/task.model'; // Path th
 })
 export class ActionLabelComponent {
   // 📥 Parent se aane wala data (Kaunse labels abhi lage hue hain)
-  appliedLabels = input<TaskLabel[]>([]); 
+  labels = input<TaskLabel[]>([]); 
   
   // 📤 Parent ko batane ke liye ki ek label click hua hai
   labelToggled = output<TaskLabel>(); 
@@ -62,7 +62,7 @@ export class ActionLabelComponent {
   ];
 
   hasLabel(label: TaskLabel): boolean {
-    return this.appliedLabels().some(l => l.name === label.name);
+    return this.labels().some(l => l.name === label.name);
   }
 
   onLabelClick(event: Event, label: TaskLabel) {

@@ -1,7 +1,7 @@
 import { Component, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { ChecklistItem } from '../../../../../core/models/task.model'; 
+import { ChecklistItem } from '../../../core/models/task.model'; 
 
 @Component({
   selector: 'app-task-checklist',

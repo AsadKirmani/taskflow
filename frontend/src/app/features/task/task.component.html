@@ -1,0 +1,76 @@
+<div
+  class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-2 sm:p-4 animate-fade-in"
+>
+  <article
+    class="bg-base-300 w-full max-w-6xl rounded-xl shadow-2xl flex flex-col max-h-[95vh] text-[#172b4d] overflow-hidden"
+    (click)="$event.stopPropagation()"
+  >
+    <app-task-header
+    (menuClicked)="close()"
+    ></app-task-header>
+    <div class="flex flex-col md:flex-row flex-1 overflow-hidden min-h-[500px]">
+      <div class="flex-1 p-5 sm:p-8 flex flex-col gap-8 bg-base-200 overflow-y-auto">
+        <div>
+          <div class="flex items-start gap-3">
+            <mat-icon class="mt-1 w-6 h-6 flex-shrink-0">radio_button_unchecked</mat-icon>
+            <h2 class="text-2xl font-bold m-0 leading-tight text-base-content">
+              {{ task().title || 'Task Title' }}
+            </h2>
+          </div>
+
+          <div class="flex flex-wrap gap-2 pl-9 mt-4">
+            <app-task-quick-actions
+              (labelToggled)="facade.toggleLabel($event)"
+              (checklistAdded)="facade.addChecklistItem($event)"
+              [task]="task()"
+              [availableMembers]="facade.boardMembers()"
+              [assignedMemberIds]="facade.currentTask()?.assigneeIds || []"
+              [currentUser]="currentUser()"
+              (dueDateChanged)="facade.updateTaskDate($event)"
+              (memberToggled)="facade.toggleTaskMember($event)"
+            >
+            </app-task-quick-actions>
+          </div>
+        </div>
+          @for (member of facade.assignedMembers(); track member.id) {
+            <app-task-assignees
+              [member]="member"
+              (openPicker)="openAssigneePicker()"
+            ></app-task-assignees>
+        }
+        @if (facade.currentTask()?.dueDate) {
+          <app-task-duedate
+             [dueDate]="facade.currentTask()?.dueDate"
+             (removed)="facade.updateTaskProperty('dueDate', null)"
+          ></app-task-duedate>
+        }
+         @if (facade.attachments().length > 0) {
+          <app-task-attachments
+            [attachments]="facade.attachments()"
+          ></app-task-attachments>
+         }
+        <app-task-description
+          [description]="facade.currentTask()?.description"
+          (saved)="facade.updateTaskProperty('description', $event)"
+        >
+        </app-task-description>
+        @if (facade.currentTask()?.checklist?.length || isChecklistVisible()) {
+          <app-task-checklist
+            [checklist]="facade.currentTask()?.checklist || []"
+            (itemAdded)="facade.addChecklistItem($event)"
+            (itemToggled)="facade.toggleChecklistItem($event.index, $event.isCompleted)"
+            (itemDeleted)="facade.deleteChecklistItem($event)"
+          >
+          </app-task-checklist>
+        }
+      </div>
+
+      <div
+        class="w-full md:w-[380px] lg:w-[420px] bg-base-100 border-l border-base-content/10 p-5 sm:p-8 flex flex-col gap-6 overflow-y-auto"
+      >
+        <app-task-comments [comments]="comments()" (commentPosted)="facade.postComment($event)">
+        </app-task-comments>
+      </div>
+    </div>
+  </article>
+</div>

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, computed, signal, effect } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BoardStoreService } from '../../data-access/board-store.service';
-import { TaskStoreService } from '../../data-access/task-store.service';
+import { TaskStoreService } from '../../../task/data-access/task-store.service';
 import { KanbanDndFacade } from '../../data-access/kanban-dnd.facade';
 import { KanbanBoardComponent } from '../../components/kanban-board/kanban-board.component';
 import { distinctUntilChanged, map } from 'rxjs';

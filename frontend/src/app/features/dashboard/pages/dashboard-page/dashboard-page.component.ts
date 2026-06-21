@@ -11,6 +11,7 @@ import { WorkspaceStoreService } from '../../../workspace/data-access/workspace-
 import { Board } from '../../../../core/models/board.model';
 import { Task } from '../../../../core/models/task.model';
 import { ActivityItem, ActivityRef, formatActivityAction } from '../../../activity/models/activity.model';
+import { CustomDatepickerComponent } from '../../../../shared/components/datepicker/custom-datepicker.component';
 
 interface DashboardTaskRow {
   id: string;
@@ -38,7 +39,7 @@ interface DashboardVm {
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, RouterLink],
+  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, RouterLink, CustomDatepickerComponent],
   templateUrl: './dashboard-page.component.html',
   styles: [`
     :host {

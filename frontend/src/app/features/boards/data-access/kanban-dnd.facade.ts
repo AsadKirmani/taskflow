@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { ColumnDropEventPayload, TaskDropEventPayload } from '../models/drag-drop.model';
 import { BoardStoreService } from './board-store.service';
-import { TaskStoreService } from './task-store.service';
+import { TaskStoreService } from '../../task/data-access/task-store.service';
 
 @Injectable({ providedIn: 'root' })
 export class KanbanDndFacade {

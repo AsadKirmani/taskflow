@@ -1,5 +1,5 @@
 import { Task } from '../../../core/models/task.model';
-import { BoardFilters } from './board-state.model';
+import { BoardFilters } from '../../boards/data-access/board-state.model';
 
 export interface TaskState {
   tasksById: Record<string, Task>;

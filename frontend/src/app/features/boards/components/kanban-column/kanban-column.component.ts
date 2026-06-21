@@ -1,7 +1,7 @@
 import { Component, ElementRef, inject, input, output } from '@angular/core';
 import { BoardColumn } from '../../../../core/models/column.model';
 import { Task } from '../../../../core/models/task.model';
-import { TaskCardComponent } from '../task-card/task-card.component';
+import { KanbanTaskComponent } from '../kanban-task/kanban-task.component';
 import { CommonModule } from '@angular/common';
 import { TaskDropEventPayload, ColumnDropEventPayload } from '../../models/drag-drop.model';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
@@ -9,7 +9,7 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
 @Component({
   selector: 'app-kanban-column',
   standalone: true,
-  imports: [TaskCardComponent, CommonModule, AutofocusDirective],
+  imports: [KanbanTaskComponent, CommonModule, AutofocusDirective],
   templateUrl: './kanban-column.component.html'
 })
 export class KanbanColumnComponent {
@@ -63,7 +63,7 @@ export class KanbanColumnComponent {
   }
 
   private calculateTaskDropIndex(clientY: number): number {
-    const taskCards = Array.from(this.el.nativeElement.querySelectorAll('app-task-card'));
+    const taskCards = Array.from(this.el.nativeElement.querySelectorAll('app-kanban-task'));
     for (let i = 0; i < taskCards.length; i++) {
       const rect = (taskCards[i] as HTMLElement).getBoundingClientRect();
       if (clientY < rect.top + rect.height / 2) {
