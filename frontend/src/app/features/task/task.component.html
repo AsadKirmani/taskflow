@@ -6,13 +6,18 @@
     (click)="$event.stopPropagation()"
   >
     <app-task-header
+    [columnName]="facade.columnName()"
     (menuClicked)="close()"
     ></app-task-header>
     <div class="flex flex-col md:flex-row flex-1 overflow-hidden min-h-[500px]">
       <div class="flex-1 p-5 sm:p-8 flex flex-col gap-8 bg-base-200 overflow-y-auto">
         <div>
           <div class="flex items-start gap-3">
+            @if (facade.currentTask()?.isCompleted) {
+              <mat-icon class="mt-1 w-6 h-6 flex-shrink-0 text-green-500">check_circle</mat-icon>
+            } @else {
             <mat-icon class="mt-1 w-6 h-6 flex-shrink-0">radio_button_unchecked</mat-icon>
+            }
             <h2 class="text-2xl font-bold m-0 leading-tight text-base-content">
               {{ task().title || 'Task Title' }}
             </h2>
@@ -21,6 +26,7 @@
           <div class="flex flex-wrap gap-2 pl-9 mt-4">
             <app-task-quick-actions
               (labelToggled)="facade.toggleLabel($event)"
+              [appliedLabels]="facade.currentTask()?.labels || []"
               (checklistAdded)="facade.addChecklistItem($event)"
               [task]="task()"
               [availableMembers]="facade.boardMembers()"
@@ -32,18 +38,20 @@
             </app-task-quick-actions>
           </div>
         </div>
-          @for (member of facade.assignedMembers(); track member.id) {
+        <div class="flex flex-wrap gap-2 pl-9 mt-4">
             <app-task-assignees
-              [member]="member"
+              [members]="facade.assignedMembers()"
               (openPicker)="openAssigneePicker()"
             ></app-task-assignees>
-        }
-        @if (facade.currentTask()?.dueDate) {
+        @if (facade.currentTask()?.dueDate || facade.currentTask()?.startDate) {
           <app-task-duedate
+             [startDate]="facade.currentTask()?.startDate"
              [dueDate]="facade.currentTask()?.dueDate"
-             (removed)="facade.updateTaskProperty('dueDate', null)"
+             (dueDateRemoved)="facade.removeDueDate()"
+             (startDateRemoved)="facade.removeStartDate()"
           ></app-task-duedate>
         }
+        </div>
          @if (facade.attachments().length > 0) {
           <app-task-attachments
             [attachments]="facade.attachments()"
@@ -68,7 +76,7 @@
       <div
         class="w-full md:w-[380px] lg:w-[420px] bg-base-100 border-l border-base-content/10 p-5 sm:p-8 flex flex-col gap-6 overflow-y-auto"
       >
-        <app-task-comments [comments]="comments()" (commentPosted)="facade.postComment($event)">
+        <app-task-comments [comments]="facade.comments()" (commentPosted)="facade.postComment($event)">
         </app-task-comments>
       </div>
     </div>

@@ -1,8 +1,9 @@
-import { computed, inject, Injectable, signal } from "@angular/core";
+import { computed, inject, Injectable, Signal, signal } from "@angular/core";
 import { TaskStoreService } from "../data-access/task-store.service";
 import { Task, TaskLabel } from "../../../core/models/task.model";
 import { BoardStoreService } from "../../boards/data-access/board-store.service";
 import { User } from "../../../core/models/user.model";
+import { TaskComment } from "../../../core/models/comment.model";
 
 @Injectable()
 export class TaskFacade {
@@ -11,8 +12,10 @@ export class TaskFacade {
   }
   private taskStore = inject(TaskStoreService);
   private boardStore = inject(BoardStoreService);
-    currentTask = signal<Task | null>(null);
+  currentTask = signal<Task | null>(null);
   boardMembers = computed(() => this.boardStore.state().members ?? []);
+  columnName = computed(() => this.boardStore.currentColumns.find(col => col.id === this.currentTask()?.columnId)?.name || '');
+  comments: Signal<TaskComment[]> = this.taskStore.comments;
   attachments = signal<
   { name: string; url: string }[]
 >([]);
@@ -25,6 +28,9 @@ export class TaskFacade {
   }
     removeDueDate() {
     this.updateTaskProperty('dueDate', null);
+  }
+  removeStartDate() {
+  this.updateTaskProperty('startDate', null);
   }
 
   toggleLabel(label: TaskLabel) {

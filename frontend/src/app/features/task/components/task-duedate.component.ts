@@ -8,28 +8,40 @@ import { DatePipe } from "@angular/common";
   standalone: true,
   imports: [MatIconModule, DatePipe],
     template: `<div class="mb-6">
-            <h3 class="text-xs font-bold text-base-content/70 uppercase mb-2">Due Date</h3>
+          
             <div class="flex items-center gap-2 group w-fit">
               <div
-                class="flex items-center gap-2 bg-base-200/50 border border-base-content/10 px-3 py-1.5 rounded-md"
+                class="flex items-center gap-2 bg-base-200/50 border border-base-content/30 text-base-content p-1 rounded-md"
               >
-                <mat-icon class="text-base-content/70 text-[18px] w-[18px] h-[18px]"
-                  >schedule</mat-icon
+                <mat-icon>schedule</mat-icon
                 >
-                <span class="text-sm font-medium text-base-content">{{
-                  dueDate() | date: 'MMM d, yyyy'
-                }}</span>
+                @if (startDate() && dueDate()) {
+                  <span class="text-sm font-medium text-base-content">
+                    {{
+                      startDate() | date: 'MMM d, yyyy'
+                    }} - {{
+                      dueDate() | date: 'MMM d, yyyy'
+                    }}</span>
+                } @else if (dueDate()) {
+                  <span class="text-sm font-medium text-base-content">
+                    {{ dueDate() | date: 'MMM d, yyyy' }}</span>
+                } @else {
+                  <span class="text-sm font-medium text-base-content">
+                    {{ startDate() | date: 'MMM d, yyyy' }}</span>
+                }
+                <button
+                  (click)="dueDateRemoved.emit(); startDateRemoved.emit()"
+                  class="hover:bg-error/20 text-error rounded-full transition-all flex items-center justify-center p-1"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
               </div>
-              <button
-                (click)="removed.emit()"
-                class="opacity-0 group-hover:opacity-100 hover:bg-error/20 text-error p-1 rounded transition-all"
-              >
-                <mat-icon class="text-[18px] w-[18px] h-[18px]">close</mat-icon>
-              </button>
             </div>
           </div>`
 })
 export class TaskDueDateComponent {
+  startDate = input.required<string | null | undefined>();
   dueDate = input.required<string | null | undefined>();
-  removed = output<void>();
+  dueDateRemoved = output<void>();
+  startDateRemoved = output<void>();
 }

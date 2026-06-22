@@ -32,10 +32,11 @@ interface CalendarDay {
 export class CustomDatepickerComponent implements OnInit {
   private calendarService = inject(CalendarService);
   private datePipe = inject(DatePipe);
-
+   
+  isOpen = signal(false);
   // Output Event
   dateApplied = output<TaskDates>();
-
+  
   months = this.calendarService.getMonths(); 
   daysOfWeek = this.calendarService.getDaysOfWeek();
   hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));

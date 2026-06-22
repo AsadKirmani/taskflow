@@ -2,11 +2,12 @@ import { Component, input, output, signal, computed, effect } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { User } from '../../../../core/models/user.model';
+import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-action-members',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, AutofocusDirective],
   template: `
     <div class="relative inline-flex w-full">
       <button
@@ -25,13 +26,14 @@ import { User } from '../../../../core/models/user.model';
         <div
           class="absolute top-full right-0 mt-2 w-64 bg-base-100 border border-base-content/10 shadow-2xl rounded-lg z-50 p-3 animate-in fade-in zoom-in-95 duration-200"
         >
-          <h4 class="text-xs font-bold text-base-content/70 uppercase mb-3 text-center">Members</h4>
+          <h4 class="text-xs font-bold text-base-content/70 mb-3 text-center">Members</h4>
           <div class="flex flex-col gap-1 relative z-50 max-h-60 overflow-y-auto">
             <input
               #searchInput
               type="text"
-              placeholder="Type & press Enter..."
-              class="input input-sm input-bordered w-full bg-base-200 mb-2 focus:outline-primary"
+              appAutofocus
+              placeholder="Search members..."
+              class="focus:outline-none w-full px-3 py-1.5 mb-2 text-sm text-base-content rounded-field border border-base-content/10 focus:border-primary transition-colors"
               (keyup.enter)="onSearch(searchInput.value)"
             />
             @for (member of filteredMembers(); track member.id) {

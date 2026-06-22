@@ -59,10 +59,11 @@
   >
     @if (!isInputOpen) {
       <button
-        class="add-task__button cursor-pointer hover:bg-base-content/10 border border-base-content/20 w-full text-center p-1 rounded-field bg-transparent transition-colors"
+        class="add-task__button cursor-pointer hover:bg-base-content/10 border border-base-content/20 w-full flex items-center justify-center p-2 rounded-field bg-transparent transition-colors"
         (click)="isInputOpen = true"
       >
-        + Add a task
+        <mat-icon class="w-4 h-4 mr-1">add</mat-icon>
+        Add a task
       </button>
     } @else {
       <input

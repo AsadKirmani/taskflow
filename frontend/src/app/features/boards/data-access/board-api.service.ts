@@ -69,8 +69,8 @@ export class BoardApiService {
     });
   }
 
-  moveTask(boardId: string, taskId: string, payload: MoveTaskPayload): Observable<ApiResponse<unknown>> {
-    return this.http.patch<ApiResponse<unknown>>(`${this.baseUrl}/boards/${boardId}/tasks/${taskId}/move`, payload, {
+  moveTask(taskId: string, payload: MoveTaskPayload): Observable<ApiResponse<unknown>> {
+    return this.http.patch<ApiResponse<unknown>>(`${this.baseUrl}/tasks/${taskId}/move`, payload, {
       withCredentials: true
     });
   }
@@ -123,7 +123,7 @@ export class BoardApiService {
 
   reorderColumns(boardId: string, columnIds: string[]): Observable<ApiResponse<null>> {
     return this.http.patch<ApiResponse<null>>(
-      `${this.baseUrl}/boards/${boardId}/columns/reorder`,
+      `${this.baseUrl}/boards/${boardId}/reorder-columns`,
       { columnIds },
       { withCredentials: true }
     );

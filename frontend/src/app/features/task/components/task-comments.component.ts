@@ -33,7 +33,7 @@ import { TaskComment } from '../../../core/models/comment.model';
       }
     </div>
 
-    <div class="flex flex-col gap-5 mt-2">
+    <div class="flex flex-col gap-5 mt-4">
       @for (comment of comments(); track comment.id) {
         <div class="flex items-start gap-3">
           <div class="w-8 h-8 rounded-full bg-base-200 border border-base-content/10 text-accent flex items-center justify-center text-xs font-bold shadow-sm">

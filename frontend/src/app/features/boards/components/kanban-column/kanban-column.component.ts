@@ -5,11 +5,12 @@ import { KanbanTaskComponent } from '../kanban-task/kanban-task.component';
 import { CommonModule } from '@angular/common';
 import { TaskDropEventPayload, ColumnDropEventPayload } from '../../models/drag-drop.model';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-kanban-column',
   standalone: true,
-  imports: [KanbanTaskComponent, CommonModule, AutofocusDirective],
+  imports: [KanbanTaskComponent, CommonModule, AutofocusDirective, MatIconModule],
   templateUrl: './kanban-column.component.html'
 })
 export class KanbanColumnComponent {

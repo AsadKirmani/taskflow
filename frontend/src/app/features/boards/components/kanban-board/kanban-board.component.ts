@@ -14,11 +14,12 @@ import { TaskComponent } from '../../../task/task.component';
 import { KanbanColumnComponent } from '../kanban-column/kanban-column.component';
 import { MatIconModule } from '@angular/material/icon';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
+import { AvatarComponent } from '../../../../shared/components/avatar.component';
 
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  imports: [ApplyFilterComponent, CommonModule, TaskComponent, KanbanColumnComponent, MatIconModule, AutofocusDirective],
+  imports: [ApplyFilterComponent, CommonModule, TaskComponent, KanbanColumnComponent, MatIconModule, AutofocusDirective, AvatarComponent],
   templateUrl: './kanban-board.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

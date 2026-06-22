@@ -194,7 +194,7 @@ export class TaskStoreService {
     this.applyOptimisticTaskMove(event);
 
     this.api
-      .moveTask(boardId, event.taskId, {
+      .moveTask(event.taskId, {
         sourceColumnId: event.sourceColumnId,
         targetColumnId: event.targetColumnId,
         sourceIndex: event.sourceIndex,

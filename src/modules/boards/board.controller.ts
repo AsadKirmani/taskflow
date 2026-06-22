@@ -23,8 +23,8 @@ export const boardController = {
       PERMISSION.BOARD_CREATE,
     );
     const board = await boardService.createBoard(req.body, userId);
-    await redisClient.del(`workspace:${workspaceId}:boards`); // Invalidate the cache for boards in this workspace
-    await redisClient.del(`user:${userId}:all_boards`); // Invalidate the cache for all boards for this user
+    //await redisClient.del(`workspace:${workspaceId}:boards`); // Invalidate the cache for boards in this workspace
+    //await redisClient.del(`user:${userId}:all_boards`); // Invalidate the cache for all boards for this user
     res.status(201).json({ success: true, data: board });
   },
 
@@ -136,10 +136,10 @@ export const boardController = {
 
     await boardService.deleteBoard(boardId, userId);
     // Yeh line teri pehle se likhi hai:
-await redisClient.del(`board:${boardId}`);
+//await redisClient.del(`board:${boardId}`);
 
 // 👇 YEH NAYI LINE ADD KAR DE (Taaki all_boards bhi refresh ho jaye):
-await redisClient.del(`user:${userId}:all_boards`);
+//await redisClient.del(`user:${userId}:all_boards`);
     res.json({ success: true, message: "Board deleted successfully" });
   },
 };

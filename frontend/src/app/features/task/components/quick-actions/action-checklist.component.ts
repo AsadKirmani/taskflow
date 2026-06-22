@@ -1,11 +1,12 @@
 import { Component, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-action-checklist',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, AutofocusDirective],
   template: `
     <div class="relative inline-flex">
       <button 
@@ -26,9 +27,9 @@ import { MatIconModule } from '@angular/material/icon';
               #itemInput 
               type="text" 
               placeholder="Add an item..." 
-              class="input input-sm input-bordered w-full bg-base-200" 
+              class="focus:outline-none w-full px-3 py-1.5 text-sm text-base-content rounded-field border border-base-content/10 focus:border-primary transition-colors" 
               (keyup.enter)="add(itemInput.value)" 
-              autofocus 
+              appAutofocus
             />
             <button 
               (click)="add(itemInput.value)" 

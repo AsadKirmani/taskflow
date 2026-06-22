@@ -76,7 +76,7 @@ async login(req: Request, res: Response) {
 
     // 3. 💾 REDIS MEIN SAVE KARO (Response bhejne se PEHLE!)
     // 7 din = 604800 seconds
-    await redisClient.set(cacheKey, sessionData, { ex: 604800 });
+    //await redisClient.set(cacheKey, sessionData, { ex: 604800 });
 
     // 4. Khushi-khushi Response bhej do
     res.cookie(jwtConfig.refreshCookieName, result.refreshToken, cookieOptions);
@@ -97,11 +97,11 @@ async login(req: Request, res: Response) {
     const cacheKey = `user:${user.id}:profile`;
     
     // 1. ⚡ Check in Redis
-    const cachedProfile = await redisClient.get(cacheKey);
+    // const cachedProfile = await redisClient.get(cacheKey);
 
-    if (cachedProfile) {
-      return res.status(200).json(cachedProfile);
-    }
+    // if (cachedProfile) {
+    //   return res.status(200).json(cachedProfile);
+    // }
     // 2. 🐌 Fetch from MongoDB
     const memberships = await WorkspaceMemberModel.find({
       userId: req.auth!.userId,
@@ -126,7 +126,7 @@ async login(req: Request, res: Response) {
 
     // 4. 💾 REDIS MEIN SAVE KARO (Yeh missing tha)
     // ex: 86400 matlab 24 ghante ke liye cache hoga
-    await redisClient.set(cacheKey, responsePayload, { ex: 86400 });
+    //await redisClient.set(cacheKey, responsePayload, { ex: 86400 });
 
     // 5. User ko response bhejo
     return res.status(200).json(responsePayload);

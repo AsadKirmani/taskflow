@@ -32,7 +32,7 @@ import { TaskLabel } from '../../../../core/models/task.model';
                 <span class="text-sm font-bold text-white">{{ label.name }}</span>
                 
                 @if (hasLabel(label)) {
-                  <mat-icon class="text-white text-[16px] w-4 h-4 font-bold">check</mat-icon>
+                  <mat-icon class="text-[16px] w-4 h-4 font-bold">check</mat-icon>
                 }
               </div>
             }

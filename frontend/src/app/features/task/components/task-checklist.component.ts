@@ -55,7 +55,7 @@ import { ChecklistItem } from '../../../core/models/task.model';
               #newItemInput 
               type="text" 
               placeholder="Add an item..." 
-              class="input input-sm input-bordered flex-1 bg-base-200 focus:outline-primary" 
+              class="focus:outline-none w-full px-3 py-1.5 text-sm text-base-content rounded-field border border-base-content/10 focus:border-primary transition-colors" 
               (keyup.enter)="onAdd(newItemInput.value); newItemInput.value = ''" 
             />
             <button 

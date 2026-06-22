@@ -2,28 +2,29 @@ import { MatIconModule } from "@angular/material/icon";
 import { Component, input, output } from "@angular/core";
 import { User } from "../../../core/models/user.model";
 import { CommonModule } from "@angular/common";
+import { AvatarComponent } from "../../../shared/components/avatar.component";
 
 @Component({
   selector: 'app-task-assignees',
   standalone: true,
-  imports: [MatIconModule, CommonModule],
-    template: `<div class="flex -space-x-2">
-            <div
-              class="w-8 h-8 rounded-full border-2 border-white bg-blue-500 text-white flex items-center justify-center text-xs font-medium"
-              [title]="member().name"
-            >
-              {{ member().name.substring(0, 1) }}
-            </div>
-
+  imports: [MatIconModule, CommonModule, AvatarComponent],
+    template: `<div class="flex items-center gap-1">
+    <div class="flex -space-x-3">
+    @for (member of members(); track member.id) {
+      <app-avatar [name]="member.name" [title]="member.name"></app-avatar>
+}
+      </div>
+      @if (members().length > 0) {
           <button
-            class="w-8 h-8 rounded-full border-2 border-dashed border-gray-400 flex items-center justify-center"
+            class="w-10 h-10 rounded-full border border-base-content flex items-center justify-center text-base-content hover:bg-base-content/10 transition-colors"
           >
-            +
+            <mat-icon>add</mat-icon>
           </button>
+}
         </div>`
 })
 export class TaskAssigneesComponent {
-  member = input.required<User>();
+  members = input.required<User[]>();
   openPicker = output<void>();
  
 }
