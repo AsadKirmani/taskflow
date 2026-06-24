@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed } from '@angular/core';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router'; 
-import { BoardStoreService } from '../../data-access/board-store.service';
+import { BoardStore } from '../../data-access/board-store.service';
 import { WorkspaceStoreService } from '../../../../features/workspace/data-access/workspace-store.service';
 import { Board } from '../../../../core/models/board.model';
 import { BoardModalComponent } from '../../components/board-modal.component';
@@ -16,7 +16,7 @@ import { LucideArrowRight } from '@lucide/angular';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BoardsPageComponent implements OnInit {
-  protected readonly boardStore = inject(BoardStoreService);
+  protected readonly boardStore = inject(BoardStore);
   protected readonly workspaceStore = inject(WorkspaceStoreService);
   protected readonly authStore = inject(AuthStoreService);
   private readonly router = inject(Router);
@@ -52,7 +52,7 @@ export class BoardsPageComponent implements OnInit {
     const currentUser = this.authStore.currentUser();
     const boardsList = this.boardStore.allBoards;
 
-    const filteredBoards = boardsList.filter((board: Board) => {
+    const filteredBoards = boardsList().filter((board: Board) => {
       if (board.workspaceId !== workspaceId) return false;
       if (board.visibility === 'private') {
         const isCreator = board.createdBy === currentUser?.id;

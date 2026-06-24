@@ -50,14 +50,12 @@ export const boardRepository = {
   },
 
   async getBoardsForUser(userId: string) {
-    console.time("Get Boards for User");
     const boards = await BoardModel.find({
       $or: [
         { createdBy: userId },
         { memberIds: userId }
       ]
     });
-    console.timeEnd("Get Boards for User");
     return boards;
   },
    async reorderColumns(boardId: string, newColumnOrder: string[]) {

@@ -29,7 +29,7 @@
               [appliedLabels]="facade.currentTask()?.labels || []"
               (checklistAdded)="facade.addChecklistItem($event)"
               [task]="task()"
-              [availableMembers]="facade.boardMembers()"
+              (availableMembers)="facade.boardMembers()"
               [assignedMemberIds]="facade.currentTask()?.assigneeIds || []"
               [currentUser]="currentUser()"
               (dueDateChanged)="facade.updateTaskDate($event)"

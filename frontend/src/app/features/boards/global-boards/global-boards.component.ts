@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { WorkspaceStoreService } from '../../../features/workspace/data-access/workspace-store.service';
-import { BoardStoreService } from '../../../features/boards/data-access/board-store.service';
+import { BoardStore } from '../../../features/boards/data-access/board-store.service';
 
 @Component({
   selector: 'app-global-boards',
@@ -11,9 +11,9 @@ import { BoardStoreService } from '../../../features/boards/data-access/board-st
 })
 export class GlobalBoardsComponent {
   protected readonly workspaceStore = inject(WorkspaceStoreService);
-  protected readonly boardStore = inject(BoardStoreService);
+  protected readonly boardStore = inject(BoardStore);
 
   getBoardsByWorkspace(workspaceId: string) {
-    return this.boardStore.allBoards.filter(board => board.workspaceId === workspaceId);
+    return this.boardStore.allBoards().filter(board => board.workspaceId === workspaceId);
   }
 }

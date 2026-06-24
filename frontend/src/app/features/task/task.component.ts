@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Task } from '../../core/models/task.model';
 import { AuthStoreService } from '../auth/data-access/auth-store.service';
-import { TaskStoreService } from './data-access/task-store.service';
+import { TaskStore } from './data-access/task-store.service';
 import { TaskComment } from '../../core/models/comment.model';
 import { TaskQuickActionsComponent } from './components/task-quick-actions.component';
 import { TaskDescriptionComponent } from './components/task-description.component';
@@ -45,7 +45,7 @@ import { TaskAttachmentsComponent } from './components/task-attachments.componen
 })
 export class TaskComponent {
   private authStore = inject(AuthStoreService);
-  private taskStore = inject(TaskStoreService);
+  private taskStore = inject(TaskStore);
 
   constructor() {
     effect(() => {

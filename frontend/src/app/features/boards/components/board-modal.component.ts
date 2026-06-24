@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BoardStoreService } from '../data-access/board-store.service';
+import { BoardStore } from '../data-access/board-store.service';
 import { Workspace } from '../../../core/models/workspace.model';
 import { NotificationService } from '../../../core/services/notification.service';
 import { LucideX } from '@lucide/angular';
@@ -86,7 +86,7 @@ import { LucideX } from '@lucide/angular';
   `
 })
 export class BoardModalComponent {
-  private readonly boardStore = inject(BoardStoreService);
+  private readonly boardStore = inject(BoardStore);
   private readonly notificationService = inject(NotificationService);
 
   readonly selectedWorkspaceId = input<string>('');

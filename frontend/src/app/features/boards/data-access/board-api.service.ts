@@ -62,6 +62,11 @@ export class BoardApiService {
       withCredentials: true
     });
   }
+  getBoardByWorkspace(workspaceId: string): Observable<ApiResponse<BoardListResponse>> {
+    return this.http.get<ApiResponse<BoardListResponse>>(`${this.baseUrl}/workspaces/${workspaceId}/boards`, {
+      withCredentials: true
+    });
+  }
 
   getBoardById(boardId: string): Observable<ApiResponse<BoardDetailResponse>> {
     return this.http.get<ApiResponse<BoardDetailResponse>>(`${this.baseUrl}/boards/${boardId}`, {

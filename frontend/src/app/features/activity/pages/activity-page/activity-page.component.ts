@@ -1,61 +1,59 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
-import { ActivityApiService } from '../../data-access/activity-api.service';
-import { WorkspaceStoreService } from '../../../workspace/data-access/workspace-store.service';
-import { ActivityItem, ActivityRef, formatActivityAction } from '../../models/activity.model';
+import { ActivityStore } from '../../data-access/activity-store.service'; // 🚀 Store path update kar lena
 
 @Component({
   selector: 'app-activity-page',
   standalone: true,
   imports: [DatePipe, RouterLink],
+  providers: [ActivityStore], // Optional: Agar global chahiye toh hata dena
   template: `
     <section class="rounded-box flex flex-col gap-2 overflow-y-auto max-h-[83vh] p-top-0">
       <header class="header bg-base-200 w-full text-base-content sticky top-0 z-1 p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-300">
         <div class="min-w-0">
           <h1 class="text-lg sm:text-xl font-semibold text-base-content">Activity</h1>
           <p class="text-sm text-base-content/70">
-            @if (boardId()) {
+            @if (store.currentBoardId()) {
               Board activity feed
-            } @else if (workspaceId()) {
+            } @else if (store.currentWorkspaceId()) {
               Workspace activity feed
             } @else {
               Global activity feed
             }
           </p>
         </div>
-        @if (workspaceId()) {
+        @if (store.currentWorkspaceId()) {
           <span class="text-xs text-base-content/70 bg-base-100 px-2 py-1 rounded break-all self-start sm:self-auto">
-            Workspace: {{ workspaceId() }}
+            Workspace: {{ store.currentWorkspaceId() }}
           </span>
         }
       </header>
 
       <div class="flex-1 rounded-b-box bg-base-200 p-3 shadow-sm">
-        @if (loading()) {
+        @if (store.isLoading()) {
           <p class="text-sm text-base-content/70">Loading activity...</p>
-        } @else if (error()) {
-          <p class="text-sm text-red-600">{{ error() }}</p>
-        } @else if (items().length === 0) {
+        } @else if (store.hasError()) {
+          <p class="text-sm text-red-600">{{ store.hasError() }}</p>
+        } @else if (store.uiItems().length === 0) {
           <p class="text-sm text-base-content/70">No activity yet.</p>
         } @else {
           <ul class="space-y-2">
-            @for (item of items(); track item._id ?? item.id ?? item.createdAt) {
+            @for (item of store.uiItems(); track item.id) {
               <li class="rounded-box border border-base-content/10 p-3 hover:bg-base-100 transition-colors">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div class="min-w-0">
-                    <p class="text-sm font-medium text-base-content">{{ describeActivity(item) }}</p>
-                    <p class="text-xs text-base-content/70">{{ describeContext(item) }}</p>
+                    <p class="text-sm font-medium text-base-content">{{ item.description }}</p>
+                    <p class="text-xs text-base-content/70">{{ item.context }}</p>
                     
-                    @if (getDeepLink(item, workspaceId()); as deepLink) {
-                      @if (deepLink.commands) {
+                    @if (item.deepLink; as link) {
+                      @if (link.commands) {
                         <a
                           class="mt-1 inline-flex text-xs font-medium text-primary hover:text-primary-focus hover:underline"
-                          [routerLink]="deepLink.commands"
-                          [queryParams]="deepLink.queryParams"
+                          [routerLink]="link.commands"
+                          [queryParams]="link.queryParams"
                         >
-                          {{ deepLink.label }}
+                          {{ link.label }}
                         </a>
                       }
                     }
@@ -71,196 +69,16 @@ import { ActivityItem, ActivityRef, formatActivityAction } from '../../models/ac
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ActivityPageComponent {
-  private readonly activityApi = inject(ActivityApiService);
-  protected readonly workspaceStore = inject(WorkspaceStoreService);
+export class ActivityPageComponent implements OnInit {
+  protected readonly store = inject(ActivityStore);
   private readonly route = inject(ActivatedRoute);
- 
-  readonly loading = signal<boolean>(true);
-  readonly error = signal<string | null>(null);
-  readonly items = signal<ActivityItem[]>([]);
-  readonly workspaceId = signal<string | undefined>(undefined);
-  readonly boardId = signal<string | undefined>(undefined);
 
   ngOnInit(): void {
-  
     this.route.paramMap.subscribe(params => {
       const wId = params.get('workspaceId') ?? undefined;
       const bId = params.get('boardId') ?? undefined;
       
-      this.workspaceId.set(wId);
-      this.boardId.set(bId);
-      this.fetchActivityData(wId, bId);
+      this.store.loadActivities(wId, bId);
     });
-  }
-
-  private async fetchActivityData(workspaceId?: string, boardId?: string) {
-    this.loading.set(true);
-    this.error.set(null);
-
-    try {
-      let request$;
-      if (boardId && workspaceId) {
-        request$ = this.activityApi.getBoardActivity(workspaceId, boardId);
-      } else if (workspaceId) {
-        request$ = this.activityApi.getWorkspaceActivity(workspaceId);
-      } else {
-        request$ = this.activityApi.getGlobalActivity();
-      }
-
-      const response = await firstValueFrom(request$);
-      this.items.set(response.data?.items ?? []);
-    } catch (err) {
-      this.error.set('Failed to load activity feed');
-      this.items.set([]);
-    } finally {
-      this.loading.set(false);
-    }
-  }
-
-  describeActivity(item: ActivityItem): string {
-    const actor = this.getActorName(item);
-    const action = formatActivityAction(item.actionType);
-    const target = this.getTargetText(item);
-    return target ? `${actor} ${action} ${target}.` : `${actor} ${action}.`;
-  }
-
-  describeContext(item: ActivityItem): string {
-    const metadata = item.metadata ?? {};
-    const sourceRaw = this.asText(metadata['sourceColumnName']) ?? this.asText(metadata['sourceColumnId']);
-    const destinationRaw = this.asText(metadata['destinationColumnName']) ?? this.asText(metadata['destinationColumnId']);
-    const source = this.sanitizeColumnText(sourceRaw);
-    const destination = this.sanitizeColumnText(destinationRaw);
-    const position = this.asText(metadata['position']);
-
-    const details: string[] = [];
-    if (source && destination) {
-      details.push(`Moved from ${source} to ${destination}`);
-    } else if (item.actionType === 'task_moved') {
-      details.push('Moved between columns');
-    }
-
-    if (position) {
-      details.push(`at position ${position}`);
-    }
-
-    const updatedFields = Array.isArray(metadata['updatedFields'])
-      ? (metadata['updatedFields'] as unknown[]).map(field => String(field)).filter(Boolean)
-      : [];
-
-    if (updatedFields.length && item.actionType !== 'task_completed' && item.actionType !== 'task_reopened') {
-      details.push(`Updated: ${updatedFields.join(', ')}`);
-    }
-
-    if (details.length === 0) {
-      const entity = this.getEntityLabel(item);
-      return entity ? `Entity: ${entity}` : `Entity ID: ${item.entityId}`;
-    }
-
-    return details.join(' | ');
-  }
-
-  private getActorName(item: ActivityItem): string {
-    const actor = this.asRef(item.userId);
-    return actor?.name || 'Someone';
-  }
-    
-
-  private getTargetText(item: ActivityItem): string {
-    const task = this.asRef(item.taskId);
-    if (task?.title) return `task "${task.title}"`;
-    const entity = this.getEntityLabel(item);
-    return entity || '';
-  }
-
-  private getEntityLabel(item: ActivityItem): string {
-    const board = this.asRef(item.boardId);
-    const column = this.asRef(item.columnId);
-
-    if (item.entityType === 'board') return board?.name ? `board "${board.name}"` : 'a board';
-    if (item.entityType === 'column') return column?.name ? `column "${column.name}"` : 'a column';
-    if (item.entityType === 'task') {
-      const task = this.asRef(item.taskId);
-      return task?.title ? `task "${task.title}"` : 'a task';
-    }
-    if (item.entityType === 'comment') {
-      const task = this.asRef(item.taskId);
-      return task?.title ? `comment on task "${task.title}"` : 'a comment';
-    }
-    return 'workspace';
-  }
-
-  private asRef(value: string | ActivityRef | null | undefined): ActivityRef | null {
-    if (!value || typeof value === 'string') return null;
-    return value;
-  }
-
-  private asText(value: unknown): string | null {
-    if (value === null || value === undefined) return null;
-    return String(value);
-  }
-
-  private sanitizeColumnText(value: string | null): string | null {
-    if (!value) return null;
-    return /^[a-f\d]{24}$/i.test(value) ? null : value;
-  }
-
-  getDeepLink(item: ActivityItem, workspaceId?: string): {
-    commands: string[] | null;
-    queryParams?: Record<string, string>;
-    label: string;
-  } {
-    const boardId = this.getRefId(item.boardId);
-    const taskId = this.getRefId(item.taskId);
-    const resolvedWorkspaceId = workspaceId || this.asText(item.workspaceId) || undefined;
-    const boardName = this.asRef(item.boardId)?.name;
-    const taskTitle = this.asRef(item.taskId)?.title;
-    const workspaceName = this.asText(item.metadata?.['workspaceName']) || 'workspace';
-
-    if (item.entityType === 'workspace') {
-      return {
-        commands: resolvedWorkspaceId
-          ? ['/workspaces', resolvedWorkspaceId, this.toSlug(workspaceName)]
-          : ['/workspaces'],
-        label: 'Open workspace'
-      };
-    }
-
-    if (boardId) {
-      const queryParams: Record<string, string> = {};
-      if (resolvedWorkspaceId) queryParams['workspaceId'] = resolvedWorkspaceId;
-      if (taskId) queryParams['taskId'] = taskId;
-      if (taskTitle) queryParams['taskTitle'] = this.toSlug(taskTitle);
-
-      return {
-        commands: ['/boards', boardId, this.toSlug(boardName || 'board')],
-        queryParams: Object.keys(queryParams).length ? queryParams : undefined,
-        label: taskId ? 'Open task in board' : 'Open board'
-      };
-    }
-
-    if (resolvedWorkspaceId) {
-      return {
-        commands: ['/activity'],
-        queryParams: { workspaceId: resolvedWorkspaceId },
-        label: 'Open activity context'
-      };
-    }
-
-    return { commands: null, label: '' };
-  }
-
-  private getRefId(value: string | ActivityRef | null | undefined): string | null {
-    if (!value) return null;
-    if (typeof value === 'string') return value;
-    return value.id ?? value._id ?? null;
-  }
-
-  private toSlug(value: string): string {
-    return value
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || 'item';
   }
 }

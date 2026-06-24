@@ -10,10 +10,10 @@
       <button
         type="button"
         class="filter-button text-base-content p-2 rounded-box transition-colors border-none cursor-pointer flex items-center justify-center"
-        [class.bg-base-content/30]="isFilterOpen"
-        [class.hover:bg-base-300]="isFilterOpen"
-        [class.hover:bg-base-100]="!isFilterOpen"
-        [attr.aria-pressed]="isFilterOpen"
+        [class.bg-base-content/30]="isFilterOpen()"
+        [class.hover:bg-base-300]="isFilterOpen()"
+        [class.hover:bg-base-100]="!isFilterOpen()"
+        [attr.aria-pressed]="isFilterOpen()"
         (click)="toggleFilterView($event)"
       >
         <mat-icon class="w-6 h-6">filter_list</mat-icon>
@@ -44,7 +44,7 @@
     </div>
   </header>
 
-  @if (isFilterOpen) {
+  @if (isFilterOpen()) {
     <app-apply-filter
       [(isOpen)]="isFilterOpen"
       (filtersChanged)="onFiltersChanged($event)"
@@ -60,7 +60,7 @@
         [columnIndex]="i"
         [column]="column"
         [tasks]="tasksByColumn()[column.id] ?? []"
-        [hasActiveFilters]="hasActiveFilters"
+        (hasActiveFilters)="hasActiveFilters()"
         (nativeTaskDrop)="onTaskDropNative($event)"
         (nativeColumnDrop)="onColumnDropNative($event)"
         (taskAdded)="submitTaskInput(column.id, $event)"
@@ -73,7 +73,7 @@
     <div
       class="bg-base-100 w-[85vw] sm:w-52 flex-shrink-0 hover:bg-base-300 p-2 rounded-box text-base-content border border-accent hover:border-accent hover:ring-accent/30 hover:ring-2 shadow transition-colors"
     >
-      @if (!isColumnInputOpen) {
+      @if (!isColumnInputOpen()) {
         <button
           type="button"
           class="add-column__button w-full flex items-center justify-center border-none bg-transparent cursor-pointer font-medium p-2"
@@ -89,7 +89,7 @@
             appAutofocus
             class="add-column__input p-2 shadow rounded-lg w-full h-12 outline-none ring-1 ring-base-content focus:ring-2 focus:ring-base-content focus:outline-none bg-base-100"
             placeholder="Column title..."
-            [value]="columnInputValue"
+            [value]="columnInputValue()"
             (input)="onColumnInputChange($event)"
             (keydown.enter)="submitColumnInput()"
             (keydown.escape)="closeColumnInput()"
@@ -117,6 +117,6 @@
   </div>
 </section>
 
-@if (activeTaskOverlay; as selectedTask) {
+@if (activeTaskOverlay(); as selectedTask) {
   <app-task [task]="selectedTask" (closed)="closeTaskOverlay()" [workspaceId]="board()?.workspaceId ?? ''" [boardId]="board()?.id ?? ''"></app-task>
 }

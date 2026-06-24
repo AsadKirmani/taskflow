@@ -1,13 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { ColumnDropEventPayload, TaskDropEventPayload } from '../models/drag-drop.model';
-import { BoardStoreService } from './board-store.service';
-import { TaskStoreService } from '../../task/data-access/task-store.service';
+import { BoardStore } from './board-store.service';
+import { TaskStore } from '../../task/data-access/task-store.service';
 
 @Injectable({ providedIn: 'root' })
 export class KanbanDndFacade {
-  private readonly boardStore = inject(BoardStoreService);
-  private readonly taskStore = inject(TaskStoreService);
+  private readonly boardStore = inject(BoardStore);
+  private readonly taskStore = inject(TaskStore);
   private readonly notificationService = inject(NotificationService);
 
   handleColumnDrop(event: ColumnDropEventPayload): void {
@@ -21,6 +21,6 @@ export class KanbanDndFacade {
       return;
     }
 
-    this.taskStore.handleTaskDrop(boardId, event);
+    this.taskStore.handleTaskDrop(boardId()!, event);
   }
 }

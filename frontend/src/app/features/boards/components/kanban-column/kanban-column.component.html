@@ -37,7 +37,7 @@
   </div>
   <div
     class="kanban-column__task-list min-h-[50px] p-1 rounded transition-colors"
-    [class.bg-base-200]="isDragOver"
+    [class.bg-base-200]="isDragOver()"
     (dragover)="onTaskDragOver($event)"
     (dragleave)="onTaskDragLeave($event)"
     (drop)="onTaskDrop($event)"
@@ -57,10 +57,10 @@
   <div
     class="add-task p-1 flex items-center justify-start gap-1 text-base-content/70 transition-colors mt-1"
   >
-    @if (!isInputOpen) {
+    @if (!isInputOpen()) {
       <button
         class="add-task__button cursor-pointer hover:bg-base-content/10 border border-base-content/20 w-full flex items-center justify-center p-2 rounded-field bg-transparent transition-colors"
-        (click)="isInputOpen = true"
+        (click)="isInputOpen.set(true)"
       >
         <mat-icon class="w-4 h-4 mr-1">add</mat-icon>
         Add a task
@@ -70,7 +70,7 @@
         type="text"
         class="add-task__input p-1 text-base-content rounded-field w-full h-10 outline-none ring-1 ring-accent focus:ring-2 focus:ring-accent focus:outline-none"
         placeholder="Task title..."
-        [value]="inputValue"
+        [value]="inputValue()"
         (input)="onInput($event)"
         (blur)="cancelInput()"
         (keydown.enter)="submitTask()"

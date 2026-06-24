@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, computed, signal, effect } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BoardStoreService } from '../../data-access/board-store.service';
-import { TaskStoreService } from '../../../task/data-access/task-store.service';
+import { BoardStore } from '../../data-access/board-store.service';
+import { TaskStore } from '../../../task/data-access/task-store.service';
 import { KanbanDndFacade } from '../../data-access/kanban-dnd.facade';
 import { KanbanBoardComponent } from '../../components/kanban-board/kanban-board.component';
 import { distinctUntilChanged, map } from 'rxjs';
@@ -21,9 +21,9 @@ import {
   template: `
     <app-kanban-board
       class="block h-full min-h-0"
-      [board]="currentBoard()"
-      [columns]="currentColumns()"
-      [tasksByColumn]="tasksByColumn()"
+      [board]="boardStore.currentBoard()"
+      [columns]="boardStore.currentColumns()"
+      [tasksByColumn]="taskStore.buildTasksByColumn(boardStore.currentColumns())"
       [loading]="isLoading()"
       (taskMoved)="onTaskMoved($event)"
       (columnMoved)="onColumnMoved($event)"
@@ -44,8 +44,8 @@ import {
 })
 export class BoardDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  protected readonly boardStore = inject(BoardStoreService);
-  protected readonly taskStore = inject(TaskStoreService);
+  protected readonly boardStore = inject(BoardStore);
+  protected readonly taskStore = inject(TaskStore);
   private readonly dndFacade = inject(KanbanDndFacade);
 
   activeBoardId = signal<string | null>(null);
@@ -64,7 +64,7 @@ export class BoardDetailPageComponent implements OnInit {
   tasksByColumn = computed(() => {
     const cols = this.currentColumns();
     if (!cols || cols.length === 0) return {};
-    return this.taskStore.buildTasksByColumn(cols);
+    return this.taskStore.buildTasksByColumn(cols());
   });
 
   ngOnInit(): void {
@@ -76,7 +76,7 @@ export class BoardDetailPageComponent implements OnInit {
       if (boardId) {
         this.boardStore.loadBoard(boardId);
         this.boardStore.loadBoardColumns(boardId);
-        this.taskStore.getTasksInBoard(boardId, this.currentColumns(), true);
+        this.taskStore.getTasksInBoard(boardId, this.boardStore.currentColumns(), true);
       }
     });
   }
@@ -91,28 +91,28 @@ export class BoardDetailPageComponent implements OnInit {
 
   onTaskAdded(event: AddTaskEventPayload): void {
     const board = this.currentBoard();
-    if (!board?.id) return;
+    if (!board()?.id) return;
 
-    this.taskStore.addTask(board.id, event.columnId, event.title, board.workspaceId);
+    this.taskStore.addTask(board()!.id, event.columnId, event.title, board()!.workspaceId);
   }
 
   onColumnAdded(event: AddColumnEventPayload): void {
     const board = this.currentBoard();
-    if (!board?.id) return;
+    if (!board()?.id) return;
 
-    this.boardStore.createColumn(board.id, board.workspaceId, event.title);
+    this.boardStore.createColumn(board()!.id, board()!.workspaceId, event.title);
   }
 
   onTaskUpdated(event: UpdateTaskEventPayload): void {
     const board = this.currentBoard();
-    if (!board?.id) return;
+    if (!board()?.id) return;
 
     this.taskStore.updateTask(event.taskId, { title: event.title });
   }
 
   onTaskCompletionToggled(event: ToggleTaskCompletionEventPayload): void {
     const board = this.currentBoard();
-    if (!board?.id) return;
+    if (!board()?.id) return;
 
     this.taskStore.toggleTaskCompletion(event.taskId, event.isCompleted);
   }
