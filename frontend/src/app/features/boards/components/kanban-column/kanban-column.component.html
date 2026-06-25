@@ -10,26 +10,11 @@
       <header class="kanban-column__header cursor-grab flex items-center gap-2" cdkDragHandle>
         <h3 class="font-bold m-0 text-base-content">{{ column().name }}</h3>
         <span
-          class="bg-base-200 text-base-content/70 px-2 py-0.5 rounded-full text-xs font-semibold"
-          >{{ tasks().length }}</span
-        >
+          class="bg-base-100 text-base-content px-2 py-0.5 rounded-full text-xs font-semibold"
+          >{{ tasks().length }}</span>
       </header>
-      <svg
-        class="cursor-pointer"
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <circle cx="12" cy="12" r="1"></circle>
-        <circle cx="19" cy="12" r="1"></circle>
-        <circle cx="5" cy="12" r="1"></circle>
-      </svg>
+        <mat-icon
+          class="cursor-pointer text-base-content hover:text-base-content/70 transition-colors">more_vert</mat-icon>
     </div>
     @if (hasActiveFilters()) {
       <span class="text-xs text-primary font-semibold">{{ tasks().length }} matching tasks</span>

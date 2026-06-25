@@ -15,7 +15,7 @@ import { ChecklistItem } from '../../../core/models/task.model';
         
         <div class="flex items-center gap-3 mb-4">
           <span class="text-xs font-bold text-base-content/70 w-8">{{ progressPercentage() }}%</span>
-          <div class="flex-1 h-2 bg-base-200 rounded-full overflow-hidden border border-base-content/10">
+          <div class="flex-1 h-2 bg-base-200 rounded-full overflow-hidden border border-base-content/20">
             <div 
               class="h-full transition-all duration-500 ease-out"
               [ngClass]="progressPercentage() === 100 ? 'bg-success' : 'bg-primary'"
@@ -24,7 +24,7 @@ import { ChecklistItem } from '../../../core/models/task.model';
           </div>
         </div>
 
-        <div class="flex flex-col gap-2 bg-base-100 p-4 rounded-md border border-base-content/10 shadow-sm">
+        <div class="flex flex-col gap-2 bg-base-100 p-4 rounded-md border border-base-content/20 shadow-sm">
           
           @for (item of checklist(); track $index; let i = $index) {
             <div class="flex items-center gap-3 group hover:bg-base-200/50 p-1.5 rounded transition-colors">
@@ -50,17 +50,17 @@ import { ChecklistItem } from '../../../core/models/task.model';
             </div>
           }
           
-          <div class="flex items-center gap-2 mt-3 pt-3 border-t border-base-content/10">
+          <div class="flex items-center gap-2 mt-3 pt-3 border-t border-base-content/20">
             <input 
               #newItemInput 
               type="text" 
               placeholder="Add an item..." 
-              class="focus:outline-none w-full px-3 py-1.5 text-sm text-base-content rounded-field border border-base-content/10 focus:border-primary transition-colors" 
+              class="focus:outline-none w-full px-3 py-1.5 text-sm text-base-content rounded-field border border-base-content/20 focus:border-primary transition-colors" 
               (keyup.enter)="onAdd(newItemInput.value); newItemInput.value = ''" 
             />
             <button 
               (click)="onAdd(newItemInput.value); newItemInput.value = ''" 
-              class="bg-base-200 hover:bg-base-300 text-base-content px-4 py-1.5 rounded text-sm font-medium transition-colors border border-base-content/10 shadow-sm">
+              class="bg-base-200 hover:bg-base-300 text-base-content px-4 py-1.5 rounded text-sm font-medium transition-colors border border-base-content/20 shadow-sm">
               Add
             </button>
           </div>

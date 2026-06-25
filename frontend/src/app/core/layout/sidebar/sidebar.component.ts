@@ -66,14 +66,17 @@ export class SidebarComponent {
   readonly workspaceLinks = [
     {
       label: 'Boards',
+      route: 'workspaces/:workspaceId/boards',
       path: 'boards'
     },
     {
       label: 'Activity',
+      route: 'workspaces/:workspaceId/activity',
       path: 'activity'
     },
     {
       label: 'Settings',
+      route: 'workspaces/:workspaceId/settings',
       path: 'settings'
     }
   ] as const;

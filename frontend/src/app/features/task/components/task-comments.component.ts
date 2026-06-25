@@ -19,7 +19,7 @@ import { TaskComment } from '../../../core/models/comment.model';
 
     <div class="flex flex-col gap-2 mt-4 relative">
       @if (!isWriting()) {
-        <div (click)="startWriting()" class="w-full bg-base-100 border border-base-content/10 rounded-md p-3 shadow-sm text-sm text-base-content/70 cursor-text hover:bg-base-200 transition-colors">
+        <div (click)="startWriting()" class="w-full bg-base-100 border border-base-content/20 rounded-md p-3 shadow-sm text-sm text-base-content/70 cursor-text hover:bg-base-200 transition-colors">
           Write a comment...
         </div>
       } @else {
@@ -36,7 +36,7 @@ import { TaskComment } from '../../../core/models/comment.model';
     <div class="flex flex-col gap-5 mt-4">
       @for (comment of comments(); track comment.id) {
         <div class="flex items-start gap-3">
-          <div class="w-8 h-8 rounded-full bg-base-200 border border-base-content/10 text-accent flex items-center justify-center text-xs font-bold shadow-sm">
+          <div class="w-8 h-8 rounded-full bg-base-100 border border-base-content/20 text-accent flex items-center justify-center text-xs font-bold">
             {{ comment.author.charAt(0).toUpperCase() }}
           </div>
           <div class="flex flex-col flex-1">
@@ -45,7 +45,7 @@ import { TaskComment } from '../../../core/models/comment.model';
               <span class="text-base-content/70 mx-1">added a comment</span>
             </div>
             <div class="text-xs text-base-content/70 mb-1.5 mt-0.5">{{ comment.createdAt | date:'short' }}</div>
-            <div class="bg-base-300 border border-base-content/10 shadow-sm rounded-md p-3 text-sm text-base-content prose prose-sm max-w-none" [innerHTML]="comment.content"></div>
+            <div class="bg-base-200 border border-base-content/20 rounded-md p-3 text-sm text-base-content prose prose-sm max-w-none" [innerHTML]="comment.content"></div>
           </div>
         </div>
       }

@@ -1,6 +1,5 @@
-<section class="dashboard-page flex flex-col bg-base-100 rounded-box gap-2 overflow-y-auto max-h-[calc(85vh)] p-top-0">
-  <app-custom-datepicker></app-custom-datepicker>
-  <div class="header bg-base-200 w-full text-base-content sticky top-0 z-1 p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-300">
+<section class="dashboard-page flex flex-col rounded-box gap-2 overflow-y-auto max-h-[calc(85vh)] p-top-0 scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-base-200">
+  <div class="header backdrop-blur-md bg-base-100/70 w-full text-base-content sticky top-0 z-1 p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-content/20">
     <div>
       <h1 class="text-2xl font-bold mb-1">Dashboard</h1>
       <p class="text-base-content/70 text-sm font-medium">Plan, Prioritize, and Track Your Tasks</p>
@@ -18,10 +17,10 @@
     <p class="rounded-box bg-error/10 p-4 text-sm font-medium text-error shadow-sm border border-error/20">{{ store.hasError() }}</p>
   }
   
-  <div class="rounded-b-box bg-base-200 p-4 text-sm font-medium text-base-content/70 shadow-sm border border-base-300">
+  <div class="rounded-b-box bg-base-100 p-4 text-sm font-medium text-base-content/70 shadow-sm border border-base-content/20 flex flex-col gap-4">
     <div class="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 p-3">
       
-      <div class="card p-5 bg-base-content/5 rounded-box border border-base-300 hover:border-info/50 transition-all">
+      <div class="card p-5 bg-base-100 rounded-box border border-base-content/20 hover:border-info/50 transition-all">
         <div class="card-header flex gap-3 pb-3 items-center justify-between text-center">
           <h2 class="card-title font-bold text-base-content">Tasks Due Today</h2>
           </div>
@@ -31,7 +30,7 @@
         </div>
       </div>
 
-      <div class="card p-5 bg-base-content/5 rounded-box border border-base-300 hover:border-error/50 transition-all">
+      <div class="card p-5 bg-base-100 rounded-box border border-base-content/20 hover:border-error/50 transition-all">
         <div class="card-header flex gap-2 pb-3 items-center justify-between text-center">
           <h2 class="card-title font-bold text-base-content">Overdue Tasks</h2>
           </div>
@@ -41,7 +40,7 @@
         </div>
       </div>
 
-      <div class="card p-5 bg-base-content/5 rounded-box border border-base-300 hover:border-warning/50 transition-all">
+      <div class="card p-5 bg-base-100 rounded-box border border-base-content/20 hover:border-warning/50 transition-all">
         <div class="card-header flex gap-2 pb-3 text-center items-center justify-between">
           <h2 class="card-title font-bold text-base-content">Active Boards</h2>
           </div>
@@ -51,7 +50,7 @@
         </div>
       </div>
 
-      <div class="card p-5 bg-base-content/5 rounded-box border border-base-300 hover:border-success/50 transition-all">
+      <div class="card p-5 bg-base-100 rounded-box border border-base-content/20 hover:border-success/50 transition-all">
         <div class="card-header flex gap-2 pb-3 text-center items-center justify-between">
           <h2 class="card-title font-bold text-base-content">Completed Tasks</h2>
           </div>
@@ -62,20 +61,20 @@
       </div>
     </div>
     
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-2 p-2">
-      <div class="task-table col-span-2 flex flex-col gap-3">
+    <div class="flex flex-col lg:flex-row gap-5 mt-2 p-2">
+      <div class="task-table col-span-2 flex flex-col gap-3 flex-1 min-w-[300px]">
         <div class="table-header flex items-center justify-between px-1">
           <h2 class="text-xl font-extrabold text-base-content">My Tasks</h2>
         </div>
-        <div class="table-body bg-base-200 shadow-sm rounded-box border border-base-100 overflow-hidden">
+        <div class="table-body bg-base-100 shadow-sm rounded-box border border-base-content/20 overflow-hidden">
           
           @if (store.recentTaskRows().length === 0) {
             <p class="p-8 text-sm font-medium text-base-content/60 text-center">No tasks available yet.</p>
           } @else {
             <div class="overflow-x-auto">
               <table class="w-full min-w-[680px]">
-                <thead class="bg-base-300/40 border-b border-base-300">
-                  <tr class="text-left text-base-content/60 text-xs font-bold uppercase tracking-wider">
+                <thead class="bg-base-300 border-b border-base-content/20">
+                  <tr class="text-left text-base-content/40 text-xs font-bold uppercase tracking-wider">
                     <th class="p-4">Task</th>
                     <th class="p-4">Board</th>
                     <th class="p-4">Due Date</th>
@@ -84,10 +83,10 @@
                     <th class="p-4">Actions</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-base-300">
+                <tbody class="divide-y divide-base-content/20">
                   
                   @for (task of store.recentTaskRows(); track task.id) {
-                    <tr class="hover:bg-base-300/30 transition-colors group">
+                    <tr class="hover:bg-base-200 transition-colors group">
                       <td class="p-4 flex items-center gap-3 text-sm font-semibold text-base-content">
                         <span class="status-indicator w-2.5 h-2.5 rounded-full inline-block shrink-0 shadow-sm" [class.bg-success]="task.isCompleted" [class.bg-primary]="!task.isCompleted"></span>
                         {{ task.title }}
@@ -116,19 +115,19 @@
         </div>
       </div>
 
-      <div class="activity-table flex flex-col gap-3 ">
+      <div class="activity-table flex flex-col gap-3 min-w-[300px]">
         <div class="table-header flex items-center justify-between px-1">
           <h2 class="text-xl font-extrabold text-base-content">Recent Activity</h2>
         </div>
-        <div class="table-body bg-base-200 shadow-sm rounded-box border border-base-300 overflow-hidden h-full">
+        <div class="table-body bg-base-100 shadow-sm rounded-box border border-base-content/20 overflow-hidden h-full">
           
           @if (store.activities().length === 0) {
             <p class="p-8 text-sm font-medium text-base-content/60 text-center">No recent activity found.</p>
           } @else {
-            <ul class="divide-y divide-base-300 max-h-[400px] overflow-y-auto">
+            <ul class="divide-y divide-base-content/20 max-h-[400px] overflow-y-auto">
               
               @for (item of store.activities(); track item._id ?? item.id ?? item.createdAt) {
-                <li class="flex items-start justify-between gap-4 p-4 hover:bg-base-300/30 transition-colors">
+                <li class="flex items-start justify-between gap-4 p-4 hover:bg-base-200 transition-colors">
                   <div class="flex items-start gap-3 min-w-0">
                     <span class="activity-icon bg-primary w-2 h-2 mt-1.5 rounded-full inline-block shrink-0 shadow-sm"></span>
                     <span class="truncate text-sm font-medium text-base-content">{{ describeActivity(item) }}</span>

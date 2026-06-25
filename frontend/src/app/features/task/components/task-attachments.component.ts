@@ -13,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         @for (file of attachments(); track file.name) {
           <div
-            class="flex items-center gap-3 p-2 rounded-md border border-base-content/10 hover:bg-base-200 transition-colors cursor-pointer group"
+            class="flex items-center gap-3 p-2 rounded-md border border-base-content/20 hover:bg-base-200 transition-colors cursor-pointer group"
           >
             <div
               class="w-12 h-12 bg-base-200 rounded flex items-center justify-center flex-shrink-0 text-base-content/70 group-hover:text-base-content transition-colors"

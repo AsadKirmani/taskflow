@@ -9,6 +9,7 @@ import {
   signRefreshTokenJwt,
   verifyRefreshTokenJwt,
 } from "./jwt.service";
+import { UserModel } from "../../models/user.model";
 
 const buildRefreshExpiryDate = (): Date => {
   const expiresAt = new Date();
@@ -86,8 +87,6 @@ export const authService = {
     meta?: { ip?: string; userAgent?: string },
   ) {
     const user = await authRepository.findUserByEmail(input.email);
-    console.time("login");
-    console.timeLog("login", "findUser");
 
     if (!user) {
       throw new AppError("Invalid credentials", 401, "INVALID_CREDENTIALS");
@@ -97,7 +96,6 @@ export const authService = {
       input.password,
       user.passwordHash,
     );
-    console.timeLog("login", "bcrypt");
 
     if (!isPasswordValid) {
       throw new AppError("Invalid credentials", 401, "INVALID_CREDENTIALS");
@@ -122,9 +120,8 @@ export const authService = {
       createdByIp: meta?.ip ?? null,
       userAgent: meta?.userAgent ?? null,
     });
-    console.timeLog("login", "createRefreshToken");
-
-    console.timeEnd("login");
+    await authRepository.cleanupExpiredTokens(user._id.toString());
+    await UserModel.findByIdAndUpdate(user._id.toString(), { lastLoginAt: new Date() });
     return {
       user: sanitizeUser(user),
       accessToken,
@@ -139,6 +136,37 @@ export const authService = {
       throw new AppError("User not found", 404, "USER_NOT_FOUND");
     }
     return sanitizeUser(user);
+  },
+  async updatePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const user = await authRepository.findUserById(userId);
+    if (!user) {
+      throw new AppError("User not found", 404, "USER_NOT_FOUND");
+    }
+
+    const isPasswordValid = await comparePassword(
+      currentPassword,
+      user.passwordHash,
+    );
+    if (!isPasswordValid) {
+      throw new AppError("Invalid current password", 401, "INVALID_CURRENT_PASSWORD");
+    }
+    if (await comparePassword(newPassword, user.passwordHash)) {
+  throw new AppError("New password cannot be the same as current password", 400, "SAME_PASSWORD");
+}
+    const newPasswordHash = await hashPassword(newPassword);
+    const updatedUser = await authRepository.updateUserPassword(userId, newPasswordHash);
+    return sanitizeUser(updatedUser);
+  },
+  async updateProfile(
+    userId: string,
+    data: { name?: string; email?: string, avatarUrl?: string, preferences?: any },
+  ) {
+    const updatedUser = await authRepository.updateUserProfile(userId, data);
+    return sanitizeUser(updatedUser);
   },
   async refresh(
     refreshToken: string,

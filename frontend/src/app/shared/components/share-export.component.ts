@@ -9,7 +9,7 @@ import { ExportService } from '../../core/services/export.service';
   imports: [CommonModule, MatIconModule],
   template: `
     <div class="w-full rounded-lg transition-all duration-200 overflow-hidden mt-2 border"
-         [class.border-base-content/30]="isOpen()"
+         [class.border-base-content/20]="isOpen()"
          [class.border-none]="!isOpen()"
          [class.bg-base-200]="isOpen()"
          [class.bg-base-100]="!isOpen()">
@@ -31,7 +31,7 @@ import { ExportService } from '../../core/services/export.service';
       </button>
 
       @if (isOpen()) {
-        <div class="bg-base-100 border-t border-base-content/30 pb-1 px-1.5 rounded-b-lg transition-all duration-200">
+        <div class="bg-base-100 border-t border-base-content/20 pb-1 px-1.5 rounded-b-lg transition-all duration-200">
           
           <div class="px-3 pt-3 pb-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Share</div>
           <button 
@@ -41,7 +41,7 @@ import { ExportService } from '../../core/services/export.service';
             <span>{{ copied() ? 'Link Copied!' : 'Copy Link' }}</span>
           </button>
           
-          <div class="border-t border-base-content/30 mx-3 my-1"></div>
+          <div class="border-t border-base-content/20 mx-3 my-1"></div>
           
           <div class="px-3 pt-2 pb-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Export</div>
           <button 

@@ -115,6 +115,8 @@ async login(req: Request, res: Response) {
           id: user.id,
           name: user.name,
           email: user.email,
+          avatarUrl: user.avatarUrl,
+          preferences: user.preferences,
         },
         workspaces: memberships.map((m) => ({
           id: m.workspaceId._id,
@@ -131,7 +133,40 @@ async login(req: Request, res: Response) {
     // 5. User ko response bhejo
     return res.status(200).json(responsePayload);
 },
-
+   async updateUserPassword(req: Request, res: Response) {
+    const { currentPassword, newPassword } = req.body;
+    const updatedUser = await authService.updatePassword(req.auth!.userId, currentPassword, newPassword);
+    return res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+      data: {
+        user: updatedUser,
+      },
+    });
+  },
+   async updateProfile(req: Request, res: Response) {
+    const { name, email, avatarUrl, preferences } = req.body;
+    const userId = req.auth!.userId;
+    const updatedUser = await authService.updateProfile(userId, { name, email, avatarUrl, preferences });
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: {
+        user: updatedUser,
+      },
+    });
+  },
+  async updatePassword(req: Request, res: Response) {
+    const { currentPassword, newPassword } = req.body;
+    const updatedUser = await authService.updatePassword(req.auth!.userId, currentPassword, newPassword);
+    return res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+      data: {
+        user: updatedUser,
+      },
+    });
+  },
   async refresh(req: Request, res: Response) {
     const refreshToken = req.cookies?.[jwtConfig.refreshCookieName];
 

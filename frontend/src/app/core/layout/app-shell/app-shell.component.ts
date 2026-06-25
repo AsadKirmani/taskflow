@@ -10,12 +10,12 @@ import { filter } from 'rxjs';
   standalone: true,
   imports: [RouterOutlet, SidebarComponent, NavbarComponent],
   template: `
-  <div class="flex w-screen h-screen overflow-hidden bg-slate-50 relative">
+  <div class="flex w-screen h-screen overflow-hidden relative">
     
     @if (isMobile() && isSidebarOpen()) {
       <div 
         (click)="isSidebarOpen.set(false)"
-        class="fixed inset-0 bg-slate-950/40 z-40 transition-opacity duration-300 md:hidden">
+        class="fixed inset-0 bg-base-content/40  z-40 transition-opacity duration-300 md:hidden">
       </div>
     }
 
@@ -28,7 +28,7 @@ import { filter } from 'rxjs';
       [class.z-50]="isMobile()"
       [class.translate-x-0]="isMobile() && isSidebarOpen()"
       [class.-translate-x-full]="isMobile() && !isSidebarOpen()"
-      class="h-full bg-base-100 transition-all duration-300 ease-in-out border-r border-base-content/10 shadow-none">
+      class="h-full bg-base-100 transition-all duration-300 ease-in-out border-r border-base-content/20 shadow-none">
       
       <app-sidebar 
         [isCollapsed]="!isSidebarOpen() && !isMobile()" 
@@ -41,7 +41,7 @@ import { filter } from 'rxjs';
       
       <app-navbar (menuToggle)="toggleMobileSidebar()"></app-navbar>
       
-      <main class="flex-1 overflow-auto p-4 min-h-0 bg-base-100">
+      <main class="flex-1 overflow-auto p-4 min-h-0 bg-base-200">
         <router-outlet />
       </main>
       

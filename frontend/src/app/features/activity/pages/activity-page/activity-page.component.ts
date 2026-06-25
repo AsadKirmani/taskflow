@@ -9,10 +9,10 @@ import { ActivityStore } from '../../data-access/activity-store.service'; // ðŸš
   imports: [DatePipe, RouterLink],
   providers: [ActivityStore], // Optional: Agar global chahiye toh hata dena
   template: `
-    <section class="rounded-box flex flex-col gap-2 overflow-y-auto max-h-[83vh] p-top-0">
-      <header class="header bg-base-200 w-full text-base-content sticky top-0 z-1 p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-300">
+    <section class="rounded-box flex flex-col gap-2 overflow-y-auto max-h-[83vh] p-top-0 scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-base-200">
+      <header class="header backdrop-blur-md bg-base-100/70 w-full text-base-content sticky top-0 z-1 p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-content/20 ">
         <div class="min-w-0">
-          <h1 class="text-lg sm:text-xl font-semibold text-base-content">Activity</h1>
+          <h1 class="text-2xl font-semibold text-base-content mb-1">Activity</h1>
           <p class="text-sm text-base-content/70">
             @if (store.currentBoardId()) {
               Board activity feed
@@ -30,7 +30,7 @@ import { ActivityStore } from '../../data-access/activity-store.service'; // ðŸš
         }
       </header>
 
-      <div class="flex-1 rounded-b-box bg-base-200 p-3 shadow-sm">
+      <div class="flex-1 rounded-b-box bg-base-100 p-3 shadow-sm border border-base-content/20">
         @if (store.isLoading()) {
           <p class="text-sm text-base-content/70">Loading activity...</p>
         } @else if (store.hasError()) {
@@ -40,7 +40,7 @@ import { ActivityStore } from '../../data-access/activity-store.service'; // ðŸš
         } @else {
           <ul class="space-y-2">
             @for (item of store.uiItems(); track item.id) {
-              <li class="rounded-box border border-base-content/10 p-3 hover:bg-base-100 transition-colors">
+              <li class="rounded-box border border-base-content/20 p-3 hover:bg-base-200 transition-colors">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div class="min-w-0">
                     <p class="text-sm font-medium text-base-content">{{ item.description }}</p>

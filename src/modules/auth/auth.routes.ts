@@ -13,5 +13,6 @@ router.get('/me', authMiddleware, asyncHandler(authController.me));
 router.post('/refresh-token', asyncHandler(authController.refresh));
 router.post('/logout', asyncHandler(authController.logout));
 router.post('/logout-all', authMiddleware, asyncHandler(authController.logoutAll));
-
+router.patch('/reset-password', authMiddleware, asyncHandler(authController.updatePassword));
+router.patch('/update-profile', authMiddleware, asyncHandler(authController.updateProfile));
 export default router;

@@ -10,7 +10,7 @@ import { TaskDates } from '../../../../shared/components/datepicker/custom-datep
   template: `
     <div class="relative overflow-hidden group w-full">
       <input #datePicker type="date" [value]="currentDate" (change)="onChange($event)" class="absolute opacity-0 w-0 h-0 pointer-events-none" />
-      <button (click)="openPicker(datePicker)" class="flex items-center gap-1.5 bg-base-100 group-hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-content/10 w-full">
+      <button (click)="openPicker(datePicker)" class="flex items-center gap-1.5 bg-base-100 group-hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-content/20 w-full">
         <mat-icon>schedule</mat-icon> Dates
       </button>
     </div>

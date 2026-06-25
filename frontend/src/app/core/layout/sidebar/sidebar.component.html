@@ -1,5 +1,5 @@
 <nav
-  class="h-full overflow-y-auto bg-base-100 py-5 text-stone-600 transition-all duration-300"
+  class="h-full overflow-y-auto bg-base-200 py-5 text-stone-600 transition-all duration-300"
   [class.px-4]="!isCollapsed()"
   [class.px-2]="isCollapsed()"
 >
@@ -12,13 +12,13 @@
     }
   </div>
 
-  <div class="space-y-1 border-t border-base-content/10 pt-3">
+  <div class="space-y-1 border-t border-base-content/20 pt-3">
     <a
       #dashboardRla="routerLinkActive"
       [class]="
         dashboardRla.isActive
-          ? 'bg-base-content/20 text-base-content'
-          : 'text-base-content/70 hover:bg-base-content/10 hover:text-base-content/90'
+          ? 'bg-base-content text-base-100'
+          : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
       "
       class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
       [class.px-3]="!isCollapsed()"
@@ -42,8 +42,8 @@
       #boardsRla="routerLinkActive"
       [class]="
         boardsRla.isActive
-          ? 'bg-base-content/20 text-base-content'
-          : 'text-base-content/70 hover:bg-base-content/10 hover:text-base-content/90'
+          ? 'bg-base-content text-base-100'
+          : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
       "
       class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
       [class.px-3]="!isCollapsed()"
@@ -67,8 +67,8 @@
 #activityRla="routerLinkActive"
 [class]="
 activityRla.isActive
-? 'bg-base-content/20 text-base-content'
-: 'text-base-content/70 hover:bg-base-content/10 hover:text-base-content/90'
+? 'bg-base-content text-base-100'
+: 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
 "
 class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
 [class.px-3]="!isCollapsed()"
@@ -92,8 +92,8 @@ routerLinkActive="active"
     #settingsRla="routerLinkActive"
       [class]="
       settingsRla.isActive
-      ? 'bg-base-content/20 text-base-content'
-      : 'text-base-content/70 hover:bg-base-content/10 hover:text-base-content/90'
+      ? 'bg-base-content text-base-100'
+      : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
       "
       class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
       [class.px-3]="!isCollapsed()"
@@ -113,7 +113,7 @@ routerLinkActive="active"
     </a>
   </div>
   
-  <section class="mt-6 border-t border-base-content/10 pt-4">
+  <section class="mt-6 border-t border-base-content/20 pt-4">
     @if (!isCollapsed()) {
       <p class="mb-3 px-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-base-content/70">
         Workspaces
@@ -125,7 +125,7 @@ routerLinkActive="active"
     <div class="space-y-2">
       @for (workspace of workspaceStore.workspaces(); track workspace.id) {
         <article
-        class="overflow-hidden border border-base-content/10 transition-colors hover:border-accent"
+        class="overflow-hidden border border-base-content/20 transition-colors hover:border-primary bg-base-100"
         [class.rounded-2xl]="!isCollapsed()"
           [class.rounded-full]="isCollapsed()"
           >
@@ -172,12 +172,12 @@ routerLinkActive="active"
         </button>
         
         @if (!isCollapsed() && isWorkspaceOpen(workspace.id)) {
-          <div class="border-t border-base-content/10 bg-base-300 px-2 py-2.5 space-y-1">
+          <div class="border-t border-base-content/20 bg-base-200 px-2 py-2.5 space-y-1">
             <a
-            class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-base-content/70 hover:bg-base-content/10 hover:text-base-content"
+            class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors"
             [routerLink]="['/w', workspace.id, 'boards']"
             (click)="navigate.emit()"
-            routerLinkActive="bg-base-100 text-base-content font-semibold shadow-sm"
+            routerLinkActive="bg-base-content text-base-100 shadow-sm"
             >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-kanban" viewBox="0 0 16 16">
               <path d="M13.5 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm-11-1a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
@@ -186,10 +186,10 @@ routerLinkActive="active"
           <span>Boards</span>
         </a>
         <a
-        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-base-content/70 hover:bg-base-content/10 hover:text-base-content"
+        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors"
         [routerLink]="['/w', workspace.id, 'activity']"
         (click)="navigate.emit()"
-        routerLinkActive="bg-base-100 text-base-content font-semibold shadow-sm"
+        routerLinkActive="bg-base-content text-base-100 shadow-sm"
         >
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
   <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
@@ -198,10 +198,10 @@ routerLinkActive="active"
                 <span>Activity</span>
               </a>
               <a
-                class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-base-content/70 hover:bg-base-content/10 hover:text-base-content"
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm  font-medium transition-colors"
                 [routerLink]="['/w', workspace.id, 'settings']"
                 (click)="navigate.emit()"
-                routerLinkActive="bg-base-200 text-base-content font-semibold shadow-sm"
+                routerLinkActive="bg-base-content text-base-100 shadow-sm"
               >
                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
   <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>

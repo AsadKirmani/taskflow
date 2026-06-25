@@ -5,7 +5,7 @@
   (dragover)="$event.preventDefault()"
   (dragenter)="$event.preventDefault()"
   [class.opacity-50]="isDragging()"
-  class="task-card shadow rounded-lg text-start text-base-content p-2 bg-base-100 mb-2 group cursor-grab active:cursor-grabbing transition-shadow hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 hover:ring-offset-white"
+  class="task-card shadow rounded-lg text-start text-base-content p-2 bg-base-100 mb-2 group cursor-grab active:cursor-grabbing transition-shadow hover:ring-2 hover:ring-primary hover:ring-offset-2 hover:ring-offset-base-200"
   (click)="openOverlay.emit()"
 >
   @if (!isEditing()) {

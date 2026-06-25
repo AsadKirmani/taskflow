@@ -16,7 +16,7 @@ import { TextEditorComponent } from '../../../shared/components/editor/text-edit
         @if (!isEditing()) {
           <div 
             (click)="enableEdit()"
-            class="bg-base-100 hover:bg-base-200 border border-base-content/10 hover:border-base-content/30 min-h-[5rem] rounded-md p-4 text-sm cursor-pointer transition-colors prose prose-sm max-w-none text-base-content"
+            class="bg-base-100 hover:bg-base-200 border border-base-content/20 min-h-[5rem] rounded-md p-4 text-sm cursor-pointer transition-colors prose prose-sm max-w-none text-base-content"
             [innerHTML]="description() || 'Add a more detailed description...'">
           </div>
         } @else {

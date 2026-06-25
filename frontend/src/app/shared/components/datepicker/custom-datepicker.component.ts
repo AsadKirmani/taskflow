@@ -33,7 +33,6 @@ export class CustomDatepickerComponent implements OnInit {
   private calendarService = inject(CalendarService);
   private datePipe = inject(DatePipe);
    
-  isOpen = signal(false);
   // Output Event
   dateApplied = output<TaskDates>();
   

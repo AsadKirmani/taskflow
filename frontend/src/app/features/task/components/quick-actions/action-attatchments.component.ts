@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [MatIconModule, CommonModule],
   template: `
-    <button (click)="fileInput.click()" class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-content/10 w-full">
+    <button (click)="fileInput.click()" class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-content/20 w-full">
       <mat-icon>attach_file</mat-icon> 
       Attach
     </button>

@@ -11,7 +11,7 @@ import { DatePipe } from "@angular/common";
           
             <div class="flex items-center gap-2 group w-fit">
               <div
-                class="flex items-center gap-2 bg-base-200/50 border border-base-content/30 text-base-content p-1 rounded-md"
+                class="flex items-center gap-2 bg-base-200/50 border border-base-content/20 text-base-content p-1 rounded-md"
               >
                 <mat-icon>schedule</mat-icon
                 >

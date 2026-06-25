@@ -12,28 +12,28 @@ import { AvatarComponent } from '../../../shared/components/avatar.component';
   standalone: true,
   imports: [MatIconModule, UserMenuComponent, CommonModule, SearchOverlayComponent, AvatarComponent],
   template: `
-    <header class="sticky top-0 z-10 bg-base-100 p-4">
+    <header class="sticky top-0 z-10 bg-base-200 p-4">
     <div class="flex flex-col gap-3 flex-row items-center justify-between">
     <div class="flex w-full items-center gap-2 sm:w-auto">
-      <button type="button" aria-label="Toggle sidebar" (click)="menuToggle.emit()" class="p-2 rounded-full hover:bg-base-200 text-base-content/70 hover:text-primary transition-colors flex items-center justify-center shrink-0">
+      <button type="button" aria-label="Toggle sidebar" (click)="menuToggle.emit()" class="p-2 rounded-full bg-base-100 text-base-content transition-colors hover:bg-base-300 flex items-center justify-center shrink-0">
        <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/>
 </svg>
       </button>
-      <span class="text-base-content/50 w-0.5 h-6 bg-base-content/50"></span>
+      <span class="w-0.5 h-6 bg-base-content/20"></span>
       <div class="relative rounded-full bg-base-100 text-base-content/50 flex sm:flex-none w-24 sm:w-64 md:w-80" (click)="searchOverlay.openSearch()">
         <svg class="w-6 h-6 absolute left-2 top-1/2 transform -translate-y-1/2 mr-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
 </svg>
 
-        <input type="text" placeholder="Search tasks..." class="w-full sm:w-64 md:w-80 pl-8 pr-4 py-2 rounded-full placeholder:text-base-content/50 placeholder:italic border border-base-content/30 focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-accent focus:border-accent transition-colors bg-transparent text-base-content" />
+        <input type="text" placeholder="Search tasks..." class="w-full sm:w-64 md:w-80 pl-8 pr-4 py-2 rounded-full placeholder:text-base-content/50 placeholder:italic border border-base-content/20 focus:outline-none focus:ring-2 focus:ring-primary/30 hover:border-primary focus:border-primary transition-colors bg-transparent text-base-content" />
       </div>
     </div>
     
     <div class="flex items-center justify-end gap-2">
     <button 
   (click)="themeService.toggleTheme()" 
-  class="p-2 rounded-full hover:bg-base-200 text-base-content/70 hover:text-primary transition-colors flex items-center justify-center border border-base-content/30"
+  class="p-2 rounded-full hover:bg-base-300 bg-base-100 text-base-content hover:text-primary transition-colors flex items-center justify-center border border-base-content/20"
   title="Toggle Theme"
 >
   @if (themeService.currentTheme() === 'light') {
@@ -43,11 +43,11 @@ import { AvatarComponent } from '../../../shared/components/avatar.component';
   }
 </button>
 
-    <button type="button" aria-label="Notifications" class="p-2 rounded-full hover:bg-base-200 text-base-content/70 hover:text-primary transition-colors flex items-center justify-center border border-base-content/30">
+    <button type="button" aria-label="Notifications" class="p-2 rounded-full hover:bg-base-300 text-base-content bg-base-100 hover:text-primary transition-colors flex items-center justify-center border border-base-content/20">
      <mat-icon>notifications_none</mat-icon>
         </button>
       <div class="relative group">
-        <button type="button" aria-label="User profile" class=" rounded-full hover:bg-base-200 text-base-content/70 hover:text-primary transition-colors flex items-center justify-center border border-base-content/30" (click)="toggleUserMenu($event)">
+        <button type="button" aria-label="User profile" class=" rounded-full hover:bg-base-200 text-base-content/70 hover:text-primary transition-colors flex items-center justify-center border border-base-content/20" (click)="toggleUserMenu($event)">
         <app-avatar [name]="authStore.currentUser()!.name" [title]="authStore.currentUser()!.name"></app-avatar>
 
         </button>

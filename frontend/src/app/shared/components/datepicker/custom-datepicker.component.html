@@ -1,11 +1,11 @@
 <div class="relative">
     <input type="text" readonly [value]="selectedRangeString()" (click)="togglePicker()" class="absolute opacity-0 w-0 h-0 pointer-events-none" />
-      <button (click)="togglePicker(); isOpen.set(!isOpen())" [class]="isOpen() ? 'bg-base-content text-base-100 hover:bg-base-content/90' : 'bg-base-100 text-base-content hover:bg-base-300'" class="flex items-center gap-1.5 bg-base-100 group-hover:bg-base-300 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-content/10 w-full">
+      <button (click)="showPicker.set(!showPicker())" [class]="showPicker() ? 'bg-base-content text-base-100 hover:bg-base-content/90' : 'bg-base-100 text-base-content hover:bg-base-300'" class="flex items-center gap-1.5 bg-base-100 group-hover:bg-base-300 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-content/20 w-full">
         <mat-icon class="text-[18px] w-[18px] h-[18px]">schedule</mat-icon> Dates
       </button>
   @if (showPicker()) {
-    <div class="absolute z-10 mt-2 p-4 w-[340px] bg-base-100 rounded-field shadow-2xl border border-base-content/10">
-      
+    <div class="absolute z-10 mt-2 p-4 w-[340px] bg-base-100 rounded-field shadow-2xl border border-base-content/20">
+      <div class="inset z-40 absolute bg-black/30" (click)="showPicker.set(false)"></div>
       <div class="flex items-center justify-between mb-4">
         <button (click)="prevMonth()" class="p-1 hover:bg-base-200 rounded-full transition-colors text-sm">◀</button>
         <span class="font-semibold text-sm text-base-content">{{ months[currentMonth()] }} {{ currentYear() }}</span>
@@ -83,7 +83,7 @@
         </button>
       </div>
 
-      <div class="mb-3 pt-2 border-t border-base-content/30 flex items-center justify-between">
+      <div class="mb-3 pt-2 border-t border-base-content/20 flex items-center justify-between">
         <label class="flex items-center gap-2 text-xs font-medium text-gray-600 cursor-pointer w-max">
           <input type="checkbox" [ngModel]="hasTime()" (ngModelChange)="hasTime.set($event)" class="rounded text-blue-600 focus:ring-blue-500">
           Include time
@@ -109,8 +109,8 @@
         </div>
       }
 
-      <div class="border-t border-base-content/30 pt-3 mt-2 flex justify-end space-x-2">
-        <button (click)="showPicker.set(false); isOpen.set(false);" class="px-3 py-1.5 text-xs text-base-content bg-base-200 hover:bg-base-300 rounded-box border border-base-content/30">Cancel</button>
+      <div class="border-t border-base-content/20 pt-3 mt-2 flex justify-end space-x-2">
+        <button (click)="showPicker.set(false);" class="px-3 py-1.5 text-xs text-base-content bg-base-200 hover:bg-base-300 rounded-box border border-base-content/20">Cancel</button>
         <button 
           (click)="onSave()" 
           [disabled]="!startDate() && !dueDate()"

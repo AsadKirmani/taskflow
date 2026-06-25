@@ -116,7 +116,9 @@ export const TaskStore = signalStore(
       pipe(
         debounceTime(300),
         distinctUntilChanged(),
-        switchMap((boardId) => {
+        switchMap(() => {
+          const boardId = store.currentBoardId();
+          if (!boardId) return of(null);
           patchState(store, { loading: true, error: null });
           const f = store.filters();
           
@@ -202,7 +204,7 @@ export const TaskStore = signalStore(
         const boardId = store.currentBoardId();
         if (boardId) {
           // Send a serialized string to trigger distinctUntilChanged in rxMethod
-          triggerFilterFetch(JSON.stringify(store.filters()) + boardId);
+          triggerFilterFetch(JSON.stringify(store.filters()));
         }
       },
 

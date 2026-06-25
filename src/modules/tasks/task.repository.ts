@@ -19,11 +19,25 @@ export const taskRepository = {
     });
     return newTask;
   },
+  
   async getTasksInBoard(boardId: string, filters?: TaskFilters) {
+    // Helper function se query object banwaya
+    const query = this.buildTaskQuery(boardId, filters);
+    
+    // DB mein seedha query pass ki aur data return kiya
+    const tasks = await TaskModel.find(query).sort({ position: 1, createdAt: 1 });
+    return tasks;
+  },
+  buildTaskQuery(boardId: string, filters?: TaskFilters): Record<string, unknown> {
     const andConditions: Record<string, unknown>[] = [];
     const now = new Date();
 
-    if (filters?.search) {
+    if (!filters) {
+      return { boardId }; // Agar filter nahi hai, toh seedha boardId return kardo
+    }
+
+    // --- Search ---
+    if (filters.search) {
       andConditions.push({
         $or: [
           { title: { $regex: filters.search, $options: 'i' } },
@@ -32,47 +46,50 @@ export const taskRepository = {
       });
     }
 
-    if (filters?.priorities?.length) {
+    // --- Priorities & Assignees ---
+    if (filters.priorities?.length) {
       andConditions.push({ priority: { $in: filters.priorities } });
     }
 
-    if (filters?.assigneeIds?.length) {
+    if (filters.assigneeIds?.length) {
       andConditions.push({ assigneeIds: { $in: filters.assigneeIds } });
     }
 
-    if (filters?.memberScope === 'no_members') {
+    if (filters.memberScope === 'no_members') {
       andConditions.push({ assigneeIds: { $size: 0 } });
     }
-
-    if (filters?.memberScope === 'me' && filters.currentUserId) {
+    
+    if (filters.memberScope === 'me' && filters.currentUserId) {
       andConditions.push({ assigneeIds: filters.currentUserId });
     }
 
-    if (filters?.completion === 'completed') {
+    // --- Completion Status ---
+    if (filters.completion === 'completed') {
       andConditions.push({ isCompleted: true });
     }
-
-    if (filters?.completion === 'incomplete') {
+    
+    if (filters.completion === 'incomplete') {
       andConditions.push({ isCompleted: false });
     }
 
-    if (filters?.dueType === 'none') {
+    // --- Due Dates ---
+    if (filters.dueType === 'none') {
       andConditions.push({ dueDate: null });
     }
-
-    if (filters?.dueType === 'overdue') {
+    
+    if (filters.dueType === 'overdue') {
       andConditions.push({ dueDate: { $lt: now } });
     }
-
-    if (filters?.dueType === 'today') {
+    
+    if (filters.dueType === 'today') {
       const start = new Date(now);
       start.setHours(0, 0, 0, 0);
       const end = new Date(start);
       end.setDate(end.getDate() + 1);
       andConditions.push({ dueDate: { $gte: start, $lt: end } });
     }
-
-    if (filters?.dueType === 'this_week') {
+    
+    if (filters.dueType === 'this_week') {
       const start = new Date(now);
       const day = start.getDay();
       const diffToMonday = day === 0 ? -6 : 1 - day;
@@ -84,12 +101,12 @@ export const taskRepository = {
       andConditions.push({ dueDate: { $gte: start, $lt: end } });
     }
 
-    if (filters?.labels?.length) {
+    // --- Labels ---
+    if (filters.labels?.length) {
       const labelConditions = filters.labels.map(label => {
         if (label === 'no_color') {
           return { labels: { $size: 0 } };
         }
-
         return {
           $or: [
             { labels: { $elemMatch: { name: new RegExp(`^${label}$`, 'i') } } },
@@ -97,11 +114,11 @@ export const taskRepository = {
           ]
         };
       });
-
       andConditions.push({ $or: labelConditions });
     }
-
-    if (filters?.activity?.length) {
+    
+    // --- Activity ---
+    if (filters.activity?.length) {
       const activityConditions: Record<string, unknown>[] = [];
 
       for (const type of filters.activity) {
@@ -132,15 +149,13 @@ export const taskRepository = {
         andConditions.push({ $or: activityConditions });
       }
     }
-
-    const query = andConditions.length
-      ? { boardId, $and: andConditions }
+    
+    // Final Query Object Return karo
+    return andConditions.length
+    ? { boardId, $and: andConditions }
       : { boardId };
-
-    const tasks = await TaskModel.find(query).sort({ position: 1, createdAt: 1 });
-    return tasks;
-  },
-  async getTaskById(taskId: string) {
+    },
+    async getTaskById(taskId: string) {
     const task = await TaskModel.findById(taskId);
     return task;
   },

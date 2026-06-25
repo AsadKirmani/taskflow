@@ -5,7 +5,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { ActivityItem, ActivityRef, formatActivityAction } from '../../../activity/models/activity.model';
-import { CustomDatepickerComponent } from '../../../../shared/components/datepicker/custom-datepicker.component';
 import { DashboardStore } from '../../data-access/dashboard-store.service';
 
 export interface DashboardTaskRow {
@@ -21,7 +20,7 @@ export interface DashboardTaskRow {
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, RouterLink, CustomDatepickerComponent],
+  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, RouterLink, ],
   templateUrl: './dashboard-page.component.html',
   styles: [`
     :host {

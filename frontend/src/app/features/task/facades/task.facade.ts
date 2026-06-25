@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, Signal, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, Signal, signal } from '@angular/core';
 import { TaskStore } from '../data-access/task-store.service';
 import { Task, TaskLabel } from '../../../core/models/task.model';
 import { BoardStore } from '../../boards/data-access/board-store.service';
@@ -13,7 +13,8 @@ export class TaskFacade {
   private taskStore = inject(TaskStore);
   private boardStore = inject(BoardStore);
   currentTask = signal<Task | null>(null);
-  boardMembers = computed(() => this.boardStore.members ?? []);
+  boardMembers = computed(() => this.boardStore.members() ?? []);
+  
   columnName = computed(
     () =>
       this.boardStore.currentColumns().find((col) => col.id === this.currentTask()?.columnId)
@@ -105,7 +106,6 @@ export class TaskFacade {
   }
   assignedMembers = computed<User[]>(() => {
     const members = this.boardStore.members() || [];
-
     const memberMap = new Map(members.map((member: User) => [member.id, member]));
     return (this.currentTask()?.assigneeIds || [])
       .map((id) => memberMap.get(id))

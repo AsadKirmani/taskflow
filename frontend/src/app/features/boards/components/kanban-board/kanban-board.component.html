@@ -1,6 +1,6 @@
 <section class="kanban-board h-full min-h-0 flex flex-col">
   <header
-    class="kanban-board__header mb-1 bg-base-200 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+    class="kanban-board__header mb-1 bg-base-100 border border-base-content/20 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
   >
     <div class="flex items-center gap-2 min-w-0 text-base-content">
       <h1 class="text-lg sm:text-2xl font-bold truncate m-0">{{ board()?.name }}</h1>
@@ -9,34 +9,32 @@
       <app-avatar name="User Name"></app-avatar>
       <button
         type="button"
-        class="filter-button text-base-content p-2 rounded-box transition-colors border-none cursor-pointer flex items-center justify-center"
-        [class.bg-base-content/30]="isFilterOpen()"
-        [class.hover:bg-base-300]="isFilterOpen()"
-        [class.hover:bg-base-100]="!isFilterOpen()"
+        class="filter-button text-base-content hover:bg-base-300 p-2 rounded-box transition-colors border-none cursor-pointer flex items-center justify-center"
+        [class.bg-base-300]="isFilterOpen()"
         [attr.aria-pressed]="isFilterOpen()"
         (click)="toggleFilterView($event)"
       >
         <mat-icon class="w-6 h-6">filter_list</mat-icon>
       </button>
       <button
-        class="star-button p-2 rounded-box hover:bg-base-100 border-none cursor-pointer flex items-center justify-center text-base-content"
+        class="star-button p-2 rounded-box hover:bg-base-300 border-none cursor-pointer flex items-center justify-center text-base-content"
       >
         
           <mat-icon class="w-6 h-6">star_border</mat-icon>
       </button>
       <button
-        class="visibility-button p-2 rounded-box hover:bg-base-100 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
+        class="visibility-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
       >
         
           <mat-icon class="w-6 h-6">visibility</mat-icon>
       </button>
       <button
-        class="share-button p-2 rounded-box hover:bg-base-100 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
+        class="share-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
       >
         <mat-icon class="w-6 h-6">person_add</mat-icon>
       </button>
       <button
-        class="more-button p-2 rounded-box hover:bg-base-100 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
+        class="more-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
       >
         
          <mat-icon class="w-6 h-6">more_horiz</mat-icon>
@@ -52,7 +50,7 @@
   }
 
   <div
-    class="kanban-board__columns flex-1 min-h-0 overflow-x-auto overflow-y-hidden flex items-start bg-base-200 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
+    class="kanban-board__columns flex-1 min-h-0 overflow-x-auto overflow-y-hidden border border-base-content/20 flex items-start bg-base-100 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
 
   >
    @for (column of columns(); track column.id; let i = $index) {
@@ -71,7 +69,7 @@
     }
 
     <div
-      class="bg-base-100 w-[85vw] sm:w-52 flex-shrink-0 hover:bg-base-300 p-2 rounded-box text-base-content border border-accent hover:border-accent hover:ring-accent/30 hover:ring-2 shadow transition-colors"
+      class="bg-base-100 w-[85vw] sm:w-52 flex-shrink-0 hover:bg-base-300 p-2 rounded-box text-base-content border border-base-content/20 hover:border-primary hover:ring-primary/30 hover:ring-2 shadow transition-colors"
     >
       @if (!isColumnInputOpen()) {
         <button
@@ -87,7 +85,7 @@
           <input
             type="text"
             appAutofocus
-            class="add-column__input p-2 shadow rounded-lg w-full h-12 outline-none ring-1 ring-base-content focus:ring-2 focus:ring-base-content focus:outline-none bg-base-100"
+            class="add-column__input p-2 shadow rounded-lg w-full h-12 outline-none ring-1 ring-base-content focus:ring-2 focus:ring-accent focus:outline-none bg-base-100"
             placeholder="Column title..."
             [value]="columnInputValue()"
             (input)="onColumnInputChange($event)"
@@ -98,14 +96,14 @@
           <div class="flex items-center justify-end gap-2">
             <button
               type="button"
-              class="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 border-none cursor-pointer text-gray-800"
+              class="text-xs px-2 py-1 rounded-box bg-base-200 hover:bg-base-300 border border-base-content/20 cursor-pointer text-base-content"
               (click)="closeColumnInput()"
             >
               Cancel
             </button>
             <button
               type="button"
-              class="text-xs px-2 py-1 rounded bg-blue-500 text-white hover:bg-blue-600 border-none cursor-pointer"
+              class="text-xs px-2 py-1 rounded-box bg-primary text-primary-content cursor-pointer"
               (click)="submitColumnInput()"
             >
               Add Column
