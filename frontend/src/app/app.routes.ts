@@ -3,6 +3,7 @@ import { AppShellComponent } from './core/layout/app-shell/app-shell.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { AcceptInviteComponent } from './features/workspace/components/accept-invite.component';
+import { LandingPageComponent } from './landing-page.component';
 
 export const appRoutes: Routes = [
   {
@@ -10,6 +11,11 @@ export const appRoutes: Routes = [
     canActivate: [guestGuard],
     loadChildren: () =>
       import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
+  },
+  {
+    path: '',
+    component: LandingPageComponent,
+    canActivate: [guestGuard]
   },
   {
     path: '',

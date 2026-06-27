@@ -9,8 +9,8 @@ import { ActivityStore } from '../../data-access/activity-store.service'; // ðŸš
   imports: [DatePipe, RouterLink],
   providers: [ActivityStore], // Optional: Agar global chahiye toh hata dena
   template: `
-    <section class="rounded-box flex flex-col gap-2 overflow-y-auto max-h-[83vh] p-top-0 scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-base-200">
-      <header class="header backdrop-blur-md bg-base-100/70 w-full text-base-content sticky top-0 z-1 p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-content/20 ">
+    <section class="rounded-box flex flex-col gap-2">
+      <header class="header bg-base-100 w-full text-base-content p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-content/20 ">
         <div class="min-w-0">
           <h1 class="text-2xl font-semibold text-base-content mb-1">Activity</h1>
           <p class="text-sm text-base-content/70">

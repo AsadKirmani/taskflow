@@ -12,7 +12,7 @@ import { AvatarComponent } from '../../../shared/components/avatar.component';
   standalone: true,
   imports: [MatIconModule, UserMenuComponent, CommonModule, SearchOverlayComponent, AvatarComponent],
   template: `
-    <header class="sticky top-0 z-10 bg-base-200 p-4">
+    <header class="sticky top-0 z-10 bg-base-200/70 p-4 backdrop-blur-lg border-b border-base-300">
     <div class="flex flex-col gap-3 flex-row items-center justify-between">
     <div class="flex w-full items-center gap-2 sm:w-auto">
       <button type="button" aria-label="Toggle sidebar" (click)="menuToggle.emit()" class="p-2 rounded-full bg-base-100 text-base-content transition-colors hover:bg-base-300 flex items-center justify-center shrink-0">
