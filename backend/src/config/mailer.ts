@@ -12,8 +12,8 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendInvitationEmail = async (to: string, workspaceName: string, inviterName: string, role: string, rawToken: string) => {
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
-  const inviteLink = `${frontendUrl}/invite/accept?token=${rawToken}`;
+  const baseUrl = process.env.BASE_URL || 'http://localhost:4200';
+  const inviteLink = `${baseUrl}/invite/accept?token=${rawToken}`;
 
   const mailOptions = {
     from: process.env.GOOGLE_APP_EMAIL,
