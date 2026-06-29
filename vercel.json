@@ -4,8 +4,7 @@
     "frontend": {
       "root": "frontend",
       "routePrefix": "/",
-      "framework": "angular",
-      "outputDirectory": "dist/taskflow/browser"
+      "framework": "angular"
     },
     "backend": {
       "root": "backend",
