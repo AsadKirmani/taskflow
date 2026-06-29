@@ -1,6 +1,6 @@
+/// <reference path="./shared/types/express.d.ts" />
 import app from './app';
 import { connectToDatabase } from './config/database';
-import express from 'express';
 
 const PORT = process.env.PORT || 5000;
 
