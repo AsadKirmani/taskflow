@@ -129,7 +129,7 @@ export class BoardApiService {
   reorderColumns(boardId: string, columnIds: string[]): Observable<ApiResponse<null>> {
     return this.http.patch<ApiResponse<null>>(
       `${this.baseUrl}/boards/${boardId}/reorder-columns`,
-      { columnIds },
+      { columnOrder: columnIds },
       { withCredentials: true }
     );
   }

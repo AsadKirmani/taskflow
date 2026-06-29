@@ -17,7 +17,7 @@ export const authGuard: CanActivateFn = () => {
       if (authStore.isAuthenticated()) {
         return true; // Aage jaane do
       }
-      return router.createUrlTree(['/auth/login']); // Login pe bhejo
+      return router.createUrlTree(['/']); // Login pe bhejo
     })
   );
 };

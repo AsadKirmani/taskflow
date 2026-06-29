@@ -5,7 +5,19 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { ActivityItem, ActivityRef, formatActivityAction } from '../../../activity/models/activity.model';
+import { UiPageLayoutComponent } from '../../../../ui/components/layout/ui-page-layout.component';
 import { DashboardStore } from '../../data-access/dashboard-store.service';
+import { UiPageContentComponent } from '../../../../ui/components/layout/ui-page-content.component';
+import { UiPageHeaderComponent } from '../../../../ui/components/layout/ui-page-header.component';
+import { UiStackComponent } from '../../../../ui/components/layout/ui-stack.component';
+import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
+import { UiBadgeComponent } from '../../../../ui/components/ui-badge.component';
+import { UiCardComponent } from '../../../../ui/components/ui-card.component';
+import { UiEmptyStateComponent } from '../../../../ui/components/ui-empty-state.component';
+import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.component';
+import { UiPageBodyComponent } from '../../../../ui/components/layout/ui-page-body.component';
+import { UiPanelComponent } from '../../../../ui/components/layout/ui-panel.component'
+import { UiStatCardComponent } from '../../../../ui/components/layout/ui-stat-card.component';
 
 export interface DashboardTaskRow {
   id: string;
@@ -20,7 +32,24 @@ export interface DashboardTaskRow {
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, RouterLink, ],
+  imports: [
+    CommonModule, 
+    MatCardModule, 
+    MatButtonModule, 
+    MatIconModule, 
+    RouterLink, 
+    UiPageLayoutComponent, 
+    UiPageHeaderComponent, 
+    UiPageContentComponent, 
+    UiButtonComponent, 
+    UiStackComponent, 
+    UiBadgeComponent, 
+    UiCardComponent, 
+    UiEmptyStateComponent, 
+    UiSkeletonComponent, 
+    UiPageBodyComponent, 
+    UiPanelComponent,
+    UiStatCardComponent],
   templateUrl: './dashboard-page.component.html',
   styles: [`
     :host {

@@ -14,7 +14,7 @@ export class UiBadgeComponent {
   variant = input<'neutral' | 'info' | 'success' | 'warning' | 'error'>('neutral');
   
   computedClasses = computed(() => {
-    const base = 'inline-flex items-center px-2.5 py-0.5 rounded-badge text-[11px] font-semibold tracking-wide border uppercase';
+    const base = 'inline-flex items-center px-2.5 py-0.5 rounded-badge text-xs font-semibold tracking-wide border uppercase';
     
     const variants = {
       neutral: 'bg-base-200 text-base-content/70 border-base-content/10',

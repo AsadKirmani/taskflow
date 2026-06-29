@@ -4,120 +4,54 @@ import { MatIconModule } from '@angular/material/icon';
 import { BoardColumn } from '../../../../core/models/column.model';
 import { Task } from '../../../../core/models/task.model';
 import { KanbanTaskComponent } from '../kanban-task/kanban-task.component';
-import { TaskDropEventPayload, ColumnDropEventPayload } from '../../models/drag-drop.model';
+import { TaskDropEventPayload } from '../../models/drag-drop.model';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
+import { ChangeDetectorRef } from '@angular/core';
+// 🚀 DragDropModule import kiya
+import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop'; 
 
 @Component({
   selector: 'app-kanban-column',
   standalone: true,
-  imports: [KanbanTaskComponent, CommonModule, AutofocusDirective, MatIconModule],
+  // 🚀 Imports me DragDropModule add kiya
+  imports: [KanbanTaskComponent, CommonModule, AutofocusDirective, MatIconModule, DragDropModule],
   templateUrl: './kanban-column.component.html'
 })
 export class KanbanColumnComponent {
+  private cdr = inject(ChangeDetectorRef);
   column = input.required<BoardColumn>();
   tasks = input<Task[]>([]);
   columnIndex = input.required<number>();
   hasActiveFilters = input<boolean>(false);
-
+  connectedTo = input<string[]>([]); // CDK DropList ke liye connected lists
+  // Sirf Task related outputs bachenge yahan
   nativeTaskDrop = output<TaskDropEventPayload>();
-  nativeColumnDrop = output<ColumnDropEventPayload>();
   taskAdded = output<string>();
   taskUpdated = output<{taskId: string, title: string}>();
   taskCompletionToggled = output<Task>();
   taskClicked = output<Task>();
-
-  private el = inject(ElementRef);
   
-  // 🚀 Local State converted to Signals
   isInputOpen = signal(false);
   inputValue = signal('');
-  isDragOver = signal(false);
 
-  onTaskDragOver(event: DragEvent) {
-    event.preventDefault();
-    this.isDragOver.set(true);
-  }
+  onTaskDrop(event: CdkDragDrop<any[]>) {
+  // Hum array mutations store pe chhod rahe hain (kyunki optimistic handle wahan hai)
+  // Hum seedha text representation ya task objects se store ke standard parameters bhejenge
+  const previousList = event.previousContainer.data;
+  const movedTask = previousList[event.previousIndex];
+  if (!movedTask){
+    console.error('No task found at index', event.previousIndex);
+    return;
+  } 
 
-  onTaskDragLeave(event: DragEvent) {
-    this.isDragOver.set(false);
-  }
-
-  // 🚀 FIX #1: Smart Drop Routing
-  onTaskDrop(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation(); // Event yahan rok liya...
-    this.isDragOver.set(false);
-
-    const dataStr = event.dataTransfer?.getData('application/json');
-    if (!dataStr) return;
-
-    try {
-      const data = JSON.parse(dataStr);
-      
-      // Agar Task drop hua hai
-      if (data.type === 'task') {
-        const targetIndex = this.calculateTaskDropIndex(event.clientY);
-        this.nativeTaskDrop.emit({
-          taskId: data.taskId,
-          sourceColumnId: data.sourceColumnId,
-          targetColumnId: this.column().id,
-          sourceIndex: data.sourceIndex,
-          targetIndex: targetIndex
-        });
-      } 
-      // 🚀 MAGIC: Agar user ne Column ko utha kar Task area me drop kar diya,
-      // toh hum usko silently Column Drop logic me bhej denge!
-      else if (data.type === 'column' && data.sourceIndex !== this.columnIndex()) {
-        this.nativeColumnDrop.emit({
-          fromIndex: data.sourceIndex,
-          toIndex: this.columnIndex()
-        });
-      }
-    } catch (e) {
-      console.error('Drag data parse error', e);
-    }
-  }
-
-  private calculateTaskDropIndex(clientY: number): number {
-    const taskCards = Array.from(this.el.nativeElement.querySelectorAll('app-kanban-task'));
-    for (let i = 0; i < taskCards.length; i++) {
-      const rect = (taskCards[i] as HTMLElement).getBoundingClientRect();
-      if (clientY < rect.top + rect.height / 2) {
-        return i;
-      }
-    }
-    return this.tasks().length;
-  }
-
-  onColumnDragStart(event: DragEvent) {
-    if (event.dataTransfer) {
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData('application/json', JSON.stringify({
-        type: 'column',
-        sourceIndex: this.columnIndex()
-      }));
-    }
-  }
-
-  onColumnDragOver(event: DragEvent) {
-    event.preventDefault();
-  }
-
-  onColumnDrop(event: DragEvent) {
-    event.preventDefault();
-    const dataStr = event.dataTransfer?.getData('application/json');
-    if (!dataStr) return;
-
-    try {
-      const data = JSON.parse(dataStr);
-      if (data.type === 'column' && data.sourceIndex !== this.columnIndex()) {
-        this.nativeColumnDrop.emit({
-          fromIndex: data.sourceIndex,
-          toIndex: this.columnIndex()
-        });
-      }
-    } catch (e) {}
-  }
+  this.nativeTaskDrop.emit({
+    taskId: movedTask.id,
+    sourceColumnId: event.previousContainer.id,
+    targetColumnId: event.container.id,
+    sourceIndex: event.previousIndex,
+    targetIndex: event.currentIndex
+  });
+}
 
   onInput(event: Event) { 
     this.inputValue.set((event.target as HTMLInputElement).value); 

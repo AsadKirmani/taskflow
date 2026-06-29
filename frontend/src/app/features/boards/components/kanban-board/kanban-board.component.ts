@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { MatIconModule } from '@angular/material/icon';
+// 🚀 CDK Imports for Board
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { Board } from '../../../../core/models/board.model';
 import { BoardColumn } from '../../../../core/models/column.model';
@@ -21,7 +23,8 @@ import { AvatarComponent } from '../../../../shared/components/avatar.component'
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  imports: [ApplyFilterComponent, CommonModule, TaskComponent, KanbanColumnComponent, MatIconModule, AutofocusDirective, AvatarComponent],
+  // 🚀 DragDropModule added here too
+  imports: [ApplyFilterComponent, CommonModule, TaskComponent, KanbanColumnComponent, MatIconModule, AutofocusDirective, AvatarComponent, DragDropModule],
   templateUrl: './kanban-board.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -31,13 +34,12 @@ export class KanbanBoardComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  // --- Inputs ---
   board = input<Board | null>(null);
   columns = input<BoardColumn[]>([]);
+  emptyArray = [];
   tasksByColumn = input<Record<string, Task[] | undefined>>({});
   loading = input<boolean>(false);
-  
-  // --- Outputs ---
+  columnIds = computed(() => this.columns().map(col => col.id));
   taskMoved = output<TaskDropEventPayload>();
   columnMoved = output<ColumnDropEventPayload>();
   taskAdded = output<AddTaskEventPayload>();
@@ -45,19 +47,16 @@ export class KanbanBoardComponent {
   taskUpdated = output<UpdateTaskEventPayload>();
   taskCompletionToggled = output<ToggleTaskCompletionEventPayload>();
   
-  // --- Local Reactive State (Signals) ---
   isColumnInputOpen = signal(false);
   columnInputValue = signal('');
   isFilterOpen = signal(false);
   hasActiveFilters = signal(false);
 
-  // 🚀 CLEANUP 1: RxJS to Signal (No Constructor, No DestroyRef needed)
   activeTaskOverlayId = toSignal(
     this.route.queryParamMap.pipe(map(params => params.get('taskId'))),
     { initialValue: null }
   );
 
-  // 🚀 CLEANUP 2: Expensive Getter converted to Highly Optimized Computed Signal
   activeTaskOverlay = computed(() => {
     const taskId = this.activeTaskOverlayId();
     if (!taskId) return null;
@@ -70,25 +69,33 @@ export class KanbanBoardComponent {
     return null;
   });
 
-  // --- Methods ---
-
-  toggleFilterView(event?: MouseEvent): void {
-    event?.stopPropagation();
-    this.isFilterOpen.update(v => !v);
+  // 🚀 COLUMN DROP LOGIC (Moved here from Column Component)
+  onColumnDrop(event: CdkDragDrop<BoardColumn[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+    
+    // UI update (Optimistic)
+    const currentColumns = [...this.columns()];
+    moveItemInArray(currentColumns, event.previousIndex, event.currentIndex);
+    
+    // Emit to store/facade to update API
+    this.columnMoved.emit({
+      fromIndex: event.previousIndex,
+      toIndex: event.currentIndex
+    });
   }
 
-  onColumnDropNative(payload: ColumnDropEventPayload): void {
-    if (payload.fromIndex === payload.toIndex) return;
-    this.columnMoved.emit(payload);
-  }
-
-  // 🚀 CLEANUP 3: Removed 10 lines of useless local array mutation (Dead Code)
-  onTaskDropNative(payload: TaskDropEventPayload): void {
+  // Pass-through for task drops
+  onTaskDrop(payload: TaskDropEventPayload): void {
     if (payload.sourceColumnId === payload.targetColumnId && payload.sourceIndex === payload.targetIndex) {
       return;
     }
-    // Parent/Store ka kaam hai arrays ko modify karna, Component ka nahi.
     this.taskMoved.emit(payload); 
+  }
+
+  // --- Baaki sab same ---
+  toggleFilterView(event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.isFilterOpen.update(v => !v);
   }
 
   submitTaskInput(columnId: string, title: string): void {
@@ -135,7 +142,6 @@ export class KanbanBoardComponent {
   }
 
   onFiltersChanged(selection: BoardFilterSelection): void {
-    // Signal set kiya
     this.hasActiveFilters.set(
       selection.noMembers || 
       selection.me || 

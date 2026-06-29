@@ -1,15 +1,12 @@
 <section class="dashboard-page flex flex-col rounded-box gap-1">
-  <div class="header bg-base-100 w-full text-base-content p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-300">
-    <div>
-      <h1 class="text-2xl font-bold mb-1">Dashboard</h1>
-      <p class="text-base-content/70 text-sm font-medium">Plan, Prioritize, and Track Your Tasks</p>
-    </div>
-    <div class="actions flex mt-3 sm:mt-0">
-      <a routerLink="/boards" class="bg-primary text-primary-content px-4 py-2 text-xs rounded-field hover:opacity-90 flex items-center gap-2 md:text-sm font-semibold transition-all">
-        Create
-      </a>
-    </div>
-  </div>
+  
+  <ui-page-header 
+    title="Dashboard" 
+    subtitle="Plan, Prioritize, and Track Your Tasks">
+    <a routerLink="/boards" class="bg-primary text-primary-content px-4 py-2 text-xs rounded-field hover:opacity-90 flex items-center gap-2 md:text-sm font-semibold transition-all">
+      Create
+    </a>
+  </ui-page-header>
 
   @if (store.isLoading()) {
     <p class="rounded-box bg-base-200 p-4 text-sm font-medium text-base-content/70 shadow-sm border border-base-300">Loading dashboard data...</p>
@@ -17,57 +14,43 @@
     <p class="rounded-box bg-error/10 p-4 text-sm font-medium text-error shadow-sm border border-error/20">{{ store.hasError() }}</p>
   }
   
-  <div class="rounded-b-box bg-base-100 p-4 text-sm font-medium text-base-content/70 shadow-sm border border-base-300 flex flex-col gap-4">
+  <ui-page-body>
     <div class="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 p-3">
       
-      <div class="card p-5 bg-base-100 rounded-box border border-base-300 hover:border-info/50 transition-all">
-        <div class="card-header flex gap-3 pb-3 items-center justify-between text-center">
-          <h2 class="card-title font-bold text-base-content">Tasks Due Today</h2>
-          </div>
-        <div class="card-body">
-          <p class="text-4xl font-extrabold text-base-content mb-1">{{ store.tasksDueToday() }}</p>
-          <p class="text-xs text-info font-bold tracking-wide uppercase">{{ store.newAssignmentsToday() }} New Assignments</p>
-        </div>
-      </div>
+      <ui-stat-card 
+        title="Tasks Due Today" 
+        [value]="store.tasksDueToday()" 
+        [subText]="store.newAssignmentsToday() + ' New Assignments'" 
+        variant="info" />
 
-      <div class="card p-5 bg-base-100 rounded-box border border-base-300 hover:border-error/50 transition-all">
-        <div class="card-header flex gap-2 pb-3 items-center justify-between text-center">
-          <h2 class="card-title font-bold text-base-content">Overdue Tasks</h2>
-          </div>
-        <div class="card-body">
-          <p class="text-4xl font-extrabold text-base-content mb-1">{{ store.overdueTasks() }}</p>
-          <p class="text-xs text-error font-bold tracking-wide uppercase">Pending deadlines</p>
-        </div>
-      </div>
+      <ui-stat-card 
+        title="Overdue Tasks" 
+        [value]="store.overdueTasks()" 
+        subText="Pending deadlines" 
+        variant="error" />
 
-      <div class="card p-5 bg-base-100 rounded-box border border-base-300 hover:border-warning/50 transition-all">
-        <div class="card-header flex gap-2 pb-3 text-center items-center justify-between">
-          <h2 class="card-title font-bold text-base-content">Active Boards</h2>
-          </div>
-        <div class="card-body items-center">
-          <p class="text-4xl font-extrabold text-base-content mb-1">{{ store.activeBoards() }}</p>
-          <p class="text-xs text-warning font-bold tracking-wide uppercase">Boards with tasks</p>
-        </div>
-      </div>
+      <ui-stat-card 
+        title="Active Boards" 
+        [value]="store.activeBoards()" 
+        subText="Boards with tasks" 
+        variant="warning" />
 
-      <div class="card p-5 bg-base-100 rounded-box border border-base-300 hover:border-success/50 transition-all">
-        <div class="card-header flex gap-2 pb-3 text-center items-center justify-between">
-          <h2 class="card-title font-bold text-base-content">Completed Tasks</h2>
-          </div>
-        <div class="card-body items-center">
-          <p class="text-4xl font-extrabold text-base-content mb-1">{{ store.completedTasks() }}</p>
-          <p class="text-xs text-success font-bold tracking-wide uppercase">{{ store.completedOnTime() }} On Time</p>
-        </div>
-      </div>
+      <ui-stat-card 
+        title="Completed Tasks" 
+        [value]="store.completedTasks()" 
+        [subText]="store.completedOnTime() + ' On Time'" 
+        variant="success" />
+
     </div>
     
     <div class="flex flex-col lg:flex-row gap-5 mt-2 p-2">
+      
       <div class="task-table col-span-2 flex flex-col gap-3 flex-1 min-w-[300px]">
         <div class="table-header flex items-center justify-between px-1">
           <h2 class="text-xl font-extrabold text-base-content">My Tasks</h2>
         </div>
-        <div class="table-body bg-base-100 rounded-box border border-base-300 overflow-hidden">
-          
+        
+        <ui-panel>
           @if (store.recentTaskRows().length === 0) {
             <p class="p-8 text-sm font-medium text-base-content/60 text-center">No tasks available yet.</p>
           } @else {
@@ -84,7 +67,6 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-base-300">
-                  
                   @for (task of store.recentTaskRows(); track task.id) {
                     <tr class="hover:bg-base-300 transition-colors group">
                       <td class="p-4 flex items-center gap-3 text-sm font-semibold text-base-content">
@@ -112,20 +94,19 @@
               </table>
             </div>
           }
-        </div>
+        </ui-panel>
       </div>
 
       <div class="activity-table flex flex-col gap-3 min-w-[300px]">
         <div class="table-header flex items-center justify-between px-1">
           <h2 class="text-xl font-extrabold text-base-content">Recent Activity</h2>
         </div>
-        <div class="table-body bg-base-100 rounded-box border border-base-300 overflow-hidden">
-          
+        
+        <ui-panel>
           @if (store.activities().length === 0) {
             <p class="p-8 text-sm font-medium text-base-content/60 text-center">No recent activity found.</p>
           } @else {
             <ul class="divide-y divide-base-300 max-h-[400px] overflow-y-auto">
-              
               @for (item of store.activities(); track item._id ?? item.id ?? item.createdAt) {
                 <li class="flex items-start justify-between gap-4 p-4 hover:bg-base-300 transition-colors">
                   <div class="flex items-start gap-3 min-w-0">
@@ -137,8 +118,9 @@
               }
             </ul>
           }
-        </div>
+        </ui-panel>
       </div>
+      
     </div>
-  </div>
+  </ui-page-body>
 </section>

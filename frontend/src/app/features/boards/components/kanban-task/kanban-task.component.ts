@@ -1,11 +1,15 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, ElementRef, inject, input, output, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Task } from '../../../../core/models/task.model';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
-  selector: 'app-task-card',
+  selector: 'app-kanban-task',
   standalone: true,
-  imports: [MatIconModule],
+  imports: [MatIconModule, DragDropModule],
+  host: {
+    'class': 'block w-full cursor-grab active:cursor-grabbing mb-2 select-none touch-none',
+  },
   templateUrl: './kanban-task.component.html'
 })
 export class KanbanTaskComponent {
@@ -18,8 +22,7 @@ export class KanbanTaskComponent {
 
   isEditing = signal(false);
   editValue = signal('');
-  isDragging = signal(false);
-
+  
   startEdit(event?: MouseEvent) {
     event?.stopPropagation();
     this.editValue.set(this.task().title);
@@ -40,23 +43,5 @@ export class KanbanTaskComponent {
 
   onInput(event: Event) {
     this.editValue.set((event.target as HTMLInputElement).value);
-  }
-  onDragStart(event: DragEvent) {
-    event.stopPropagation();
-    this.isDragging.set(true);
-    if (event.dataTransfer) {
-      event.dataTransfer.effectAllowed = 'move';
-      const payload = {
-        type: 'task',
-        taskId: this.task().id,
-        sourceColumnId: this.sourceColumnId(),
-        sourceIndex: this.columnIndex()
-      };
-      event.dataTransfer.setData('application/json', JSON.stringify(payload));
-    }
-  }
-
-  onDragEnd(event: DragEvent) {
-    this.isDragging.set(false);
   }
 }

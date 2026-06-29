@@ -1,11 +1,6 @@
 <article
-  draggable="true"
-  (dragstart)="onDragStart($event)"
-  (dragend)="onDragEnd($event)"
-  (dragover)="$event.preventDefault()"
-  (dragenter)="$event.preventDefault()"
-  [class.opacity-50]="isDragging()"
-  class="task-card shadow rounded-lg text-start text-base-content p-2 bg-base-100 mb-2 group cursor-grab active:cursor-grabbing transition-shadow hover:ring-2 hover:ring-primary hover:ring-offset-2 hover:ring-offset-base-200"
+  class="task-card shadow rounded-lg text-start text-base-content p-2 bg-base-100 group cursor-grab active:cursor-grabbing transition-shadow hover:ring-2 hover:ring-inset-2 hover:ring-primary overflow-hidden
+  [[.cdk-drag-placeholder]_&]:opacity-50"
   (click)="openOverlay.emit()"
 >
   @if (!isEditing()) {

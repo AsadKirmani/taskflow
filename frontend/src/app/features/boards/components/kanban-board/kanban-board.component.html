@@ -19,14 +19,12 @@
       <button
         class="star-button p-2 rounded-box hover:bg-base-300 border-none cursor-pointer flex items-center justify-center text-base-content"
       >
-        
-          <mat-icon class="w-6 h-6">star_border</mat-icon>
+        <mat-icon class="w-6 h-6">star_border</mat-icon>
       </button>
       <button
         class="visibility-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
       >
-        
-          <mat-icon class="w-6 h-6">visibility</mat-icon>
+        <mat-icon class="w-6 h-6">visibility</mat-icon>
       </button>
       <button
         class="share-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
@@ -36,8 +34,7 @@
       <button
         class="more-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
       >
-        
-         <mat-icon class="w-6 h-6">more_horiz</mat-icon>
+        <mat-icon class="w-6 h-6">more_horiz</mat-icon>
       </button>
     </div>
   </header>
@@ -51,19 +48,25 @@
 
   <div
     class="kanban-board__columns flex-1 min-h-0 overflow-x-auto overflow-y-hidden border border-base-content/20 flex items-start bg-base-100 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
-
-  >
-   @for (column of columns(); track column.id; let i = $index) {
+  cdkDropList
+  cdkDropListOrientation="horizontal"
+  (cdkDropListDropped)="onColumnDrop($event)"
+  #boardBoundary>
+    @for (column of columns(); track column.id; let i = $index) {
       <app-kanban-column
+        cdkDrag
         [columnIndex]="i"
+        [cdkDragBoundary]="boardBoundary"
         [column]="column"
+        [connectedTo]="columnIds()"
         [tasks]="tasksByColumn()[column.id] ?? []"
         (hasActiveFilters)="hasActiveFilters()"
-        (nativeTaskDrop)="onTaskDropNative($event)"
-        (nativeColumnDrop)="onColumnDropNative($event)"
+        (nativeTaskDrop)="onTaskDrop($event)"
         (taskAdded)="submitTaskInput(column.id, $event)"
         (taskUpdated)="taskUpdated.emit($event)"
-        (taskCompletionToggled)="taskCompletionToggled.emit({taskId: $event.id, isCompleted: !$event.isCompleted})"
+        (taskCompletionToggled)="
+          taskCompletionToggled.emit({ taskId: $event.id, isCompleted: !$event.isCompleted })
+        "
         (taskClicked)="openTaskOverlay($event)"
       ></app-kanban-column>
     }
@@ -77,8 +80,8 @@
           class="add-column__button w-full flex items-center justify-center border-none bg-transparent cursor-pointer font-medium p-2"
           (click)="openColumnInput()"
         >
-         <mat-icon class="w-4 h-4 mr-1">add</mat-icon>
-         Add Column
+          <mat-icon class="w-4 h-4 mr-1">add</mat-icon>
+          Add Column
         </button>
       } @else {
         <div class="flex flex-col gap-2">
@@ -116,5 +119,10 @@
 </section>
 
 @if (activeTaskOverlay(); as selectedTask) {
-  <app-task [task]="selectedTask" (closed)="closeTaskOverlay()" [workspaceId]="board()?.workspaceId ?? ''" [boardId]="board()?.id ?? ''"></app-task>
+  <app-task
+    [task]="selectedTask"
+    (closed)="closeTaskOverlay()"
+    [workspaceId]="board()?.workspaceId ?? ''"
+    [boardId]="board()?.id ?? ''"
+  ></app-task>
 }
