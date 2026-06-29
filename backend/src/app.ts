@@ -16,35 +16,9 @@ console.log('Server started', new Date().toISOString());
 
 const app = express();
 
-const corsOrigins = (process.env.CORS_ORIGINS || '')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean)
-  .map((origin) => origin.replace(/\/$/, ''));
-  
-const corsOriginSet = new Set(corsOrigins);
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) {
-        callback(null, true);
-        return;
-      }
-      const normalizedOrigin = origin.replace(/\/$/, '');
-      if (corsOriginSet.size === 0 || corsOriginSet.has(normalizedOrigin)) {
-        callback(null, true);
-        return;
-      }
-      
-      callback(new Error(`CORS blocked for origin: ${origin}`));
-    },
-    credentials: true
-  })
-);
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-
 
 app.get('/', (_req, res) => {
   res.json({
