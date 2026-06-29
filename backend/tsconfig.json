@@ -5,14 +5,13 @@
     "moduleResolution": "nodenext",
     "outDir": "dist",
     "rootDir": "src",
-    "strict": false,
-    "strictNullChecks": false,
+    "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["./node_modules/@types", "./src/shared/types"]
+    "typeRoots": ["./node_modules/@types", "./types"]
   },
-  "include": ["src/**/*", "src/shared/types/**/*.d.ts", "server.ts"],
+  "include": ["src/**/*", "types/**/*.d.ts", "server.ts"],
   "exclude": ["node_modules", "dist"]
 }
