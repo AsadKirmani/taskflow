@@ -8,7 +8,7 @@ const qstashClient = new Client({
 
 export const addInvitationEmailJob = async (email: string, workspaceName: string, inviterName: string, role: string, rawToken: string) => {
   
-    const baseUrl = process.env.BASE_URL;
+    const baseUrl = process.env.API_URL;
   await qstashClient.publishJSON({
     url: `${baseUrl}/api/v1/webhooks/send-invitation`,
     body: { email, workspaceName, inviterName, role, rawToken },

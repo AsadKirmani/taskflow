@@ -8,7 +8,7 @@ import crypto from 'crypto';
 import { PermissionService } from '../../services/permission.service';
 import { WorkspaceMemberModel } from '../../models/workspace-member.model';
 import { PERMISSION } from '../../config/roles';
-import { addInvitationEmailJob } from '../../queues/email.queue';
+import { addInvitationEmailJob } from '../../queues/queue.service';
 import { WorkspaceRole } from '../../shared/constants/enums';
 
 const createSlug = (value: string) => {

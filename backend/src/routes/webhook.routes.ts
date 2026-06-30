@@ -1,6 +1,6 @@
 import express from 'express';
 import { Receiver } from '@upstash/qstash';
-import { sendInvitationEmail } from '../config/mailer';
+import { mailService } from '../mail';
 
 const router = express.Router();
 
@@ -8,7 +8,6 @@ const receiver = new Receiver({
   currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
   nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
 });
-
 router.post('/send-invitation', async (req, res) => {
   try {
     const signature = req.headers["upstash-signature"] as string;
@@ -22,7 +21,7 @@ router.post('/send-invitation', async (req, res) => {
     }
 
     const { email, workspaceName, inviterName, role, rawToken } = req.body;
-    await sendInvitationEmail(email, workspaceName, inviterName, role, rawToken);
+    await mailService.sendInvitationEmail(email, workspaceName, inviterName, role, rawToken);
     res.status(200).json({ success: true, message: 'Email sent' });
   } catch (error) {
     console.error('Webhook Error:', error);
