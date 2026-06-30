@@ -9,7 +9,6 @@
 .env.*
 !.env.example
 !.env.sample
-package-lock.json
 
 # Node
 /node_modules
