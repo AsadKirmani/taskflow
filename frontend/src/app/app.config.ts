@@ -18,9 +18,9 @@ export const appConfig: ApplicationConfig = {
         authInterceptor
       ])
     ),
-    provideAppInitializer(() => {
-      const authStore = inject(AuthStoreService);
-      return firstValueFrom(authStore.initializeSession());
-    })
+    // provideAppInitializer(() => {
+    //   const authStore = inject(AuthStoreService);
+    //   return firstValueFrom(authStore.initializeSession());
+    // })
   ]
 };

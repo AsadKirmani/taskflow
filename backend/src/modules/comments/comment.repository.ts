@@ -20,7 +20,7 @@ export const commentRepository = {
     commentId: string,
     data: { content?: string; archived?: boolean },
   ) {
-    const updatedComment = await CommentModel.findByIdAndUpdate(commentId, data, { new: true });
+    const updatedComment = await CommentModel.findByIdAndUpdate(commentId, data, { returnDocument: "after" });
     return updatedComment;
   },
   async getCommentById(commentId: string) {

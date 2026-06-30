@@ -8,7 +8,13 @@ import { redisClient } from '../../config/redis';
 export const workspaceController = {
     async listWorkspaces(req: Request, res: Response) {
         const userId = req.auth!.userId;
+        const cacheKey = `user:${userId}:workspaces`;
+        const cachedWorkspaces = await redisClient.get(cacheKey);
+        if (cachedWorkspaces) {
+            return res.json({ success: true, data: { items: cachedWorkspaces } });
+        }
         const workspaces = await workspaceService.listUserWorkspaces(userId);
+        await redisClient.set(cacheKey, JSON.stringify(workspaces), { ex: 3600 }); // Cache for 1 hour
         res.json({
             success: true,
             data: workspaces
@@ -18,13 +24,20 @@ export const workspaceController = {
   async createWorkspace(req: Request, res: Response) {
         const userId = req.auth!.userId;
         const workspace = await workspaceService.createWorkspace(req.body, userId);
+        await redisClient.del(`user:${userId}:workspaces`); // Invalidate the cache for user's workspaces
         res.status(201).json({ success: true, data: workspace });
     },
 
     async getWorkspaceDetail(req: Request, res: Response) {
         const userId = req.auth!.userId;
         const { workspaceId } = req.params as { workspaceId: string };
+        const cacheKey = `workspace:${workspaceId}:detail`;
+        const cachedWorkspaceDetail = await redisClient.get(cacheKey);
+        if (cachedWorkspaceDetail) {
+            return res.json({ success: true, data: cachedWorkspaceDetail });
+        }
         const workspaceDetail = await workspaceService.getWorkspaceDetail(workspaceId, userId);
+        await redisClient.set(cacheKey, JSON.stringify(workspaceDetail), { ex: 3600 }); // Cache for 1 hour
         res.json({ success: true, data: workspaceDetail });
     },
 
@@ -33,6 +46,8 @@ export const workspaceController = {
         const { workspaceId } = req.params as { workspaceId: string };
         await PermissionService.ensure(userId, workspaceId, 'workspace:edit');
         const updatedWorkspace = await workspaceService.updateWorkSpace(workspaceId, req.body, userId);
+        await redisClient.del(`workspace:${workspaceId}:detail`); // Invalidate the cache for this workspace's detail
+        await redisClient.del(`user:${userId}:workspaces`); // Invalidate the cache for user's workspaces
         res.json({ success: true, data: updatedWorkspace });
     },
 
@@ -62,7 +77,7 @@ export const workspaceController = {
           token, 
           userId
       );
-
+      await redisClient.del(`user:${userId}:workspaces`); // Invalidate the cache for user's workspaces
       res.status(200).json(result);
   },
   async updateWorkspaceMemberRole(req: Request, res: Response) {
@@ -72,7 +87,9 @@ export const workspaceController = {
     await PermissionService.ensure(userId, workspaceId, 'member:role_change');
     await PermissionService.ensureCanChangeRole(userId, workspaceId, newRole as WorkspaceRole);
     const updatedMember = await workspaceService.updateWorkspaceMemberRole(workspaceId, memberId, newRole, userId);
-    //await redisClient.del(`user:${userId}:profile`);
+    await redisClient.del(`workspace:${workspaceId}:detail`); // Invalidate the cache for this workspace's detail
+    await redisClient.del(`workspace:${workspaceId}:members`); // Invalidate the cache for this workspace's members
+    await redisClient.del(`user:${memberId}:workspaces`); // Invalidate the cache for the member's workspaces
     res.json({ success: true, data: updatedMember });
   },
   async removeWorkspaceMember(req: Request, res: Response) {
@@ -81,7 +98,9 @@ export const workspaceController = {
     await PermissionService.ensure(userId, workspaceId, 'member:remove');
     await PermissionService.ensureCanManageMember(userId, memberId, workspaceId);
     await workspaceService.removeWorkspaceMember(workspaceId, memberId, userId);
-   // await redisClient.del(`user:${userId}:profile`);
+    await redisClient.del(`workspace:${workspaceId}:detail`); // Invalidate the cache for this workspace's detail
+    await redisClient.del(`workspace:${workspaceId}:members`); // Invalidate the cache for this workspace's members
+    await redisClient.del(`user:${memberId}:workspaces`); // Invalidate the cache for the removed member's workspaces
     res.json({ success: true, message: 'Member removed successfully' });
   },
   async deleteWorkspace(req: Request, res: Response) {
@@ -89,13 +108,22 @@ export const workspaceController = {
         const { workspaceId } = req.params as { workspaceId: string };
         await PermissionService.ensure(userId, workspaceId, 'workspace:delete');
         const result = await workspaceService.deleteWorkspace(workspaceId, userId);
+        await redisClient.del(`workspace:${workspaceId}:detail`); // Invalidate the cache for this workspace's detail
+        await redisClient.del(`user:${userId}:workspaces`); // Invalidate the cache for user's workspaces
+        await redisClient.del(`workspace:${workspaceId}:members`); // Invalidate the cache for this workspace's members
         res.json(result);
    },
     async listWorkspaceMembers(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { workspaceId } = req.params as { workspaceId: string };
+    const cacheKey = `workspace:${workspaceId}:members`;
+    const cachedMembers = await redisClient.get(cacheKey);
+    if (cachedMembers) {
+      return res.json({ success: true, data: { items: cachedMembers } });
+    }
     await PermissionService.ensure(userId, workspaceId, 'workspace:view');
     const members = await workspaceService.listWorkspaceMembers(workspaceId, userId);
+    await redisClient.set(cacheKey, JSON.stringify(members), { ex: 3600 }); // Cache for 1 hour
     res.json({ success: true, data: members });
     }
 };

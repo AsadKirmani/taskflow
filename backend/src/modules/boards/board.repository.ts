@@ -17,10 +17,16 @@ export const boardRepository = {
     return newboard;
   },
 
-  async getBoardById(boardId: string) {
-    const board = await BoardModel.findById(boardId).populate('memberIds', 'name email avatarUrl');
-    return board;
-  },
+ async getBoardById(boardId: string) {
+  return await BoardModel.findById(boardId)
+    .populate('memberIds', 'name email avatarUrl')
+    .populate({
+      path: 'columnOrder',
+      populate: { path: 'taskOrder' }
+    })
+    .lean() // 🚀 YEH ZAROORI HAI CACHING KE LIYE
+    .exec();
+},
 
   async getBoardsInWorkspace(workspaceId: string, userId: string) {
 
@@ -44,7 +50,7 @@ export const boardRepository = {
     },
   ) {
     const updatedBoard = await BoardModel.findByIdAndUpdate(boardId, data, {
-      new: true,
+      returnDocument: "after",
     });
     return updatedBoard;
   },
@@ -62,7 +68,7 @@ export const boardRepository = {
     return await BoardModel.findByIdAndUpdate(
       boardId, 
       {$set: { columnOrder: newColumnOrder }}, 
-      { new: true });
+      { returnDocument: "after" });
   },
   async deleteBoard(boardId: string) {
     return await BoardModel.findByIdAndDelete(boardId);

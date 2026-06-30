@@ -22,14 +22,14 @@ export const authRepository = {
     return UserModel.findByIdAndUpdate(
       userId,
       { passwordHash: newPasswordHash },
-      { new: true }
+      { returnDocument: "after"}
     ).select('+passwordHash');
   },
   updateUserProfile(userId: string, data: { name?: string; email?: string, avatarUrl?: string, preferences?: any }) {
     return UserModel.findByIdAndUpdate(
       userId,
       { $set: data },
-      { new: true }
+      { returnDocument: "after" }
     );
   },
   createRefreshToken(data: {

@@ -77,7 +77,6 @@ export const BoardStore = signalStore(
           columns: [...store.columns(), newColumn],
           loadedColumnBoardIds: newLoadedCols
         });
-        notification.success('Column created successfully');
       } catch (err) {
         notification.error('Failed to create column');
       }
@@ -116,7 +115,6 @@ export const BoardStore = signalStore(
 
     async loadBoard(boardId: string, forceUpdate = false) {
       if (!boardId?.trim()) {
-        patchState(store, { loading: false, error: 'Board ID is missing' });
         notification.error('Board ID is missing');
         return;
       }
@@ -127,14 +125,22 @@ export const BoardStore = signalStore(
 
       try {
         const response = await firstValueFrom(boardApi.getBoardById(boardId));
-        const payload = response.data as any;
-        const board = normalizeBoard(payload.board ?? payload ?? {});
-        const columns = normalizeColumns(payload.columns ?? []);
-        const members = (board.memberIds || []).map(normalizeMember);
+        
+        // 🚀 Backend se aaya Populated Data
+        const boardPayload = response.data as any; 
+        
+        // 1. Board ko normalize karo
+        const board = normalizeBoard(boardPayload);
+        
+        // 2. Columns ab 'columnOrder' ke andar hain (kyunki tune populate kiya hai)
+        const columns = normalizeColumns(boardPayload.columnOrder ?? []);
+        
+        // 3. Members extract karo
+        const members = (boardPayload.memberIds || []).map(normalizeMember);
 
         patchState(store, {
           board,
-          columns,
+          columns, // 🚀 Ab tere store ke 'currentColumns()' mein data aa jayega
           members,
           loading: false,
           error: null,
@@ -145,33 +151,6 @@ export const BoardStore = signalStore(
         notification.error('Failed to load board details');
       }
     },
-
-    async loadBoardColumns(boardId: string, forceUpdate = false) {
-      if (!boardId?.trim()) {
-        notification.error('Board ID is missing');
-        return;
-      }
-
-      if (store.loadingColumnBoardIds().includes(boardId)) return;
-      if (store.loadedColumnBoardIds().includes(boardId) && !forceUpdate) return;
-
-      patchState(store, { loadingColumnBoardIds: [...store.loadingColumnBoardIds(), boardId] });
-
-      try {
-        const response = await firstValueFrom(boardApi.getBoardColumns(boardId));
-        const columns = normalizeColumns(response.data?.columns ?? []);
-        
-        patchState(store, { 
-          columns,
-          loadedColumnBoardIds: [...new Set([...store.loadedColumnBoardIds(), boardId])],
-          loadingColumnBoardIds: store.loadingColumnBoardIds().filter(id => id !== boardId)
-        });
-      } catch (err) {
-        patchState(store, { loadingColumnBoardIds: store.loadingColumnBoardIds().filter(id => id !== boardId) });
-        notification.error('Failed to load board columns');
-      }
-    },
-
     async handleColumnDrop(event: ColumnDropEventPayload) {
       if (event.fromIndex === event.toIndex) return;
 
@@ -188,7 +167,6 @@ export const BoardStore = signalStore(
 
       try {
         await firstValueFrom(boardApi.reorderColumns(board.id, updatedColumns.map(c => c.id)));
-        notification.success('Columns reordered successfully');
       } catch (err) {
         // Rollback snapshot on error
         patchState(store, { columns: currentColumns });

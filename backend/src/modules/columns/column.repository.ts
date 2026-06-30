@@ -20,7 +20,7 @@ export const columnRepository = {
     data: { name?: string; archived?: boolean },
   ) {
     const updatedColumn = await ColumnModel.findByIdAndUpdate(columnId, data, {
-      new: true,
+      returnDocument: "after",
     });
     return updatedColumn;
   },
@@ -34,6 +34,6 @@ export const columnRepository = {
     return await ColumnModel.findByIdAndUpdate(
       columnId, 
       {$set: { taskOrder: newTaskOrder }}, 
-      { new: true });
+      { returnDocument: "after" });
   }
 };

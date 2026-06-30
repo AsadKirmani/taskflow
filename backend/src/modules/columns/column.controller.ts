@@ -4,6 +4,7 @@ import { PermissionService } from "../../services/permission.service";
 import { PERMISSION } from "../../config/roles";
 import { columnService } from "./column.service";
 import { boardService } from "../boards/board.service";
+import { redisClient } from "../../config/redis";
 
 export const columnController = {
   async createColumn(req: Request, res: Response) {
@@ -42,6 +43,7 @@ export const columnController = {
       workspaceId,
       userId,
     );
+    await redisClient.del(`board:${boardId}:detail`); // Invalidate the cache for columns in this board
     res.status(201).json({ success: true, data: column });
   },
 
@@ -69,6 +71,7 @@ export const columnController = {
       { name, archived },
       userId,
     );
+    await redisClient.del(`board:${column.boardId.toString()}:detail`); // Invalidate the cache for columns in this board
     res.json({ success: true, data: updatedColumn });
   },
 
@@ -107,6 +110,7 @@ export const columnController = {
       PERMISSION.TASK_EDIT,
     );
     await columnService.reorderTasks(columnId, taskIds, userId);
+    await redisClient.del(`board:${column.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
     res.json({ success: true });
   },
 };

@@ -29,8 +29,8 @@ export class AuthApiService {
     });
   }
 
-  refreshToken(): Observable<ApiResponse<{ accessToken: string }>> {
-    return this.http.post<ApiResponse<{ accessToken: string }>>(
+  refreshToken(): Observable<ApiResponse<{ accessToken: string, user: User }>> {
+    return this.http.post<ApiResponse<{ accessToken: string, user: User }>>(
       `${this.baseUrl}/refresh-token`,
       {},
       { withCredentials: true }

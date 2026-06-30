@@ -169,7 +169,7 @@ export const taskRepository = {
       commentCount?: number;
     },
   ) {
-    const updatedTask = await TaskModel.findByIdAndUpdate(taskId, data, { new: true });
+    const updatedTask = await TaskModel.findByIdAndUpdate(taskId, data, { returnDocument: "after" });
     return updatedTask;
   },
   async moveTask(

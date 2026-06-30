@@ -73,7 +73,7 @@ export const workspaceRepository = {
     const updatedWorkspace = await WorkspaceModel.findByIdAndUpdate(
       workspaceId,
       data,
-      { new: true },
+      { returnDocument: "after" },
     );
     return updatedWorkspace;
   },
@@ -145,7 +145,7 @@ export const workspaceRepository = {
     const updatedMember = await WorkspaceMemberModel.findOneAndUpdate(
       { workspaceId, userId },
       { role: newRole },
-      { new: true },
+      { returnDocument: "after" },
     );
     return updatedMember;
   },

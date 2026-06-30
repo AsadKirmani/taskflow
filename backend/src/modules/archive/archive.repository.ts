@@ -23,7 +23,7 @@ export const archiveRepository = {
     const updated = await model.findByIdAndUpdate(
       data.entityId,
       { archived: true },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!updated) {
@@ -52,7 +52,7 @@ export const archiveRepository = {
     const updated = await model.findByIdAndUpdate(
       data.entityId,
       { archived: false },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!updated) {

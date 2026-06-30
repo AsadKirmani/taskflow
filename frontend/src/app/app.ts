@@ -4,6 +4,7 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { ThemeService } from './core/services/theme.service'
 import { polyfill } from 'mobile-drag-drop';
 import { ToastContainerComponent } from './shared/components/toast-container.component';
+import { AuthStoreService } from './features/auth/data-access/auth-store.service';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ import { ToastContainerComponent } from './shared/components/toast-container.com
 })
 export class App implements OnInit {
   protected readonly title = signal('Taskflow');
+  private authStore = inject(AuthStoreService);
   private themeService = inject(ThemeService);
   constructor(private matIconRegistry: MatIconRegistry) {
     polyfill({
@@ -24,8 +26,8 @@ export class App implements OnInit {
       }
     })
   }
-
   ngOnInit(): void {
     this.matIconRegistry.setDefaultFontSetClass('material-symbols-outlined');
+    this.authStore.initializeSession().subscribe();
   }
 }

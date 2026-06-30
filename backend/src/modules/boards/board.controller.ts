@@ -4,6 +4,7 @@ import { PermissionService } from "../../services/permission.service";
 import { PERMISSION } from "../../config/roles";
 import { boardService } from "./board.service";
 import { redisClient } from "../../config/redis";
+import { BoardModel } from "../../models/board.model";
 
 export const boardController = {
   async createBoard(req: Request, res: Response) {
@@ -23,28 +24,30 @@ export const boardController = {
       PERMISSION.BOARD_CREATE,
     );
     const board = await boardService.createBoard(req.body, userId);
-    //await redisClient.del(`workspace:${workspaceId}:boards`); // Invalidate the cache for boards in this workspace
-    //await redisClient.del(`user:${userId}:all_boards`); // Invalidate the cache for all boards for this user
+    await redisClient.del(`workspace:${workspaceId}:boards`); // Invalidate the cache for boards in this workspace
+    await redisClient.del(`user:${userId}:all_boards`); // Invalidate the cache for all boards for this user
     res.status(201).json({ success: true, data: board });
   },
 
   async getBoardById(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { boardId } = req.params as { boardId: string };
-
-    
-    let responsePayload: any;
-      const board = await boardService.getBoardById(userId, boardId);
+    let board: any;
+    const cacheKey = `board:${boardId}:detail`;
+    const cachedBoard = await redisClient.get(cacheKey);
+    if (cachedBoard) {
+      board = cachedBoard;
+    } else {
+      board = await boardService.getBoardById(userId, boardId);
       if (!board) {
         throw new AppError("Board not found", 404, "NOT_FOUND");
       }
-      responsePayload = { success: true, data: board };
-
-    // 🛡️ 3. SECURITY CHECK NOW (Cache se aane par bhi permission check hogi!)
-    // Hum payload ke andar se workspaceId nikal rahe hain
+      await redisClient.set(cacheKey, JSON.stringify(board), { ex: 3600 });
+    }
+    const responsePayload = { success: true, data: board };
     await PermissionService.ensureBoardPermission(
       userId,
-      { workspaceId: responsePayload.data.workspaceId.toString() },
+      { workspaceId: board.workspaceId.toString() },
       PERMISSION.BOARD_VIEW,
     );
     
@@ -54,6 +57,7 @@ export const boardController = {
   async getBoardsInWorkspace(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { workspaceId } = req.params as { workspaceId: string };
+    const cacheKey = `workspace:${workspaceId}:boards`;
     
     // 🛡️ 1. SECURITY FIRST: Pehle permission check karo
     await PermissionService.ensureBoardPermission(
@@ -61,9 +65,12 @@ export const boardController = {
       { workspaceId },
       PERMISSION.BOARD_VIEW,
     );
-    
+    const cachedBoards = await redisClient.get(cacheKey);
+    if (cachedBoards) {
+      return res.json({ success: true, data: { items: cachedBoards } });
+    }
     const boards = await boardService.getBoardsInWorkspace(workspaceId, userId);
-
+    await redisClient.set(cacheKey, JSON.stringify(boards), { ex: 3600 }); // Cache for 1 hour
     const responseData = { success: true, data: { items: boards } };
     
     return res.json(responseData);
@@ -89,13 +96,21 @@ export const boardController = {
       req.body,
       userId,
     );
+    await redisClient.del(`board:${boardId}:detail`); // Invalidate the cache for this board's detail
+    await redisClient.del(`workspace:${existingBoard.workspaceId.toString()}:boards`);
+    await redisClient.del(`user:${userId}:all_boards`); // Invalidate the cache for all boards for this user
     res.json({ success: true, data: updatedBoard });
   },
   
   async getBoards(req: Request, res: Response) {
-   const start = performance.now();
     const userId = req.auth!.userId; 
+    const cacheKey = `user:${userId}:all_boards`;
+    const cachedBoards = await redisClient.get(cacheKey);
+    if (cachedBoards) {
+      return res.json({ success: true, data: { items: cachedBoards } });
+    }
     const boards = await boardService.getBoards(userId);
+    await redisClient.set(cacheKey, JSON.stringify(boards), { ex: 3600 }); // Cache for 1 hour
     const responseData = { success: true, data: { items: boards } };
     return res.json(responseData);
   },
@@ -117,6 +132,7 @@ export const boardController = {
     );
 
     await boardService.reorderColumns(boardId, columnIds, userId);
+    await redisClient.del(`board:${boardId}:detail`); // Invalidate the cache for this board's detail
     res.json({ success: true, message: "Column order updated" });
   },
   async deleteBoard(req: Request, res: Response) {
@@ -133,13 +149,11 @@ export const boardController = {
       { workspaceId: board.workspaceId.toString() },
       PERMISSION.BOARD_DELETE,
     );
-
     await boardService.deleteBoard(boardId, userId);
-    // Yeh line teri pehle se likhi hai:
-//await redisClient.del(`board:${boardId}`);
-
-// 👇 YEH NAYI LINE ADD KAR DE (Taaki all_boards bhi refresh ho jaye):
-//await redisClient.del(`user:${userId}:all_boards`);
+    
+    await redisClient.del(`board:${boardId}:detail`); // Invalidate the cache for this board's detail
+    await redisClient.del(`workspace:${board.workspaceId.toString()}:boards`);
+    await redisClient.del(`user:${userId}:all_boards`); // Invalidate the cache for all boards for this user
     res.json({ success: true, message: "Board deleted successfully" });
   },
-};
+};  

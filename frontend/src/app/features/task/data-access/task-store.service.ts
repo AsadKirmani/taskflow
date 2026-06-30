@@ -192,7 +192,6 @@ export const TaskStore = signalStore(
             loadedTaskBoardIds: [...new Set([...store.loadedTaskBoardIds(), boardId])],
             loadingTaskBoardIds: store.loadingTaskBoardIds().filter(id => id !== boardId)
           });
-          notification.success('Board tasks loaded successfully');
         } catch (err) {
           patchState(store, { loading: false, error: 'Failed to load board tasks', loadingTaskBoardIds: store.loadingTaskBoardIds().filter(id => id !== boardId) });
           notification.error('Failed to load board tasks');
@@ -240,7 +239,6 @@ export const TaskStore = signalStore(
               [columnId]: [...(store.taskIdsByColumn()[columnId] ?? []), newTask.id]
             }
           });
-          notification.success('Task added successfully');
         } catch (err) {
           notification.error('Failed to add task');
         }
@@ -258,7 +256,6 @@ export const TaskStore = signalStore(
 
         try {
           await firstValueFrom(api.updateTask(taskId, updates));
-          notification.success('Task updated successfully');
         } catch (err) {
           // Rollback
           patchState(store, { tasksById: { ...store.tasksById(), [taskId]: existingTask } });
@@ -269,6 +266,24 @@ export const TaskStore = signalStore(
       toggleTaskCompletion(taskId: string, isCompleted: boolean) {
         this.updateTask(taskId, { isCompleted });
       },
+      // async deleteTask(taskId: string) {
+      //   if (!taskId?.trim()) return;
+      //   const existingTask = store.tasksById()[taskId];
+      //   if (!existingTask) return;
+      //   const columnId = existingTask.columnId;
+
+      //   // Optimistic UI update
+      //   const updatedTaskIdsByColumn = { ...store.taskIdsByColumn() };
+      //   updatedTaskIdsByColumn[columnId] = (updatedTaskIdsByColumn[columnId] ?? []).filter(id => id !== taskId);
+      //   patchState(store, { taskIdsByColumn: updatedTaskIdsByColumn, tasksById: { ...store.tasksById(), [taskId]: undefined } });
+      //   try {
+      //     await firstValueFrom(api.deleteTask(taskId));
+      //     notification.success('Task deleted successfully');
+      //   } catch (err) {
+      //     patchState(store, { taskIdsByColumn: store.taskIdsByColumn(), tasksById: { ...store.tasksById(), [taskId]: existingTask } });
+      //     notification.error('Failed to delete task');
+      //   }
+      // },
 
       async handleTaskDrop(boardId: string, event: TaskDropEventPayload) {
         if (!boardId?.trim()) return;
@@ -302,7 +317,6 @@ export const TaskStore = signalStore(
             sourceIndex: event.sourceIndex, targetIndex: event.targetIndex,
             destinationColumnId: event.targetColumnId, position: event.targetIndex
           }));
-          notification.success('Task moved successfully');
         } catch (err) {
           patchState(store, { tasksById: originalTasksById, taskIdsByColumn: originalTaskIdsByCol });
           notification.error('Failed to move task');
@@ -343,6 +357,7 @@ export const TaskStore = signalStore(
 
         try {
           await firstValueFrom(api.deleteComment(commentId));
+          notification.success('Comment deleted successfully');
         } catch (err) {
           patchState(store, { comments: currentComments }); // Rollback on error
           notification.error('Failed to delete comment');

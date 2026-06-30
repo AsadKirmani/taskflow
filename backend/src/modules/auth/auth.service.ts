@@ -221,6 +221,7 @@ export const authService = {
       sessionData = {
         sub: user._id.toString(),
         email: user.email,
+        user: sanitizeUser(user),
       };
     }
 
@@ -257,7 +258,7 @@ export const authService = {
     await Promise.all([
       redisClient.del(cacheKey),
 
-      redisClient.set(newCacheKey, sessionData, { ex: ttlSeconds }),
+      redisClient.set(newCacheKey, JSON.stringify(sessionData), { ex: ttlSeconds }),
 
       authRepository.revokeRefreshToken(tokenHash, newRefreshTokenHash),
 
@@ -269,10 +270,12 @@ export const authService = {
         userAgent: meta?.userAgent ?? null,
       }),
     ]);
-    return {
+    const response = {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
+      user: sessionData.user,
     };
+    return response;
   },
 
   async logout(refreshToken: string) {

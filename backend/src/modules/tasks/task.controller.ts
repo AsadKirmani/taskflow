@@ -4,6 +4,7 @@ import { AppError } from "../../shared/errors/app-error";
 import { PermissionService } from "../../services/permission.service";
 import { PERMISSION } from "../../config/roles";
 import { boardService } from "../boards/board.service";
+import { redisClient } from "../../config/redis";
 
 const parseCsv = (value: unknown): string[] => {
   if (typeof value !== 'string') {
@@ -43,6 +44,7 @@ export const taskController = {
       workspaceId,
       userId,
     );
+    await redisClient.del(`board:${boardId}:detail`); // Invalidate the cache for this board's detail
     res.status(201).json({ success: true, data: newTask });
   },
   async getTasksInBoard(req: Request, res: Response) {
@@ -176,6 +178,7 @@ export const taskController = {
     );
 
     const updatedTask = await taskService.updateTask(taskId, updatePayload, req.auth!.userId);
+    await redisClient.del(`board:${task.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
     res.json({ success: true, data: updatedTask });
   },
   async moveTask(req: Request, res: Response) {
@@ -196,6 +199,7 @@ export const taskController = {
       PERMISSION.TASK_EDIT
     );
     await taskService.moveTask(taskId, sourceColumnId, targetColumnId, targetIndex, userId);
+    await redisClient.del(`board:${task.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
     res.json({ success: true, message: "Task moved successfully", data: null });
   },
   async deleteTask(req: Request, res: Response) {
@@ -211,6 +215,7 @@ export const taskController = {
       PERMISSION.TASK_DELETE
     );
     await taskService.deleteTask(taskId, userId);
+    await redisClient.del(`board:${task.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
     res.json({ success: true, message: "Task deleted successfully", data: null });
   }
 };

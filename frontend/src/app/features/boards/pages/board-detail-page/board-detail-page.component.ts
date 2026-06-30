@@ -75,7 +75,6 @@ export class BoardDetailPageComponent implements OnInit {
       this.activeBoardId.set(boardId);
       if (boardId) {
         this.boardStore.loadBoard(boardId);
-        this.boardStore.loadBoardColumns(boardId);
         this.taskStore.getTasksInBoard(boardId, this.boardStore.currentColumns(), true);
       }
     });
