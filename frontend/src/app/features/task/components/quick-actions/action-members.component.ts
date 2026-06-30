@@ -45,7 +45,7 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
                   <div
                     class="w-7 h-7 rounded-full bg-primary text-primary-content flex items-center justify-center text-xs font-bold"
                   >
-                    {{ member?.name?.charAt(0)?.toUpperCase() || 'U' }}
+                    {{ member.name.charAt(0).toUpperCase() || 'U' }}
                   </div>
                   <span
                     class="text-sm font-medium text-base-content group-hover:text-primary transition-colors"

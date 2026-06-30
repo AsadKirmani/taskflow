@@ -11,7 +11,6 @@
   "private": true,
   "packageManager": "npm@11.18.0",
   "dependencies": {
-    "@angular/animations": "^22.0.4",
     "@angular/cdk": "^22.0.2",
     "@angular/common": "^22.0.4",
     "@angular/compiler": "^22.0.4",
@@ -23,6 +22,8 @@
     "@lucide/angular": "^1.22.0",
     "@ngrx/signals": "^21.1.1",
     "@tiptap/core": "^3.27.1",
+    "@tiptap/extension-bubble-menu": "^3.27.1",
+    "@tiptap/extension-floating-menu": "^3.27.1",
     "@tiptap/starter-kit": "^3.27.1",
     "marked": "^18.0.5",
     "mobile-drag-drop": "^3.0.0-rc.0",
