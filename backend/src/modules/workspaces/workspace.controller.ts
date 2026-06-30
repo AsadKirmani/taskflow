@@ -41,7 +41,7 @@ export const workspaceController = {
         const { workspaceId } = req.params as { workspaceId: string };
         const { email, role } = req.body as {
             email: string;
-            role: string;
+            role: WorkspaceRole;
         };
         await PermissionService.ensure(userId, workspaceId, 'member:invite');
         await PermissionService.ensureCanInviteRole(userId, workspaceId, role as WorkspaceRole);
@@ -68,7 +68,7 @@ export const workspaceController = {
   async updateWorkspaceMemberRole(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { workspaceId, memberId } = req.params as { workspaceId: string; memberId: string };
-    const { newRole } = req.body as { newRole: string };
+    const { newRole } = req.body as { newRole: WorkspaceRole };
     await PermissionService.ensure(userId, workspaceId, 'member:role_change');
     await PermissionService.ensureCanChangeRole(userId, workspaceId, newRole as WorkspaceRole);
     const updatedMember = await workspaceService.updateWorkspaceMemberRole(workspaceId, memberId, newRole, userId);

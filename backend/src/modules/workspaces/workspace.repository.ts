@@ -2,6 +2,7 @@ import { WorkspaceInvitationModel } from "../../models/workspace-invitation.mode
 import { WorkspaceModel } from "../../models/workspace.model";
 import { WorkspaceMemberModel } from "../../models/workspace-member.model";
 import { Types } from "mongoose";
+import type { WorkspaceRole, InvitationStatus } from "../../shared/constants/enums";
 
 export const workspaceRepository = {
   async createWorkspace(data: {
@@ -79,9 +80,9 @@ export const workspaceRepository = {
   async workspaceInvitation(
     workspaceId: string,
     email: string,
-    role: string,
+    role: WorkspaceRole,
     invitedBy: string,
-    status: string = "pending",
+    status: InvitationStatus = "pending",
     tokenHash: string,
     expiresAt: Date,
   ) {
@@ -118,7 +119,7 @@ export const workspaceRepository = {
       workspaceName,
     }: {
       userId: string;
-      role: string;
+      role: WorkspaceRole;
       workspaceName: string;
     },
   ) {

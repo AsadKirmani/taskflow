@@ -9,6 +9,7 @@ import { PermissionService } from '../../services/permission.service';
 import { WorkspaceMemberModel } from '../../models/workspace-member.model';
 import { PERMISSION } from '../../config/roles';
 import { addInvitationEmailJob } from '../../queues/email.queue';
+import { WorkspaceRole } from '../../shared/constants/enums';
 
 const createSlug = (value: string) => {
   const slug = value
@@ -85,7 +86,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
     }
     return updatedWorkspace;
   },
-  async inviteWorkspaceMember(workspaceId: string, email: string, userId: string, role: string) {
+  async inviteWorkspaceMember(workspaceId: string, email: string, userId: string, role: WorkspaceRole) {
     const inviter = await authService.getCurrentUser(userId);
     const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
     if (!workspace) {
@@ -124,7 +125,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
     return { success: true, message: `Invitation sent to ${email} from ${inviter.name}` };
   },
 
-  async updateWorkspaceMemberRole(workspaceId: string, memberId: string, newRole: string, userId: string) {
+  async updateWorkspaceMemberRole(workspaceId: string, memberId: string, newRole: WorkspaceRole, userId: string) {
     const updatedMember = await workspaceRepository.updateMemberRole(workspaceId, memberId, newRole);
     if (updatedMember) {
       await activityService.logActivity({
@@ -159,7 +160,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
       throw new AppError('Workspace no longer exists', 404, 'NOT_FOUND');
     }
 
-    const isAlreadyMember = await WorkspaceMemberModel.exists({ workspaceId, userId, status: 'active' });
+    const isAlreadyMember = await WorkspaceMemberModel.exists({ workspaceId, userId, status: 'ACTIVE' });
 
     if (isAlreadyMember) {
       throw new AppError('You are already a member of this workspace', 400, 'ALREADY_MEMBER');
@@ -193,7 +194,7 @@ async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, us
     if (!workspace) {
       throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
     }
-    const member = await WorkspaceMemberModel.findOne({ workspaceId, userId: memberId });
+    const member = await WorkspaceMemberModel.findOne({ workspaceId, userId: memberId, status: 'ACTIVE' });
     if (!member) {
       throw new AppError('Member not found in workspace', 404, 'MEMBER_NOT_FOUND');
     }

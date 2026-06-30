@@ -6,9 +6,9 @@ import { PERMISSION } from '../../config/roles';
 
 const searchTasks = async (req: Request, res: Response) => {
   try {
-    const searchQuery = req.query.q;
+    const searchQuery = typeof req.query.q === 'string' ? req.query.q : '';
 
-    if (!searchQuery || searchQuery.toString().trim() === '') {
+    if (!searchQuery) {
       return res.status(200).json([]);
     }
     const memberships = await WorkspaceMemberModel.find({ userId: req.auth!.userId, workspaceId: { $exists: true } })
