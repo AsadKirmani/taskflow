@@ -9,7 +9,7 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
   imports: [CommonModule, ...APP_ICONS],
   template: `
     <div class="flex items-start gap-3">
-      <svg lucideChecklist class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>
+      <svg lucideSquareCheck class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>
       <div class="flex-1 w-full relative">
         <h3 class="font-semibold text-base mb-3 text-base-content">Checklist</h3>
         
@@ -45,7 +45,7 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
               </span>
               
               <button (click)="onDelete(i)" class="opacity-0 group-hover:opacity-100 text-error hover:bg-error/20 p-1.5 rounded transition-all cursor-pointer">
-                <svg lucideTrash2 class="w-4 h-4"></svg>
+                <svg lucideTrash class="w-4 h-4"></svg>
               </button>
             </div>
           }

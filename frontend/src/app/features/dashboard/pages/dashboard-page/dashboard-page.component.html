@@ -1,9 +1,10 @@
-<section class="dashboard-page flex flex-col rounded-box gap-1">
+<section class="dashboard-page flex flex-col rounded-box">
   <ui-page-header title="Dashboard" subtitle="Plan, Prioritize, and Track Your Tasks">
     <a
       routerLink="/boards"
       class="bg-primary text-primary-content px-4 py-2 text-xs rounded-field hover:opacity-90 flex items-center gap-2 md:text-sm font-semibold transition-all"
     >
+      <svg lucidePlus class="w-4 h-4"></svg>
       Create
     </a>
   </ui-page-header>
@@ -131,7 +132,7 @@
                   <button
                     actions
                     routerLink="/boards"
-                    class="bg-base-200 hover:bg-base-300 text-base-content px-4 py-2 mt-2 rounded-box text-xs font-semibold border border-base-content/20 transition-colors"
+                    class="bg-base-200 hover:bg-base-300 text-base-content px-4 py-2 mt-2 rounded-box text-xs font-semibold border border-base-300/20 transition-colors"
                   >
                     Go to Boards
                   </button>
@@ -140,9 +141,9 @@
             } @else {
               <div class="overflow-x-auto">
                 <table class="w-full min-w-[680px]">
-                  <thead class="bg-neutral border-b border-base-300">
+                  <thead class="bg-base-300 border-b border-base-300">
                     <tr
-                      class="text-left text-neutral-content text-xs font-bold uppercase tracking-wider"
+                      class="text-left text-base-content/50 text-xs font-bold uppercase tracking-wider"
                     >
                       <th class="p-4">Task</th>
                       <th class="p-4">Board</th>

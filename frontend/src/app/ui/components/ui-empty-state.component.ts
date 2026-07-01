@@ -39,7 +39,7 @@ export class UiEmptyStateComponent {
   });
 
   iconClasses = computed(() => {
-    const base = 'flex items-center justify-center rounded-full bg-base-200 text-base-content/50 border border-base-content/5';
+    const base = 'flex items-center justify-center rounded-full bg-base-200 text-base-content/50 border border-base-300/5';
     const dimensions = this.size() === 'compact' ? 'w-8 h-8 mb-2' : 'w-12 h-12 mb-4 shadow-sm';
     return `${base} ${dimensions}`;
   });

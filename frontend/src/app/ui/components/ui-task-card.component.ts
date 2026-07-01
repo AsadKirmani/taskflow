@@ -21,7 +21,7 @@ import { CommonModule } from '@angular/common';
           {{ title() }}
         </h4>
 
-        <div class="flex items-center justify-between mt-1 pt-3 border-t border-base-content/5">
+        <div class="flex items-center justify-between mt-1 pt-3 border-t border-base-300/5">
           <div class="flex items-center gap-1.5 flex-wrap">
             <ng-content select="[labels]"></ng-content>
           </div>

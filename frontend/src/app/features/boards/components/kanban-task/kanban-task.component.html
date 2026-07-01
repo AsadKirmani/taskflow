@@ -1,5 +1,5 @@
 <article
-  class="task-card flex flex-col gap-2 shadow-sm rounded-xl text-start text-base-content p-3 bg-base-100 group cursor-grab active:cursor-grabbing transition-all hover:ring-2 hover:ring-primary hover:shadow-md overflow-hidden border border-base-content/10"
+  class="task-card flex flex-col gap-2 shadow-sm rounded-xl text-start text-base-content p-3 bg-base-100 group cursor-grab active:cursor-grabbing transition-all hover:ring-2 hover:ring-primary hover:shadow-md overflow-hidden border border-base-300/10"
   (click)="openOverlay.emit()"
 >
   @if (!isEditing()) {
@@ -54,13 +54,13 @@
       task().description ||
       task().commentCount ||
       task().checklist?.length ||
-      task().assigneeIds?.length
+      task().assigneeIds.length
     ) {
-      <div class="flex items-center justify-between mt-1 pt-2 border-t border-base-content/5">
+      <div class="flex items-center justify-between mt-1 pt-2 border-t border-base-300/5">
         <div class="flex items-center gap-3 text-base-content/50">
           @if (task().description) {
             <div class="flex items-center" title="This task has a description">
-              <svg lucideSubject class="w-4 h-4 text-[16px]"></svg>
+              <svg lucideTextAlignStart class="w-4 h-4 text-[16px]"></svg>
             </div>
           }
 
@@ -70,14 +70,14 @@
               [class.text-success]="completedChecklistCount === task().checklist!.length"
               title="Checklist items"
             >
-              <svg lucideCheckSquare class="w-4 h-4 text-[16px]"></svg>
+              <svg lucideSquareCheck class="w-4 h-4 text-[16px]"></svg>
               <span>{{ completedChecklistCount }}/{{ task().checklist!.length }}</span>
             </div>
           }
 
           @if (task().commentCount && task().commentCount! > 0) {
             <div class="flex items-center gap-1 text-xs font-semibold" title="Comments">
-              <svg lucideChatBubble class="w-4 h-4 text-[16px]"></svg>
+              <svg lucideMessageSquare class="w-4 h-4 text-[16px]"></svg>
               <span>{{ task().commentCount }}</span>
             </div>
           }

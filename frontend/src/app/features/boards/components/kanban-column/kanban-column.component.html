@@ -17,7 +17,7 @@
     }
   </div>
   <div
-  class="kanban-column__task-list flex-1 min-h-0 p-1 rounded transition-colors overflow-y-auto gap-2"
+  class="kanban-column__task-list flex-1 min-h-0 p-1 rounded transition-colors overflow-y-auto gap-1"
   cdkDropList
   [id]="column().id"
   [cdkDropListData]="tasks()"
@@ -47,11 +47,11 @@
   </div>
 
   <div
-    class="add-task p-1 flex items-center justify-start gap-1 text-base-content/70 transition-colors mt-1"
+    class="add-task p-1 flex items-center justify-start gap-1 text-base-content/70 transition-colors"
   >
     @if (!isInputOpen()) {
       <button
-        class="add-task__button cursor-pointer hover:bg-base-content/10 border border-base-300 w-full flex items-center justify-center p-2 rounded-field bg-transparent transition-colors"
+        class="add-task__button cursor-pointer hover:bg-base-content/10 border border-base-300 w-full flex items-center justify-center p-2 rounded-field bg-base-200 transition-colors"
         (click)="isInputOpen.set(true)"
       >
         <svg lucidePlus class="w-4 h-4 mr-1"></svg>

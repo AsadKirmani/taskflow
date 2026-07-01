@@ -6,6 +6,7 @@ import {
   output,
   computed,
   signal,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -34,6 +35,8 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
 import { AvatarComponent } from '../../../../shared/components/avatar.component';
 import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.component';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
+import { KeyboardShortcutsService } from '../../../../core/services/keyboard-shortcuts.service';
 
 @Component({
   selector: 'app-kanban-board',
@@ -48,6 +51,7 @@ import { APP_ICONS } from '../../../../core/icons/lucide-icons';
     AvatarComponent,
     DragDropModule,
     UiSkeletonComponent,
+    UiButtonComponent,
     ...APP_ICONS  
   ],
   templateUrl: './kanban-board.component.html',
@@ -56,6 +60,7 @@ import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 export class KanbanBoardComponent {
   private readonly taskStore = inject(TaskStore);
   protected readonly authStore = inject(AuthStoreService);
+  protected readonly shortcuts = inject(KeyboardShortcutsService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -170,7 +175,20 @@ export class KanbanBoardComponent {
       replaceUrl: true,
     });
   }
-
+// Jab bhi document pe 'Escape' dabega, ye function chalega
+  @HostListener('document:keydown.escape', ['$event'])
+  handleEscapeKey(event: Event) {
+    const keyboardEvent = event as KeyboardEvent;
+    // 1. Agar Task overlay khula hai, toh usko band kar do
+    if (this.activeTaskOverlay()) {
+      this.closeTaskOverlay();
+    }
+    
+    // 3. Filter open hai toh usko band karo
+    if (this.isFilterOpen()) {
+      this.isFilterOpen.set(false);
+    }
+  }
   onFiltersChanged(selection: BoardFilterSelection): void {
     this.hasActiveFilters.set(
       selection.noMembers ||
@@ -224,5 +242,15 @@ export class KanbanBoardComponent {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '') || 'task'
     );
+  }
+  ngOnInit(): void {
+    this.shortcuts.createTriggered.subscribe(() => {
+      this.isColumnInputOpen.set(true);
+    });
+    this.shortcuts.escapeTriggered.subscribe(() => {
+      if (this.isColumnInputOpen()) {
+        this.isColumnInputOpen.set(false);
+      }
+    });
   }
 }

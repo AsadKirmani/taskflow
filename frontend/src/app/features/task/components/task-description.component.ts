@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, HostListener, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TextEditorComponent } from '../../../shared/components/editor/text-editor.component';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
@@ -9,7 +9,7 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
   imports: [CommonModule, TextEditorComponent, ...APP_ICONS],
   template: `
     <div class="flex items-start gap-3">
-     <svg lucideFileText class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>
+     <svg lucideTextAlignStart class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>
       <div class="flex-1 w-full relative">
         <h3 class="font-semibold text-base mb-3 text-base-content">Description</h3>
         
@@ -50,4 +50,11 @@ export class TaskDescriptionComponent {
     this.saved.emit(this.descValue());
     this.isEditing.set(false);
   }
+  @HostListener('keydown', ['$event'])
+handleKeyboardEvent(event: KeyboardEvent) {
+  if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+    event.preventDefault();
+    this.save();
+  }
+}
 }

@@ -49,8 +49,8 @@ import { APP_ICONS } from '../../icons/lucide-icons';
       </div>
     </div>
     </div>
-    <app-search-overlay #searchOverlay></app-search-overlay>
     </header>
+    <app-search-overlay #searchOverlay></app-search-overlay>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

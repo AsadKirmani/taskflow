@@ -16,7 +16,7 @@ import { environment } from '../../../../../environments/environment';
       <div class="text-base-content">
         <h1 class="text-2xl font-bold mb-6">Settings</h1>
 
-        <div class="bg-base-200 rounded-xl border border-base-300 shadow-sm overflow-hidden flex flex-col min-h-[500px]">
+        <div class="bg-base-100 rounded-box border border-base-300 overflow-hidden flex flex-col min-h-[500px]">
           
           <nav class="flex flex-row overflow-x-auto gap-2 border-b border-base-300 bg-base-300 p-4">
             <button (click)="setTab('profile')" [class.bg-base-200]="activeTab() === 'profile'" [class.font-semibold]="activeTab() === 'profile'" [class.shadow-sm]="activeTab() === 'profile'" class="px-4 py-2 rounded-lg text-sm transition-all hover:bg-base-100 whitespace-nowrap">

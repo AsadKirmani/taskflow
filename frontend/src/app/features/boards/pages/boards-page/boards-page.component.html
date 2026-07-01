@@ -1,57 +1,34 @@
-<div
-  class="bg-base-200 w-full flex flex-col gap-2 select-none rounded-box overflow-y-auto max-h-[calc(85vh)] pt-0 scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-base-200"
->
-  <div
-    class="header bg-base-100 w-full text-base-content sticky top-0 z-1 p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-300"
-  >
-    <div>
-      @if (isWorkspaceMode()) {
-        <h1 class="text-2xl font-bold tracking-tight text-base-content">Workspace Boards</h1>
-        <p class="text-sm text-base-content/70">Viewing boards for this workspace context only</p>
-      } @else {
-        <h1 class="text-2xl font-bold tracking-tight text-base-content">All Your Boards</h1>
-        <p class="text-sm text-base-content/70">Categorized across your active team workspaces</p>
-      }
-    </div>
-
-    <div class="flex items-center gap-3 mt-3 sm:mt-0">
-      @if (isWorkspaceMode()) {
-        <button
-          (click)="openInviteModal()"
-          class="bg-secondary hover:bg-secondary/90 text-secondary-content focus:ring-2 focus:ring-offset-2 focus:ring-offset-secondary/70 focus:ring-secondary/50 px-3 h-10 text-xs rounded-box font-semibold transition-colors flex items-center gap-2"
-        >
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-            />
-          </svg>
-          Invite Member
-        </button>
-      }
-      <button
-        (click)="toggleBoardModal($event)"
-        class="bg-primary hover:bg-primary/70 text-primary-content focus:ring-2 focus:ring-offset-2 focus:ring-offset-primary/70 focus:ring-primary/50 h-10 px-3 text-xs rounded-box font-semibold transition-colors flex items-center gap-2"
+<div class="bg-base-100 w-full flex flex-col select-none rounded-box">
+  <div>
+    @if (isWorkspaceMode()) {
+      <ui-page-header
+        title="Workspace Boards"
+        subtitle="Organize your tasks and projects with boards across your workspaces"
       >
-        <svg
-          class="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          viewBox="0 0 24 24"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
-        New Board
-      </button>
-    </div>
+        <div class="flex items-center gap-3 mt-3 sm:mt-0">
+          @if (isWorkspaceMode()) {
+            <ui-button variant="secondary" size="md" (clicked)="openInviteModal()">
+              <svg lucideUserPlus class="w-4 h-4 mr-1.5"></svg>
+              Invite Member
+            </ui-button>
+          }
+          <ui-button variant="primary" size="md" (clicked)="toggleBoardModal($event)">
+            <svg lucidePlus class="w-4 h-4 mr-1.5"></svg>
+            New Board
+          </ui-button>
+        </div>
+      </ui-page-header>
+    } @else {
+      <ui-page-header
+        title="All your Boards"
+        subtitle="Organize your tasks and projects with boards"
+      >
+        <ui-button variant="primary" size="md" (clicked)="toggleBoardModal($event)">
+          <svg lucidePlus class="w-4 h-4 mr-1.5"></svg>
+          New Board
+        </ui-button>
+      </ui-page-header>
+    }
   </div>
 
   @if (boardStore.loading()) {
@@ -91,93 +68,85 @@
       </div>
     </div>
   } @else {
-    <div class="rounded-b-box bg-base-100 border border-base-300">
-      <div class="space-y-8 p-3">
-        @for (workspace of displayedWorkspaces(); track workspace.id) {
-          <section class="bg-base-300 p-6 rounded-box border border-base-300">
-            <div class="flex items-center justify-between border-b border-base-300 pb-3 mb-5">
-              <div class="flex items-center gap-3">
-                <span
-                  class="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-xs font-bold uppercase text-accent-content shadow-sm"
-                >
-                  {{ workspace.name[0] }}
-                </span>
-                <h2 class="text-xs font-bold text-base-content">{{ workspace.name }}</h2>
-                <span class="text-xs bg-info text-info-content rounded-lg font-medium px-2 py-0.5">
-                  {{ workspace.slug }}
-                </span>
-              </div>
-
-              @if (!isWorkspaceMode()) {
-                <a
-                  [routerLink]="['/w', workspace.id, 'boards']"
-                  class="text-xs font-semibold text-base-content hover:text-base-content/70 transition-colors flex items-center gap-1"
-                >
-                  <svg lucideArrowRight></svg>
-                </a>
-              }
+    <div class="space-y-8 p-3">
+      @for (workspace of displayedWorkspaces(); track workspace.id) {
+        <section class="bg-base-200 p-6 rounded-box border border-base-300">
+          <div class="flex items-center justify-between border-b border-base-300 pb-3 mb-5">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-xs font-bold uppercase text-accent-content shadow-sm"
+              >
+                {{ workspace.name[0] }}
+              </span>
+              <h2 class="text-xs font-bold text-base-content">{{ workspace.name }}</h2>
+              <span class="text-xs bg-info text-info-content rounded-lg font-medium px-2 py-0.5">
+                {{ workspace.slug }}
+              </span>
             </div>
 
-            <div
-              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-base-300"
-            >
-              @for (board of getBoardsByWorkspace(workspace.id); track board.id) {
-                <button
-                  type="button"
-                  (click)="openBoard(board)"
-                  class="group text-left w-full p-4 h-28 bg-base-100 rounded-box transition-all relative overflow-hidden cursor-pointer border border-base-300 hover:border-base-content focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-base-content"
-                >
-                  <div
-                    class="absolute -right-6 -top-6 w-16 h-16 bg-accent/20 rounded-full group-hover:scale-150 transition-transform duration-500"
-                  ></div>
-                  <h3 class="font-semibold text-base-content truncate pr-6">{{ board.name }}</h3>
-
-                  <div
-                    class="absolute bottom-3 right-3 flex items-center gap-1 text-xs text-base-content group-hover:text-base-content/70 transition-colors font-medium"
-                  >
-                    <span>View</span>
-                    <svg
-                      class="w-3 h-3 transform group-hover:translate-x-0.5 transition-transform"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                      viewBox="0 0 24 24"
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </button>
-              } @empty {
-                <div class="col-span-full">
-                  <ui-empty-state
-                    title="No Boards Active"
-                    description="There are no boards active in this workspace category. Create a new one to get started."
-                  >
-                    <svg lucideLayoutDashboard class="w-6 h-6"></svg>
-
-                    <button
-                      actions
-                      (click)="toggleBoardModal($event)"
-                      class="bg-primary text-primary-content hover:bg-primary/90 px-4 py-2 mt-2 rounded-box text-xs font-semibold transition-colors"
-                    >
-                      Create Board
-                    </button>
-                  </ui-empty-state>
-                </div>
-              }
-            </div>
-          </section>
-        } @empty {
-          <div class="col-span-full mt-8">
-            <ui-empty-state
-              title="No Workspaces Active"
-              description="There are no matching workspace targets available for the selected view state context."
-            >
-              <svg lucideLayoutDashboard class="w-6 h-6"></svg>
-            </ui-empty-state>
+            @if (!isWorkspaceMode()) {
+              <a
+                [routerLink]="['/w', workspace.id, 'boards']"
+                class="text-xs font-semibold text-base-content hover:text-base-content/70 transition-colors flex items-center gap-1"
+              >
+                <svg lucideArrowRight class="w-4 h-4"></svg>
+              </a>
+            }
           </div>
-        }
-      </div>
+
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 bg-base-200"
+          >
+            @for (board of getBoardsByWorkspace(workspace.id); track board.id) {
+              <button
+                type="button"
+                (click)="openBoard(board)"
+                class="group text-left w-full p-4 h-28 bg-base-100 rounded-box transition-all relative overflow-hidden cursor-pointer border border-base-300 hover:border-base-100 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-base-300"
+              >
+                <div
+                  class="absolute -right-6 -top-6 w-16 h-16 bg-accent/20 rounded-full group-hover:scale-150 transition-transform duration-500"
+                ></div>
+                <h3 class="font-semibold text-base-content truncate pr-6">{{ board.name }}</h3>
+
+                <div
+                  class="absolute bottom-3 right-3 flex items-center gap-1 text-xs text-base-content group-hover:text-base-content/70 transition-colors font-medium"
+                >
+                  <span>View</span>
+                  <svg lucideChevronRight class="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform"></svg>
+                </div>
+              </button>
+            } @empty {
+              <div class="col-span-full">
+                <ui-empty-state
+                  title="No Boards Active"
+                  description="There are no boards active in this workspace category. Create a new one to get started."
+                >
+                  <svg lucideBox class="w-6 h-6 text-base-content/50"></svg>
+
+                  <ui-button 
+                    actions
+                    variant="primary" 
+                    size="sm" 
+                    class="mt-2" 
+                    (clicked)="toggleBoardModal($event)"
+                  >
+                    Create Board
+                  </ui-button>
+                </ui-empty-state>
+              </div>
+            }
+          </div>
+        </section>
+      } @empty {
+        <div class="col-span-full mt-8">
+          <ui-empty-state
+            title="No Workspaces Active"
+            description="There are no matching workspace targets available for the selected view state context."
+          >
+           <svg lucideBox class="w-6 h-6 text-base-content/50"></svg>
+          </ui-empty-state>
+        </div>
+      }
     </div>
   }
 </div>

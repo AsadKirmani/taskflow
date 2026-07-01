@@ -17,6 +17,9 @@ import { LucideArrowRight } from '@lucide/angular';
 import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.component';
 import { UiEmptyStateComponent } from '../../../../ui/components/ui-empty-state.component';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
+import { UiPageHeaderComponent } from '../../../../ui/components/layout/ui-page-header.component';
+import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
+import { KeyboardShortcutsService } from '../../../../core/services/keyboard-shortcuts.service';
 
 @Component({
   selector: 'app-board-page',
@@ -28,6 +31,8 @@ import { APP_ICONS } from '../../../../core/icons/lucide-icons';
     LucideArrowRight,
     UiSkeletonComponent,
     UiEmptyStateComponent,
+    UiPageHeaderComponent,
+    UiButtonComponent,
     ...APP_ICONS
   ],
   templateUrl: './boards-page.component.html',
@@ -37,6 +42,7 @@ export class BoardsPageComponent implements OnInit {
   protected readonly boardStore = inject(BoardStore);
   protected readonly workspaceStore = inject(WorkspaceStoreService);
   protected readonly authStore = inject(AuthStoreService);
+  protected readonly shortcuts = inject(KeyboardShortcutsService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -63,6 +69,14 @@ export class BoardsPageComponent implements OnInit {
       const wId = params.get('workspaceId');
 
       this.workspaceStore.setActiveWorkspace(wId);
+    });
+    this.shortcuts.createTriggered.subscribe(() => {
+      this.isBoardModalOpen.set(true);
+    });
+    this.shortcuts.escapeTriggered.subscribe(() => {
+      if (this.isBoardModalOpen()) {
+        this.isBoardModalOpen.set(false);
+      }
     });
   }
 

@@ -4,7 +4,7 @@ import {
   LucidePlus, LucideCircleCheck, LucideCircle, LucidePencil, LucideFileText, LucideSquareCheck, LucideMessageSquare, 
   LucideUser, LucidePaperclip, LucideCheck, LucideCalendar, LucideX, LucideImage, LucideList, 
   LucideType, LucideListOrdered, LucideTag, LucideArrowDown, LucideLink, LucideDatabase, 
-  LucideTableProperties, LucideTextAlignStart, LucideSearch, LucideChevronRight, LucideActivity,
+  LucideTableProperties, LucideTextAlignStart, LucideSearch, LucideChevronRight, LucideActivity, LucideTrash
 } from '@lucide/angular';
 
 export const APP_ICONS = [
@@ -13,5 +13,5 @@ export const APP_ICONS = [
   LucidePlus, LucideCircleCheck, LucideCircle, LucidePencil, LucideFileText, LucideSquareCheck, LucideMessageSquare, 
   LucideUser, LucidePaperclip, LucideCheck, LucideCalendar, LucideX, LucideImage, LucideList, 
   LucideType, LucideListOrdered, LucideTag, LucideArrowDown, LucideLink, LucideDatabase, 
-  LucideTableProperties, LucideTextAlignStart, LucideSearch, LucideChevronRight, LucideActivity
+  LucideTableProperties, LucideTextAlignStart, LucideSearch, LucideChevronRight, LucideActivity, LucideTrash
 ];

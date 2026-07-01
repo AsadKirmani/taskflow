@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   selector: 'ui-board-column',
   standalone: true,
   template: `
-    <div class="w-[300px] sm:w-[320px] flex flex-col h-full max-h-full rounded-xl bg-base-200/50 border border-base-content/5">
+    <div class="w-[300px] sm:w-[320px] flex flex-col h-full max-h-full rounded-xl bg-base-200/50 border border-base-300/5">
       
       <div class="p-3 shrink-0 flex items-center justify-between group cursor-grab">
         <div class="flex items-center gap-2">

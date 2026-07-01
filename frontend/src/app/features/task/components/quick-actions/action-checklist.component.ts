@@ -13,7 +13,7 @@ import { APP_ICONS } from '../../../../core/icons/lucide-icons';
         (click)="isOpen.set(!isOpen())" 
         [ngClass]="isOpen() ? 'bg-base-content text-base-100 hover:bg-base-content/90' : 'bg-base-100 text-base-content hover:bg-base-300'"
         class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300">
-        <svg lucideCheckSquare class="w-4 h-4"></svg> Checklist
+        <svg lucideSquareCheck class="w-4 h-4"></svg> Checklist
       </button>
 
       @if (isOpen()) {

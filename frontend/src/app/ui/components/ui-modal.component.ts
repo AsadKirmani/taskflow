@@ -13,9 +13,9 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
         </div>
 
         <div 
-          class="relative w-full max-w-lg transform overflow-hidden rounded-xl bg-base-100 shadow-2xl transition-all border border-base-content/10 animate-in fade-in zoom-in-95 duration-200"
+          class="relative w-full max-w-lg transform overflow-hidden rounded-xl bg-base-100 shadow-2xl transition-all border border-base-300/10 animate-in fade-in zoom-in-95 duration-200"
         >
-          <div class="px-6 py-4 border-b border-base-content/5 flex items-center justify-between bg-base-100">
+          <div class="px-6 py-4 border-b border-base-300/5 flex items-center justify-between bg-base-100">
             <h3 class="text-lg font-semibold text-base-content">{{ title() }}</h3>
             <button 
               (click)="close.emit()" 
@@ -30,7 +30,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
           </div>
 
           @if (hasFooter()) {
-            <div class="px-6 py-4 bg-base-200/50 border-t border-base-content/5 flex justify-end gap-2">
+            <div class="px-6 py-4 bg-base-200/50 border-t border-base-300/5 flex justify-end gap-2">
               <ng-content select="[modal-footer]"></ng-content>
             </div>
           }

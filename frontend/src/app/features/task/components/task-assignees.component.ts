@@ -16,7 +16,7 @@ import { APP_ICONS } from "../../../core/icons/lucide-icons";
       </div>
       @if (members().length > 0) {
           <button
-            class="w-10 h-10 rounded-full border border-base-content flex items-center justify-center text-base-content hover:bg-base-content/10 transition-colors"
+            class="w-10 h-10 rounded-full border border-base-300 flex items-center justify-center text-base-content hover:bg-base-content/10 transition-colors"
           >
             <svg lucidePlus class="w-4 h-4"></svg>
           </button>

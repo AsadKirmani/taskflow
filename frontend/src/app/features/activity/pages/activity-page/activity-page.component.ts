@@ -3,33 +3,28 @@ import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/cor
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ActivityStore } from '../../data-access/activity-store.service'; // 🚀 Store path update kar lena
 import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.component';
+import { UiPageHeaderComponent } from '../../../../ui/components/layout/ui-page-header.component';
 
 @Component({
   selector: 'app-activity-page',
   standalone: true,
-  imports: [DatePipe, RouterLink, UiSkeletonComponent],
+  imports: [DatePipe, RouterLink, UiSkeletonComponent, UiPageHeaderComponent],
   providers: [ActivityStore], // Optional: Agar global chahiye toh hata dena
   template: `
-    <section class="rounded-box flex flex-col gap-2">
-  <header class="header bg-base-100 w-full text-base-content p-3 rounded-t-box flex flex-col sm:flex-row sm:items-center sm:justify-between border border-base-300">
+    <section class="rounded-box flex flex-col">
     <div class="min-w-0">
-      <h1 class="text-2xl font-semibold text-base-content mb-1">Activity</h1>
-      <p class="text-sm text-base-content/70">
         @if (store.currentBoardId()) {
-          Board activity feed
+        <ui-page-header title="Board activity feed" subtitle="Activities related to the current board"></ui-page-header>
         } @else if (store.currentWorkspaceId()) {
-          Workspace activity feed
+          <ui-page-header title="Workspace activity feed" subtitle="Activities related to the current workspace">
+          <span class="text-xs text-base-content/70 bg-base-100 px-2 py-1 rounded break-all self-start sm:self-auto">
+            Workspace: {{ store.currentWorkspaceId() }}
+          </span>
+          </ui-page-header>
         } @else {
-          Global activity feed
+          <ui-page-header title="Global activity feed" subtitle="Activities across all boards and workspaces"></ui-page-header>
         }
-      </p>
     </div>
-    @if (store.currentWorkspaceId()) {
-      <span class="text-xs text-base-content/70 bg-base-100 px-2 py-1 rounded break-all self-start sm:self-auto">
-        Workspace: {{ store.currentWorkspaceId() }}
-      </span>
-    }
-  </header>
 
   <div class="flex-1 rounded-b-box bg-base-100 p-3 shadow-sm border border-base-300">
     @if (store.hasError()) {

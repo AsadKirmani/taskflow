@@ -6,11 +6,12 @@ import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { AutofocusDirective } from '../../directives/autofocus.directive';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-text-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, TiptapEditorDirective, AutofocusDirective, ...APP_ICONS],
+  imports: [CommonModule, FormsModule, TiptapEditorDirective, AutofocusDirective, UiButtonComponent, ...APP_ICONS],
   templateUrl: './text-editor.component.html',
   encapsulation: ViewEncapsulation.None
 })

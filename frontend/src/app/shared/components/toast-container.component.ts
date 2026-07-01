@@ -75,6 +75,6 @@ export class ToastContainerComponent {
     };
 
     // If a type is passed that doesn't exist, it falls back to a neutral base style
-    return `${base} ${variants[type] || 'bg-base-100 border-base-content/10 text-base-content'}`;
+    return `${base} ${variants[type] || 'bg-base-100 border-base-300/10 text-base-content'}`;
   }
 }

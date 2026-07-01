@@ -1,7 +1,7 @@
 <section class="kanban-board h-full min-h-0 flex flex-col">
   @if (loading()) {
     <header
-      class="kanban-board__header mb-1 bg-base-100 border border-base-content/20 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+      class="kanban-board__header mb-1 bg-base-100 border border-base-300/20 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
     >
       <div class="flex items-center gap-2 min-w-0 text-base-content">
         <ui-skeleton variant="text" class="h-7 sm:h-8 w-48 sm:w-64"></ui-skeleton>
@@ -15,7 +15,7 @@
     </header>
 
     <div
-      class="kanban-board__columns flex-1 min-h-0 overflow-hidden border border-base-content/20 flex items-start bg-base-100 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
+      class="kanban-board__columns flex-1 min-h-0 overflow-hidden border border-base-300/20 flex items-start bg-base-100 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
     >
       @for (col of [1, 2, 3, 4]; track col) {
         <section
@@ -54,42 +54,39 @@
     </div>
   } @else {
     <header
-      class="kanban-board__header mb-1 bg-base-100 border border-base-content/20 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+      class="kanban-board__header mb-1 bg-base-100 border border-base-300/20 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
     >
       <div class="flex items-center gap-2 min-w-0 text-base-content">
         <h1 class="text-lg sm:text-2xl font-bold truncate m-0">{{ board()?.name }}</h1>
       </div>
       <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
         <app-avatar name="User Name"></app-avatar>
-        <button
-          type="button"
-          class="filter-button text-base-content hover:bg-base-300 p-2 rounded-box transition-colors border-none cursor-pointer flex items-center justify-center"
+        
+        <ui-button
+          variant="ghost"
+          size="icon"
           [class.bg-base-300]="isFilterOpen()"
           [attr.aria-pressed]="isFilterOpen()"
-          (click)="toggleFilterView($event)"
+          (clicked)="toggleFilterView($event)"
         >
           <svg lucideFunnel> </svg>
-        </button>
-        <button
-          class="star-button p-2 rounded-box hover:bg-base-300 border-none cursor-pointer flex items-center justify-center text-base-content"
-        >
-         <svg lucideStar></svg>
-        </button>
-        <button
-          class="visibility-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
-        >
+        </ui-button>
+        
+        <ui-button variant="ghost" size="icon">
+          <svg lucideStar></svg>
+        </ui-button>
+        
+        <ui-button variant="ghost" size="icon">
           <svg lucideEye></svg>
-        </button>
-        <button
-          class="share-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
-        >
+        </ui-button>
+        
+        <ui-button variant="ghost" size="icon">
           <svg lucideUserPlus></svg>
-        </button>
-        <button
-          class="more-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
-        >
+        </ui-button>
+        
+        <ui-button variant="ghost" size="icon">
           <svg lucideEllipsis></svg>
-        </button>
+        </ui-button>
       </div>
     </header>
 
@@ -101,7 +98,7 @@
     }
 
     <div
-      class="kanban-board__columns flex-1 min-h-0 overflow-x-auto overflow-y-hidden border border-base-content/20 flex items-start bg-base-100 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
+      class="kanban-board__columns flex-1 min-h-0 overflow-x-auto overflow-y-hidden border border-base-300/20 flex items-start bg-base-100 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
       cdkDropList
       cdkDropListOrientation="horizontal"
       (cdkDropListDropped)="onColumnDrop($event)"
@@ -127,17 +124,18 @@
       }
 
       <div
-        class="bg-base-100 w-[85vw] sm:w-52 flex-shrink-0 hover:bg-base-300 p-2 rounded-box text-base-content border border-base-content/20 hover:border-primary hover:ring-primary/30 hover:ring-2 shadow transition-colors"
+        class="bg-base-200 w-64 flex-shrink-0 hover:bg-base-300 p-2 rounded-box text-base-content border border-base-300 hover:border-primary hover:ring-primary/30 hover:ring-2 shadow transition-colors"
       >
         @if (!isColumnInputOpen()) {
-          <button
-            type="button"
-            class="add-column__button w-full flex items-center justify-center border-none bg-transparent cursor-pointer font-medium p-2"
-            (click)="openColumnInput()"
+          <ui-button
+            variant="ghost"
+            size="md"
+      
+            (clicked)="openColumnInput()"
           >
             <svg lucidePlus class="w-4 h-4 mr-1"></svg>
             Add Column
-          </button>
+          </ui-button>
         } @else {
           <div class="flex flex-col gap-2">
             <input
@@ -151,21 +149,22 @@
               (keydown.escape)="closeColumnInput()"
               autofocus
             />
-            <div class="flex items-center justify-end gap-2">
-              <button
-                type="button"
-                class="text-xs px-2 py-1 rounded-box bg-base-200 hover:bg-base-300 border border-base-content/20 cursor-pointer text-base-content"
-                (click)="closeColumnInput()"
+            <div class="flex items-center justify-end gap-2 mt-1">
+              <ui-button
+                variant="secondary"
+                size="sm"
+                (clicked)="closeColumnInput()"
               >
                 Cancel
-              </button>
-              <button
-                type="button"
-                class="text-xs px-2 py-1 rounded-box bg-primary text-primary-content cursor-pointer"
-                (click)="submitColumnInput()"
+              </ui-button>
+              
+              <ui-button
+                variant="primary"
+                size="sm"
+                (clicked)="submitColumnInput()"
               >
                 Add Column
-              </button>
+              </ui-button>
             </div>
           </div>
         }

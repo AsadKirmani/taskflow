@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, HostListener, input, output, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { TextEditorComponent } from '../../../shared/components/editor/text-editor.component';
 import { TaskComment } from '../../../core/models/comment.model';
@@ -72,4 +72,11 @@ export class TaskCommentsComponent {
     this.commentPosted.emit(text);
     this.cancel();
   }
+  @HostListener('keydown', ['$event'])
+handleKeyboardEvent(event: KeyboardEvent) {
+  if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+    event.preventDefault();
+    this.post();
+  }
+}
 }

@@ -26,14 +26,15 @@ import { CommonModule } from '@angular/common';
 })
 export class UiButtonComponent {
   variant = input<'primary' | 'secondary' | 'ghost' | 'danger'>('primary');
-  size = input<'sm' | 'md' | 'lg' | 'icon'>('md');
+  // 🚀 Yahan 'icon-sm' add kiya
+  size = input<'sm' | 'md' | 'lg' | 'icon' | 'icon-sm'>('md'); 
   disabled = input(false);
   loading = input(false);
   
   clicked = output<MouseEvent>();
 
   computedClasses = computed(() => {
-    // Base styles with active scale effect
+    // Base styles (ismein rounded-btn hai, jo aage override ho jayega jahan zaroorat hogi)
     const base = 'inline-flex items-center justify-center font-medium transition-all duration-300 rounded-btn focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-btn whitespace-nowrap';
     
     const variants = {
@@ -47,7 +48,8 @@ export class UiButtonComponent {
       sm: 'h-8 px-3 text-xs',
       md: 'h-10 px-4 text-sm',
       lg: 'h-12 px-6 text-base',
-      icon: 'h-10 w-10 p-2' // For icon-only buttons
+      icon: 'h-10 w-10 p-2 rounded-full', // Ise bhi full circle kar diya
+      'icon-sm': 'h-7 w-7 p-0 !rounded-full' // 🚀 Perfect circle for small toolbars (overrides rounded-btn)
     };
 
     return `${base} ${variants[this.variant()]} ${sizes[this.size()]}`;
