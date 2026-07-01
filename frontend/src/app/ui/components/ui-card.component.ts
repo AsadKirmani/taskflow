@@ -5,7 +5,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   standalone: true,
   template: `
     <div 
-      [class]="'bg-base-100 rounded-box border border-base-content/10 overflow-hidden transition-all duration-200 ' + (interactive() ? 'hover:shadow-md hover:border-base-content/20 cursor-pointer active:scale-[0.99]' : 'shadow-sm')"
+      [class]="'bg-base-100 rounded-box border border-base-content/10 overflow-hidden transition-all duration-200 ' + (interactive() ? 'hover:shadow-md hover:border-base-300 cursor-pointer active:scale-[0.99]' : 'shadow-sm')"
     >
       @if (hasHeader()) {
          <div class="px-5 py-3.5 border-b border-base-content/5 bg-base-200/30">

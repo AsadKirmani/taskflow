@@ -1,22 +1,22 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
 import { TextEditorComponent } from '../../../shared/components/editor/text-editor.component';
+import { APP_ICONS } from '../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-task-description',
   standalone: true,
-  imports: [CommonModule, MatIconModule, TextEditorComponent],
+  imports: [CommonModule, TextEditorComponent, ...APP_ICONS],
   template: `
     <div class="flex items-start gap-3">
-      <mat-icon class="text-base-content w-6 h-6 flex-shrink-0">subject</mat-icon>
+     <svg lucideFileText class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>
       <div class="flex-1 w-full relative">
         <h3 class="font-semibold text-base mb-3 text-base-content">Description</h3>
         
         @if (!isEditing()) {
           <div 
             (click)="enableEdit()"
-            class="bg-base-100 hover:bg-base-200 border border-base-content/20 min-h-[5rem] rounded-md p-4 text-sm cursor-pointer transition-colors prose prose-sm max-w-none text-base-content"
+            class="bg-base-100 hover:bg-base-200 border border-base-300 min-h-[5rem] rounded-md p-4 text-sm cursor-pointer transition-colors prose prose-sm max-w-none text-base-content"
             [innerHTML]="description() || 'Add a more detailed description...'">
           </div>
         } @else {
@@ -27,7 +27,7 @@ import { TextEditorComponent } from '../../../shared/components/editor/text-edit
               <button (click)="cancelEdit()" class="hover:bg-base-300 text-base-content text-sm font-medium px-4 py-1.5 rounded-box transition-colors">Cancel</button>
             </div>
           </div>
-        }
+        } 
       </div>
     </div>
   `

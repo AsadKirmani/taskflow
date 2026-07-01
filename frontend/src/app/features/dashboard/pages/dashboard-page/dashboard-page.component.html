@@ -1,126 +1,242 @@
 <section class="dashboard-page flex flex-col rounded-box gap-1">
-  
-  <ui-page-header 
-    title="Dashboard" 
-    subtitle="Plan, Prioritize, and Track Your Tasks">
-    <a routerLink="/boards" class="bg-primary text-primary-content px-4 py-2 text-xs rounded-field hover:opacity-90 flex items-center gap-2 md:text-sm font-semibold transition-all">
+  <ui-page-header title="Dashboard" subtitle="Plan, Prioritize, and Track Your Tasks">
+    <a
+      routerLink="/boards"
+      class="bg-primary text-primary-content px-4 py-2 text-xs rounded-field hover:opacity-90 flex items-center gap-2 md:text-sm font-semibold transition-all"
+    >
       Create
     </a>
   </ui-page-header>
 
-  @if (store.isLoading()) {
-    <p class="rounded-box bg-base-200 p-4 text-sm font-medium text-base-content/70 shadow-sm border border-base-300">Loading dashboard data...</p>
-  } @else if (store.hasError()) {
-    <p class="rounded-box bg-error/10 p-4 text-sm font-medium text-error shadow-sm border border-error/20">{{ store.hasError() }}</p>
-  }
-  
-  <ui-page-body>
-    <div class="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 p-3">
-      
-      <ui-stat-card 
-        title="Tasks Due Today" 
-        [value]="store.tasksDueToday()" 
-        [subText]="store.newAssignmentsToday() + ' New Assignments'" 
-        variant="info" />
-
-      <ui-stat-card 
-        title="Overdue Tasks" 
-        [value]="store.overdueTasks()" 
-        subText="Pending deadlines" 
-        variant="error" />
-
-      <ui-stat-card 
-        title="Active Boards" 
-        [value]="store.activeBoards()" 
-        subText="Boards with tasks" 
-        variant="warning" />
-
-      <ui-stat-card 
-        title="Completed Tasks" 
-        [value]="store.completedTasks()" 
-        [subText]="store.completedOnTime() + ' On Time'" 
-        variant="success" />
-
-    </div>
-    
-    <div class="flex flex-col lg:flex-row gap-5 mt-2 p-2">
-      
-      <div class="task-table col-span-2 flex flex-col gap-3 flex-1 min-w-[300px]">
-        <div class="table-header flex items-center justify-between px-1">
-          <h2 class="text-xl font-extrabold text-base-content">My Tasks</h2>
-        </div>
-        
-        <ui-panel>
-          @if (store.recentTaskRows().length === 0) {
-            <p class="p-8 text-sm font-medium text-base-content/60 text-center">No tasks available yet.</p>
-          } @else {
-            <div class="overflow-x-auto">
-              <table class="w-full min-w-[680px]">
-                <thead class="bg-neutral border-b border-base-300">
-                  <tr class="text-left text-neutral-content text-xs font-bold uppercase tracking-wider">
-                    <th class="p-4">Task</th>
-                    <th class="p-4">Board</th>
-                    <th class="p-4">Due Date</th>
-                    <th class="p-4">Priority</th>
-                    <th class="p-4">Status</th>
-                    <th class="p-4">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-base-300">
-                  @for (task of store.recentTaskRows(); track task.id) {
-                    <tr class="hover:bg-base-300 transition-colors group">
-                      <td class="p-4 flex items-center gap-3 text-sm font-semibold text-base-content">
-                        <span class="status-indicator w-2.5 h-2.5 rounded-full inline-block shrink-0 shadow-sm" [class.bg-success]="task.isCompleted" [class.bg-primary]="!task.isCompleted"></span>
-                        {{ task.title }}
-                      </td>
-                      <td class="p-4 text-sm font-medium text-base-content/80">{{ task.boardName }}</td>
-                      <td class="p-4 text-sm font-medium text-base-content/80">
-                        {{ task.dueDate ? (task.dueDate | date: 'yyyy-MM-dd') : 'No due date' }}
-                      </td>
-                      <td class="p-4 text-sm font-semibold" [class]="getPriorityClass(task.priority)">
-                        {{ task.priority | titlecase }}
-                      </td>
-                      <td class="p-4 text-sm font-semibold" [class]="getTaskStatusClass(task)">
-                        {{ task.isCompleted ? 'Completed' : 'In Progress' }}
-                      </td>
-                      <td class="p-4 text-sm">
-                        <a class="text-primary hover:text-primary/80 flex items-center gap-1.5 font-bold transition-all group-hover:underline" [routerLink]="getBoardRoute(task.boardId, task.boardName)" [queryParams]="getTaskQueryParams(task)">
-                          Open
-                        </a>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          }
-        </ui-panel>
+  @if (store.hasError()) {
+    <p
+      class="rounded-box bg-error/10 p-4 text-sm font-medium text-error shadow-sm border border-error/20"
+    >
+      {{ store.hasError() }}
+    </p>
+  } @else if (store.isLoading()) {
+    <ui-page-body>
+      <div class="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 p-3">
+        @for (item of [1, 2, 3, 4]; track item) {
+          <div
+            class="rounded-box bg-base-200 p-5 border border-base-300 h-[104px] flex flex-col gap-3 shadow-sm justify-center"
+          >
+            <ui-skeleton variant="text" class="w-1/2"></ui-skeleton>
+            <ui-skeleton variant="text" class="h-8 w-1/3"></ui-skeleton>
+          </div>
+        }
       </div>
 
-      <div class="activity-table flex flex-col gap-3 min-w-[300px]">
-        <div class="table-header flex items-center justify-between px-1">
-          <h2 class="text-xl font-extrabold text-base-content">Recent Activity</h2>
-        </div>
-        
-        <ui-panel>
-          @if (store.activities().length === 0) {
-            <p class="p-8 text-sm font-medium text-base-content/60 text-center">No recent activity found.</p>
-          } @else {
-            <ul class="divide-y divide-base-300 max-h-[400px] overflow-y-auto">
-              @for (item of store.activities(); track item._id ?? item.id ?? item.createdAt) {
-                <li class="flex items-start justify-between gap-4 p-4 hover:bg-base-300 transition-colors">
-                  <div class="flex items-start gap-3 min-w-0">
-                    <span class="activity-icon bg-primary w-2 h-2 mt-1.5 rounded-full inline-block shrink-0 shadow-sm"></span>
-                    <span class="truncate text-sm font-medium text-base-content">{{ describeActivity(item) }}</span>
-                  </div>
-                  <span class="text-xs font-bold text-base-content/40 shrink-0 mt-0.5">{{ item.createdAt | date: 'short' }}</span>
-                </li>
+      <div class="flex flex-col lg:flex-row gap-5 mt-2 p-2">
+        <div class="col-span-2 flex flex-col gap-3 flex-1 min-w-[300px]">
+          <div class="table-header flex items-center justify-between px-1 mb-1">
+            <ui-skeleton variant="text" class="h-7 w-32"></ui-skeleton>
+          </div>
+
+          <ui-panel>
+            <div class="flex flex-col divide-y divide-base-300">
+              <div class="p-4 bg-neutral">
+                <ui-skeleton variant="rect" class="h-4 w-full opacity-30"></ui-skeleton>
+              </div>
+              @for (item of [1, 2, 3, 4, 5]; track item) {
+                <div class="p-4 flex gap-4 items-center">
+                  <ui-skeleton
+                    variant="circle"
+                    width="10px"
+                    height="10px"
+                    class="shrink-0"
+                  ></ui-skeleton>
+                  <ui-skeleton variant="text" class="w-1/3"></ui-skeleton>
+                  <ui-skeleton variant="text" class="w-1/6 hidden md:block"></ui-skeleton>
+                  <ui-skeleton variant="text" class="w-1/6 hidden md:block"></ui-skeleton>
+                  <ui-skeleton variant="text" class="w-1/6"></ui-skeleton>
+                </div>
               }
-            </ul>
-          }
-        </ui-panel>
+            </div>
+          </ui-panel>
+        </div>
+
+        <div class="activity-table flex flex-col gap-3 min-w-[300px]">
+          <div class="table-header flex items-center justify-between px-1 mb-1">
+            <ui-skeleton variant="text" class="h-7 w-40"></ui-skeleton>
+          </div>
+
+          <ui-panel>
+            <div class="flex flex-col divide-y divide-base-300">
+              @for (item of [1, 2, 3, 4, 5]; track item) {
+                <div class="p-4 flex items-start justify-between gap-4">
+                  <div class="flex gap-3 w-full items-center">
+                    <ui-skeleton
+                      variant="circle"
+                      width="8px"
+                      height="8px"
+                      class="shrink-0 mt-0.5"
+                    ></ui-skeleton>
+                    <ui-skeleton variant="text" class="w-3/4"></ui-skeleton>
+                  </div>
+                </div>
+              }
+            </div>
+          </ui-panel>
+        </div>
       </div>
-      
-    </div>
-  </ui-page-body>
+    </ui-page-body>
+  } @else {
+    <ui-page-body>
+      <div class="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 p-3">
+        <ui-stat-card
+          title="Tasks Due Today"
+          [value]="store.tasksDueToday()"
+          [subText]="store.newAssignmentsToday() + ' New Assignments'"
+          variant="info"
+        />
+
+        <ui-stat-card
+          title="Overdue Tasks"
+          [value]="store.overdueTasks()"
+          subText="Pending deadlines"
+          variant="error"
+        />
+
+        <ui-stat-card
+          title="Active Boards"
+          [value]="store.activeBoards()"
+          subText="Boards with tasks"
+          variant="warning"
+        />
+
+        <ui-stat-card
+          title="Completed Tasks"
+          [value]="store.completedTasks()"
+          [subText]="store.completedOnTime() + ' On Time'"
+          variant="success"
+        />
+      </div>
+
+      <div class="flex flex-col lg:flex-row gap-5 mt-2 p-2">
+        <div class="task-table col-span-2 flex flex-col gap-3 flex-1 min-w-[300px]">
+          <div class="table-header flex items-center justify-between px-1">
+            <h2 class="text-xl font-extrabold text-base-content">My Tasks</h2>
+          </div>
+
+          <ui-panel>
+            @if (store.recentTaskRows().length === 0) {
+              <div class="py-8">
+                <ui-empty-state
+                  title="All Caught Up!"
+                  description="You don't have any pending tasks assigned to you right now."
+                >
+                  <svg lucideCheckCircle class="w-6 h-6"></svg>
+
+                  <button
+                    actions
+                    routerLink="/boards"
+                    class="bg-base-200 hover:bg-base-300 text-base-content px-4 py-2 mt-2 rounded-box text-xs font-semibold border border-base-content/20 transition-colors"
+                  >
+                    Go to Boards
+                  </button>
+                </ui-empty-state>
+              </div>
+            } @else {
+              <div class="overflow-x-auto">
+                <table class="w-full min-w-[680px]">
+                  <thead class="bg-neutral border-b border-base-300">
+                    <tr
+                      class="text-left text-neutral-content text-xs font-bold uppercase tracking-wider"
+                    >
+                      <th class="p-4">Task</th>
+                      <th class="p-4">Board</th>
+                      <th class="p-4">Due Date</th>
+                      <th class="p-4">Priority</th>
+                      <th class="p-4">Status</th>
+                      <th class="p-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-base-300">
+                    @for (task of store.recentTaskRows(); track task.id) {
+                      <tr class="hover:bg-base-300 transition-colors group">
+                        <td
+                          class="p-4 flex items-center gap-3 text-sm font-semibold text-base-content"
+                        >
+                          <span
+                            class="status-indicator w-2.5 h-2.5 rounded-full inline-block shrink-0 shadow-sm"
+                            [class.bg-success]="task.isCompleted"
+                            [class.bg-primary]="!task.isCompleted"
+                          ></span>
+                          {{ task.title }}
+                        </td>
+                        <td class="p-4 text-sm font-medium text-base-content/80">
+                          {{ task.boardName }}
+                        </td>
+                        <td class="p-4 text-sm font-medium text-base-content/80">
+                          {{ task.dueDate ? (task.dueDate | date: 'yyyy-MM-dd') : 'No due date' }}
+                        </td>
+                        <td
+                          class="p-4 text-sm font-semibold"
+                          [class]="getPriorityClass(task.priority)"
+                        >
+                          {{ task.priority | titlecase }}
+                        </td>
+                        <td class="p-4 text-sm font-semibold" [class]="getTaskStatusClass(task)">
+                          {{ task.isCompleted ? 'Completed' : 'In Progress' }}
+                        </td>
+                        <td class="p-4 text-sm">
+                          <a
+                            class="text-primary hover:text-primary/80 flex items-center gap-1.5 font-bold transition-all group-hover:underline"
+                            [routerLink]="getBoardRoute(task.boardId, task.boardName)"
+                            [queryParams]="getTaskQueryParams(task)"
+                          >
+                            Open
+                          </a>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </ui-panel>
+        </div>
+
+        <div class="activity-table flex flex-col gap-3 min-w-[300px]">
+          <div class="table-header flex items-center justify-between px-1">
+            <h2 class="text-xl font-extrabold text-base-content">Recent Activity</h2>
+          </div>
+
+          <ui-panel>
+            @if (store.activities().length === 0) {
+              <div class="py-8">
+                <ui-empty-state
+                  title="No Recent Activity"
+                  description="Things are quiet right now. Your recent workspace events will appear here."
+                >
+                  <svg lucideNotificationsPaused class="w-8 h-8 text-base-content/50"></svg>
+                </ui-empty-state>
+              </div>
+            } @else {
+              <ul class="divide-y divide-base-300 max-h-[400px] overflow-y-auto">
+                @for (item of store.activities(); track item._id ?? item.id ?? item.createdAt) {
+                  <li
+                    class="flex items-start justify-between gap-4 p-4 hover:bg-base-300 transition-colors"
+                  >
+                    <div class="flex items-start gap-3 min-w-0">
+                      <span
+                        class="activity-icon bg-primary w-2 h-2 mt-1.5 rounded-full inline-block shrink-0 shadow-sm"
+                      ></span>
+                      <span class="truncate text-sm font-medium text-base-content">{{
+                        describeActivity(item)
+                      }}</span>
+                    </div>
+                    <span class="text-xs font-bold text-base-content/40 shrink-0 mt-0.5">{{
+                      item.createdAt | date: 'short'
+                    }}</span>
+                  </li>
+                }
+              </ul>
+            }
+          </ui-panel>
+        </div>
+      </div>
+    </ui-page-body>
+  }
 </section>

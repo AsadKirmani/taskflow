@@ -9,8 +9,8 @@
           class="bg-base-100 text-base-content px-2 py-0.5 rounded-full text-xs font-semibold"
           >{{ tasks().length }}</span>
       </header>
-        <mat-icon
-          class="cursor-pointer text-base-content hover:text-base-content/70 transition-colors">more_vert</mat-icon>
+        <svg lucideEllipsisVertical
+          class="cursor-pointer text-base-content hover:text-base-content/70 transition-colors"></svg>
     </div>
     @if (hasActiveFilters()) {
       <span class="text-xs text-primary font-semibold">{{ tasks().length }} matching tasks</span>
@@ -36,6 +36,13 @@
         (toggleCompletion)="taskCompletionToggled.emit(task)"
         (openOverlay)="taskClicked.emit(task)"
       ></app-kanban-task>
+    } @empty {
+      <ui-empty-state 
+        title="No Tasks" 
+        description="Drag tasks here or add a new one."
+        size="compact">
+        <svg lucideAssignment class="w-5 h-5"></svg>
+      </ui-empty-state>
     }
   </div>
 
@@ -44,10 +51,10 @@
   >
     @if (!isInputOpen()) {
       <button
-        class="add-task__button cursor-pointer hover:bg-base-content/10 border border-base-content/20 w-full flex items-center justify-center p-2 rounded-field bg-transparent transition-colors"
+        class="add-task__button cursor-pointer hover:bg-base-content/10 border border-base-300 w-full flex items-center justify-center p-2 rounded-field bg-transparent transition-colors"
         (click)="isInputOpen.set(true)"
       >
-        <mat-icon class="w-4 h-4 mr-1">add</mat-icon>
+        <svg lucidePlus class="w-4 h-4 mr-1"></svg>
         Add a task
       </button>
     } @else {

@@ -13,6 +13,7 @@ import {
   UpdateTaskEventPayload, 
   ToggleTaskCompletionEventPayload 
 } from '../../models/drag-drop.model';
+import { TaskFacade } from '../../../task/facades/task.facade';
 
 @Component({
   selector: 'app-board-detail-page',
@@ -46,6 +47,7 @@ export class BoardDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   protected readonly boardStore = inject(BoardStore);
   protected readonly taskStore = inject(TaskStore);
+  protected readonly facade = inject(TaskFacade);
   private readonly dndFacade = inject(KanbanDndFacade);
 
   activeBoardId = signal<string | null>(null);

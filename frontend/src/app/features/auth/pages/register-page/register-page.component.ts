@@ -21,7 +21,7 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
           type="text"
           appAutofocus
           formControlName="name"
-          class="w-full p-2 border border-base-content/20 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
+          class="w-full p-2 border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
           placeholder="John Doe"
         />
       </div>
@@ -32,7 +32,7 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
           id="email"
           type="email"
           formControlName="email"
-          class="w-full p-2 border border-base-content/20 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
+          class="w-full p-2 border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
           placeholder="name@email.com"
         />
       </div>
@@ -43,7 +43,7 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
           id="password"
           type="password"
           formControlName="password"
-          class="w-full p-2 border border-base-content/20 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
+          class="w-full p-2 border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
           placeholder="••••••••"
         />
       </div>

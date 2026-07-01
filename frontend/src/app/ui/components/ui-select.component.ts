@@ -17,7 +17,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
           [ngModel]="value"
           (ngModelChange)="onValueChange($event)"
           (blur)="onTouched()"
-          [class]="'w-full h-10 pl-3 pr-10 text-sm bg-base-100 border rounded-btn transition-colors appearance-none focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:bg-base-200 cursor-pointer ' + (error() ? 'border-error focus:ring-error/30' : 'border-base-content/20 focus:border-primary focus:ring-primary/20')"
+          [class]="'w-full h-10 pl-3 pr-10 text-sm bg-base-100 border rounded-btn transition-colors appearance-none focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:bg-base-200 cursor-pointer ' + (error() ? 'border-error focus:ring-error/30' : 'border-base-300 focus:border-primary focus:ring-primary/20')"
         >
           @if (placeholder()) {
             <option value="" disabled selected hidden>{{ placeholder() }}</option>

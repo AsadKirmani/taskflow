@@ -3,7 +3,6 @@ import {
   Component,
   EventEmitter,
   Output,
-  computed,
   inject,
   input,
   signal
@@ -15,13 +14,15 @@ import {
 } from '@angular/router';
 
 import { WorkspaceStoreService } from '../../../features/workspace/data-access/workspace-store.service';
+import { APP_ICONS } from '../../icons/lucide-icons';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [
     RouterLink,
-    RouterLinkActive
+    RouterLinkActive,
+    ...APP_ICONS
   ],
   templateUrl: './sidebar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush

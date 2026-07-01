@@ -3,9 +3,12 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 @Component({
   selector: 'ui-skeleton',
   standalone: true,
-  template: `
-    <div [class]="computedClasses()" [style.width]="width()" [style.height]="height()"></div>
-  `,
+  template: '', // BINGO! Koi inner HTML ki zaroorat nahi
+  host: {
+    '[class]': 'computedClasses()',
+    '[style.width]': 'width()',
+    '[style.height]': 'height()'
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiSkeletonComponent {
@@ -17,12 +20,15 @@ export class UiSkeletonComponent {
   height = input<string>();
 
   computedClasses = computed(() => {
-    const base = 'animate-pulse bg-base-300';
+    // Note: 'block' add kiya hai kyunki custom HTML elements default 'inline' hote hain
+    const base = 'block animate-pulse bg-base-300'; 
+    
     const variants = {
-      text: 'rounded-md h-4 w-full',
+      text: 'rounded-md',
       circle: 'rounded-full',
-      rect: 'rounded-xl w-full h-full'
+      rect: 'rounded-xl'
     };
+    
     return `${base} ${variants[this.variant()]}`;
   });
 }

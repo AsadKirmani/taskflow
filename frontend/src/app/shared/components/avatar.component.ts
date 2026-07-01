@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div
-      class="flex h-10 w-10 items-center justify-center rounded-full font-bold text-base-content shadow-sm border border-base-content/20 text-sm"
+      class="flex h-10 w-10 items-center justify-center rounded-full font-bold text-base-content shadow-sm border border-base-300 text-sm"
       [ngClass]="avatarColor"
     >
       {{ getInitials() }}

@@ -31,7 +31,7 @@ import { filter } from 'rxjs';
     [class.z-50]="isMobile()"
     [class.translate-x-0]="isMobile() && isSidebarOpen()"
     [class.-translate-x-full]="isMobile() && !isSidebarOpen()"
-    class="h-full bg-base-100 transition-all duration-300 cubic-bezier(0.4, 0, 0.2, 1) border-r border-base-content/10 flex-shrink-0 shadow-2xl md:shadow-none">
+    class="h-full bg-base-100 transition-all duration-300 cubic-bezier(0.4, 0, 0.2, 1) border-r border-base-300 flex-shrink-0 shadow-2xl md:shadow-none">
     
     <app-sidebar 
       [isCollapsed]="!isSidebarOpen() && !isMobile()" 

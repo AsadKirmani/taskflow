@@ -14,9 +14,9 @@
         <div>
           <div class="flex items-start gap-3">
             @if (facade.currentTask()?.isCompleted) {
-              <mat-icon class="mt-1 w-6 h-6 flex-shrink-0 text-green-500">check_circle</mat-icon>
+              <svg lucideCircleCheck class="mt-1 w-6 h-6 flex-shrink-0 text-success"></svg>
             } @else {
-            <mat-icon class="mt-1 w-6 h-6 flex-shrink-0">radio_button_unchecked</mat-icon>
+              <svg lucideCircle class="mt-1 w-6 h-6 flex-shrink-0 text-base-content/50"></svg>
             }
             <h2 class="text-2xl font-bold m-0 leading-tight text-base-content">
               {{ task().title || 'Task Title' }}
@@ -74,7 +74,7 @@
       </div>
 
       <div
-        class="w-full md:w-[380px] lg:w-[420px] bg-base-100 border-l border-base-content/20 p-5 sm:p-8 flex flex-col gap-6 overflow-y-auto"
+        class="w-full md:w-[380px] lg:w-[420px] bg-base-100 border-l border-base-300 p-5 sm:p-8 flex flex-col gap-6 overflow-y-auto"
       >
         <app-task-comments [comments]="facade.comments()" (commentPosted)="facade.postComment($event)">
         </app-task-comments>

@@ -4,19 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { BoardStore } from '../data-access/board-store.service';
 import { Workspace } from '../../../core/models/workspace.model';
 import { NotificationService } from '../../../core/services/notification.service';
-import { LucideX } from '@lucide/angular';
+import { APP_ICONS } from '../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-board-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideX],
+  imports: [CommonModule, FormsModule, ...APP_ICONS],
   template: `
     <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-10 p-2" (click)="close()">
-      <div class="bg-base-100 rounded-lg shadow p-6 w-full max-w-md border border-base-content/20" (click)="$event.stopPropagation()">
+      <div class="bg-base-100 rounded-lg shadow p-6 w-full max-w-md border border-base-300" (click)="$event.stopPropagation()">
         <div class="flex items-start justify-between gap-4 mb-4">
           <h2 class="text-2xl font-semibold text-base-content">Create New Board</h2>
           <button type="button" class="text-base-content/70 hover:text-primary hover:bg-base-content/10 transition-colors p-2 rounded-full" (click)="close()">
-            <svg lucideX></svg>
+            <svg lucideX class="w-6 h-6"></svg>
           </button>
         </div>
 
@@ -28,7 +28,7 @@ import { LucideX } from '@lucide/angular';
               id="boardName"
               [(ngModel)]="boardDraft.name"
               name="boardName"
-              class="w-full px-3 py-2 border border-base-content/20 text-base-content rounded-field focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
+              class="w-full px-3 py-2 border border-base-300 text-base-content rounded-field focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
               placeholder="Enter board name"
             >
           </div>
@@ -39,7 +39,7 @@ import { LucideX } from '@lucide/angular';
               <input
                 id="workspace"
                 type="text"
-                class="w-full px-3 py-2 border border-base-content/20 rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
+                class="w-full px-3 py-2 border border-base-300 rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
                 [value]="selectedWorkspaceName()"
                 readonly
               >
@@ -49,7 +49,7 @@ import { LucideX } from '@lucide/angular';
                 [(ngModel)]="boardDraft.workspaceId"
                 name="workspaceId"
                 id="workspace"
-                class="w-full px-3 py-2 border border-base-content/20 rounded-field focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
+                class="w-full px-3 py-2 border border-base-300 rounded-field focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
               >
                 <option value="">Select workspace</option>
                 <option *ngFor="let workspace of availableWorkspaces()" [value]="workspace.id">
@@ -65,7 +65,7 @@ import { LucideX } from '@lucide/angular';
               [(ngModel)]="boardDraft.visibility"
               name="visibility"
               id="visibility"
-              class="w-full px-3 py-2 border border-base-content/20 rounded-field focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
+              class="w-full px-3 py-2 border border-base-300 rounded-field focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
             >
               <option value="private">Private</option>
               <option value="workspace">Workspace</option>

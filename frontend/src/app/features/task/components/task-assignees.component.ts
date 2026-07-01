@@ -1,13 +1,13 @@
-import { MatIconModule } from "@angular/material/icon";
 import { Component, input, output } from "@angular/core";
 import { User } from "../../../core/models/user.model";
 import { CommonModule } from "@angular/common";
 import { AvatarComponent } from "../../../shared/components/avatar.component";
+import { APP_ICONS } from "../../../core/icons/lucide-icons";
 
 @Component({
   selector: 'app-task-assignees',
   standalone: true,
-  imports: [MatIconModule, CommonModule, AvatarComponent],
+  imports: [CommonModule, AvatarComponent, ...APP_ICONS],
     template: `<div class="flex items-center gap-1">
     <div class="flex -space-x-3">
     @for (member of members(); track member.id) {
@@ -18,7 +18,7 @@ import { AvatarComponent } from "../../../shared/components/avatar.component";
           <button
             class="w-10 h-10 rounded-full border border-base-content flex items-center justify-center text-base-content hover:bg-base-content/10 transition-colors"
           >
-            <mat-icon>add</mat-icon>
+            <svg lucidePlus class="w-4 h-4"></svg>
           </button>
 }
         </div>`

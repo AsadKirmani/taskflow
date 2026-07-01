@@ -1,121 +1,177 @@
 <section class="kanban-board h-full min-h-0 flex flex-col">
-  <header
-    class="kanban-board__header mb-1 bg-base-100 border border-base-content/20 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-  >
-    <div class="flex items-center gap-2 min-w-0 text-base-content">
-      <h1 class="text-lg sm:text-2xl font-bold truncate m-0">{{ board()?.name }}</h1>
-    </div>
-    <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
-      <app-avatar name="User Name"></app-avatar>
-      <button
-        type="button"
-        class="filter-button text-base-content hover:bg-base-300 p-2 rounded-box transition-colors border-none cursor-pointer flex items-center justify-center"
-        [class.bg-base-300]="isFilterOpen()"
-        [attr.aria-pressed]="isFilterOpen()"
-        (click)="toggleFilterView($event)"
-      >
-        <mat-icon class="w-6 h-6">filter_list</mat-icon>
-      </button>
-      <button
-        class="star-button p-2 rounded-box hover:bg-base-300 border-none cursor-pointer flex items-center justify-center text-base-content"
-      >
-        <mat-icon class="w-6 h-6">star_border</mat-icon>
-      </button>
-      <button
-        class="visibility-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
-      >
-        <mat-icon class="w-6 h-6">visibility</mat-icon>
-      </button>
-      <button
-        class="share-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
-      >
-        <mat-icon class="w-6 h-6">person_add</mat-icon>
-      </button>
-      <button
-        class="more-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
-      >
-        <mat-icon class="w-6 h-6">more_horiz</mat-icon>
-      </button>
-    </div>
-  </header>
+  @if (loading()) {
+    <header
+      class="kanban-board__header mb-1 bg-base-100 border border-base-content/20 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+    >
+      <div class="flex items-center gap-2 min-w-0 text-base-content">
+        <ui-skeleton variant="text" class="h-7 sm:h-8 w-48 sm:w-64"></ui-skeleton>
+      </div>
+      <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
+        <ui-skeleton variant="circle" width="36px" height="36px"></ui-skeleton>
+        @for (btn of [1, 2, 3, 4, 5]; track btn) {
+          <ui-skeleton variant="rect" class="w-10 h-10 rounded-box"></ui-skeleton>
+        }
+      </div>
+    </header>
 
-  @if (isFilterOpen()) {
-    <app-apply-filter
-      [(isOpen)]="isFilterOpen"
-      (filtersChanged)="onFiltersChanged($event)"
-    ></app-apply-filter>
-  }
+    <div
+      class="kanban-board__columns flex-1 min-h-0 overflow-hidden border border-base-content/20 flex items-start bg-base-100 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
+    >
+      @for (col of [1, 2, 3, 4]; track col) {
+        <section
+          class="kanban-column max-h-[calc(100vh-4rem)] self-start bg-base-300 p-2 w-[85vw] sm:w-64 rounded-xl shadow flex-shrink-0 flex flex-col transition-colors"
+        >
+          <div class="flex flex-col p-2 gap-1 mb-2">
+            <div class="flex items-center justify-between">
+              <ui-skeleton variant="text" class="h-5 w-32"></ui-skeleton>
+              <ui-skeleton variant="rect" class="h-5 w-8 rounded-full"></ui-skeleton>
+            </div>
+          </div>
 
-  <div
-    class="kanban-board__columns flex-1 min-h-0 overflow-x-auto overflow-y-hidden border border-base-content/20 flex items-start bg-base-100 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
-  cdkDropList
-  cdkDropListOrientation="horizontal"
-  (cdkDropListDropped)="onColumnDrop($event)"
-  #boardBoundary>
-    @for (column of columns(); track column.id; let i = $index) {
-      <app-kanban-column
-        cdkDrag
-        [columnIndex]="i"
-        [cdkDragBoundary]="boardBoundary"
-        [column]="column"
-        [connectedTo]="columnIds()"
-        [tasks]="tasksByColumn()[column.id] ?? []"
-        (hasActiveFilters)="hasActiveFilters()"
-        (nativeTaskDrop)="onTaskDrop($event)"
-        (taskAdded)="submitTaskInput(column.id, $event)"
-        (taskUpdated)="taskUpdated.emit($event)"
-        (taskCompletionToggled)="
-          taskCompletionToggled.emit({ taskId: $event.id, isCompleted: !$event.isCompleted })
-        "
-        (taskClicked)="openTaskOverlay($event)"
-      ></app-kanban-column>
+          <div class="kanban-column__task-list flex-1 flex flex-col gap-2 min-h-0 p-1">
+            @for (card of [1, 2, 3]; track card) {
+              <article
+                class="task-card shadow rounded-lg p-2.5 bg-base-100 flex items-center justify-between"
+              >
+                <div class="flex items-center gap-2 w-full">
+                  <ui-skeleton
+                    variant="circle"
+                    width="18px"
+                    height="18px"
+                    class="shrink-0 opacity-40"
+                  ></ui-skeleton>
+                  <ui-skeleton variant="text" class="h-4 w-3/4"></ui-skeleton>
+                </div>
+              </article>
+            }
+          </div>
+
+          <div class="add-task p-1 mt-1">
+            <ui-skeleton variant="rect" class="h-9 w-full rounded-field opacity-60"></ui-skeleton>
+          </div>
+        </section>
+      }
+    </div>
+  } @else {
+    <header
+      class="kanban-board__header mb-1 bg-base-100 border border-base-content/20 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+    >
+      <div class="flex items-center gap-2 min-w-0 text-base-content">
+        <h1 class="text-lg sm:text-2xl font-bold truncate m-0">{{ board()?.name }}</h1>
+      </div>
+      <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
+        <app-avatar name="User Name"></app-avatar>
+        <button
+          type="button"
+          class="filter-button text-base-content hover:bg-base-300 p-2 rounded-box transition-colors border-none cursor-pointer flex items-center justify-center"
+          [class.bg-base-300]="isFilterOpen()"
+          [attr.aria-pressed]="isFilterOpen()"
+          (click)="toggleFilterView($event)"
+        >
+          <svg lucideFunnel> </svg>
+        </button>
+        <button
+          class="star-button p-2 rounded-box hover:bg-base-300 border-none cursor-pointer flex items-center justify-center text-base-content"
+        >
+         <svg lucideStar></svg>
+        </button>
+        <button
+          class="visibility-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
+        >
+          <svg lucideEye></svg>
+        </button>
+        <button
+          class="share-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
+        >
+          <svg lucideUserPlus></svg>
+        </button>
+        <button
+          class="more-button p-2 rounded-box hover:bg-base-300 border-none bg-transparent cursor-pointer flex items-center justify-center text-base-content"
+        >
+          <svg lucideEllipsis></svg>
+        </button>
+      </div>
+    </header>
+
+    @if (isFilterOpen()) {
+      <app-apply-filter
+        [(isOpen)]="isFilterOpen"
+        (filtersChanged)="onFiltersChanged($event)"
+      ></app-apply-filter>
     }
 
     <div
-      class="bg-base-100 w-[85vw] sm:w-52 flex-shrink-0 hover:bg-base-300 p-2 rounded-box text-base-content border border-base-content/20 hover:border-primary hover:ring-primary/30 hover:ring-2 shadow transition-colors"
+      class="kanban-board__columns flex-1 min-h-0 overflow-x-auto overflow-y-hidden border border-base-content/20 flex items-start bg-base-100 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      (cdkDropListDropped)="onColumnDrop($event)"
+      #boardBoundary
     >
-      @if (!isColumnInputOpen()) {
-        <button
-          type="button"
-          class="add-column__button w-full flex items-center justify-center border-none bg-transparent cursor-pointer font-medium p-2"
-          (click)="openColumnInput()"
-        >
-          <mat-icon class="w-4 h-4 mr-1">add</mat-icon>
-          Add Column
-        </button>
-      } @else {
-        <div class="flex flex-col gap-2">
-          <input
-            type="text"
-            appAutofocus
-            class="add-column__input p-2 shadow rounded-lg w-full h-12 outline-none ring-1 ring-base-content focus:ring-2 focus:ring-accent focus:outline-none bg-base-100"
-            placeholder="Column title..."
-            [value]="columnInputValue()"
-            (input)="onColumnInputChange($event)"
-            (keydown.enter)="submitColumnInput()"
-            (keydown.escape)="closeColumnInput()"
-            autofocus
-          />
-          <div class="flex items-center justify-end gap-2">
-            <button
-              type="button"
-              class="text-xs px-2 py-1 rounded-box bg-base-200 hover:bg-base-300 border border-base-content/20 cursor-pointer text-base-content"
-              (click)="closeColumnInput()"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              class="text-xs px-2 py-1 rounded-box bg-primary text-primary-content cursor-pointer"
-              (click)="submitColumnInput()"
-            >
-              Add Column
-            </button>
-          </div>
-        </div>
+      @for (column of columns(); track column.id; let i = $index) {
+        <app-kanban-column
+          cdkDrag
+          [columnIndex]="i"
+          [cdkDragBoundary]="boardBoundary"
+          [column]="column"
+          [connectedTo]="columnIds()"
+          [tasks]="tasksByColumn()[column.id] ?? []"
+          (hasActiveFilters)="hasActiveFilters()"
+          (nativeTaskDrop)="onTaskDrop($event)"
+          (taskAdded)="submitTaskInput(column.id, $event)"
+          (taskUpdated)="taskUpdated.emit($event)"
+          (taskCompletionToggled)="
+            taskCompletionToggled.emit({ taskId: $event.id, isCompleted: !$event.isCompleted })
+          "
+          (taskClicked)="openTaskOverlay($event)"
+        ></app-kanban-column>
       }
+
+      <div
+        class="bg-base-100 w-[85vw] sm:w-52 flex-shrink-0 hover:bg-base-300 p-2 rounded-box text-base-content border border-base-content/20 hover:border-primary hover:ring-primary/30 hover:ring-2 shadow transition-colors"
+      >
+        @if (!isColumnInputOpen()) {
+          <button
+            type="button"
+            class="add-column__button w-full flex items-center justify-center border-none bg-transparent cursor-pointer font-medium p-2"
+            (click)="openColumnInput()"
+          >
+            <svg lucidePlus class="w-4 h-4 mr-1"></svg>
+            Add Column
+          </button>
+        } @else {
+          <div class="flex flex-col gap-2">
+            <input
+              type="text"
+              appAutofocus
+              class="add-column__input p-2 shadow rounded-lg w-full h-12 outline-none ring-1 ring-base-content focus:ring-2 focus:ring-accent focus:outline-none bg-base-100"
+              placeholder="Column title..."
+              [value]="columnInputValue()"
+              (input)="onColumnInputChange($event)"
+              (keydown.enter)="submitColumnInput()"
+              (keydown.escape)="closeColumnInput()"
+              autofocus
+            />
+            <div class="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                class="text-xs px-2 py-1 rounded-box bg-base-200 hover:bg-base-300 border border-base-content/20 cursor-pointer text-base-content"
+                (click)="closeColumnInput()"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="text-xs px-2 py-1 rounded-box bg-primary text-primary-content cursor-pointer"
+                (click)="submitColumnInput()"
+              >
+                Add Column
+              </button>
+            </div>
+          </div>
+        }
+      </div>
     </div>
-  </div>
+  }
 </section>
 
 @if (activeTaskOverlay(); as selectedTask) {

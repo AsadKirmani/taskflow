@@ -10,7 +10,6 @@ import {
   computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
 import { Task } from '../../core/models/task.model';
 import { AuthStoreService } from '../auth/data-access/auth-store.service';
 import { TaskStore } from './data-access/task-store.service';
@@ -24,12 +23,12 @@ import { TaskHeaderComponent } from './components/task-header.component';
 import { TaskAssigneesComponent } from './components/task-assignees.component';
 import { TaskDueDateComponent } from './components/task-duedate.component';
 import { TaskAttachmentsComponent } from './components/task-attachments.component';
+import { APP_ICONS } from '../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-task',
   standalone: true,
   imports: [
-    MatIconModule,
     CommonModule,
     TaskHeaderComponent,
     TaskChecklistComponent,
@@ -39,6 +38,7 @@ import { TaskAttachmentsComponent } from './components/task-attachments.componen
     TaskQuickActionsComponent,
     TaskDescriptionComponent,
     TaskCommentsComponent,
+    ...APP_ICONS
   ],
   templateUrl: './task.component.html',
   providers: [TaskFacade]

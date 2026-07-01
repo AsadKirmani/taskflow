@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
       
       <div 
         (click)="toggleOpen()"
-        class="min-h-10 w-full p-1.5 bg-base-100 border border-base-content/20 rounded-btn cursor-pointer transition-colors hover:border-base-content/30 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary flex flex-wrap gap-1 items-center"
+        class="min-h-10 w-full p-1.5 bg-base-100 border border-base-300 rounded-btn cursor-pointer transition-colors hover:border-base-content/30 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary flex flex-wrap gap-1 items-center"
       >
         @if (selectedOptions().length === 0) {
           <span class="text-sm text-base-content/50 pl-2">{{ placeholder() }}</span>

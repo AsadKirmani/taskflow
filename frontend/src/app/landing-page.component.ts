@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
   template: `
     <div class="min-h-[100dvh] bg-base-100 text-base-content selection:bg-primary/20 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
       
-      <nav class="fixed top-0 z-50 w-full border-b border-base-content/5 bg-base-100/80 backdrop-blur-md">
+      <nav class="fixed top-0 z-50 w-full border-b border-base-300 bg-base-100/80 backdrop-blur-md">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           
           <div class="flex items-center gap-2 font-bold text-lg tracking-tight">
@@ -43,7 +43,7 @@ import { Router } from '@angular/router';
       <section class="relative pt-40 pb-20 overflow-hidden flex flex-col items-center text-center px-4">
         
         <div class="animate-in fade-in slide-in-from-bottom-4 duration-700 mb-6">
-          <ui-badge variant="neutral" class="rounded-full px-4 py-1.5 shadow-sm bg-base-100 border-base-content/10">
+          <ui-badge variant="neutral" class="rounded-full px-4 py-1.5 shadow-sm bg-base-100 border-base-300">
             <span class="mr-2">✨</span> TaskFlow 1.0 is now in Public Beta
           </ui-badge>
         </div>

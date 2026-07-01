@@ -1,5 +1,5 @@
 <div
-  class="bg-base-200 rounded-field border border-base-content/20 overflow-hidden focus-within:ring-2 focus-within:ring-base-content flex flex-col shadow-sm"
+  class="bg-base-200 rounded-field border border-base-300 overflow-hidden focus-within:ring-2 focus-within:ring-base-content flex flex-col shadow-sm"
 >
   <!-- <tiptap-bubble-menu [editor]="descEditor">
     <div
@@ -53,12 +53,12 @@
         [class.bg-gray-200]="descEditor.isActive('bulletList')"
         class="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 text-gray-700 transition-colors"
       >
-        <mat-icon class="text-[16px]">format_list_bulleted</mat-icon>
+        <svg lucideList class="w-4 h-4"></svg>
       </button>
     </div>
   </tiptap-floating-menu> -->
   <div
-    class="bg-base-300 border-b border-base-content/20 px-2 py-1 flex flex-wrap gap-1 items-center relative z-10"
+    class="bg-base-300 border-b border-base-300 px-2 py-1 flex flex-wrap gap-1 items-center relative z-10"
   >
     <div class="flex items-center">
       <button
@@ -102,13 +102,13 @@
           } @else if (editor.isActive('heading', { level: 3 })) {
             <span class="font-bold text-sm">H3</span>
           } @else {
-            <mat-icon class="text-[18px]">text_format</mat-icon>
+            <svg lucideType class="w-4 h-4"></svg>
           }
         </div>
-        <mat-icon class="text-[16px]">arrow_drop_down</mat-icon>
+        <svg lucideChevronDown class="w-4 h-4"></svg>
       </button>
       <div
-        class="absolute left-0 mt-0 w-44 bg-base-100 border border-base-content/20 rounded-md shadow-lg hidden group-hover:flex flex-col py-1 z-50"
+        class="absolute left-0 mt-0 w-44 bg-base-100 border border-base-300 rounded-md shadow-lg hidden group-hover:flex flex-col py-1 z-50"
       >
         <button
           (click)="editor.chain().focus().setParagraph().run()"
@@ -154,15 +154,15 @@
       >
         <div class="flex items-center justify-center w-5">
           @if (editor.isActive('orderedList')) {
-            <mat-icon class="text-[18px]">format_list_numbered</mat-icon>
+            <svg lucideListOrdered class="w-4 h-4"></svg>
           } @else {
-            <mat-icon class="text-[18px]">format_list_bulleted</mat-icon>
+            <svg lucideList class="w-4 h-4"></svg>
           }
         </div>
-        <mat-icon class="text-[16px]">arrow_drop_down</mat-icon>
+        <svg lucideChevronDown class="w-4 h-4"></svg>
       </button>
       <div
-        class="absolute left-0 mt-0 w-48 bg-base-100 border border-base-content/20 rounded-md shadow-lg hidden group-hover:flex flex-col py-1 z-50"
+        class="absolute left-0 mt-0 w-48 bg-base-100 border border-base-300 rounded-md shadow-lg hidden group-hover:flex flex-col py-1 z-50"
       >
         <button
           (click)="editor.chain().focus().toggleBulletList().run()"
@@ -170,7 +170,7 @@
           class="flex items-center gap-2 px-3 py-1.5 text-sm text-base-content hover:bg-base-200 transition-colors"
           title="Bullet List (Ctrl+Shift+8)"
         >
-          <mat-icon class="text-[18px]">format_list_bulleted</mat-icon> Bullet List
+          <svg lucideList class="w-4 h-4"></svg> Bullet List
         </button>
         <button
           (click)="editor.chain().focus().toggleOrderedList().run()"
@@ -178,7 +178,7 @@
           class="flex items-center gap-2 px-3 py-1.5 text-sm text-base-content hover:bg-base-200 transition-colors"
           title="Numbered List (Ctrl+Shift+7)"
         >
-          <mat-icon class="text-[18px]">format_list_numbered</mat-icon> Numbered List
+          <svg lucideListOrdered class="w-4 h-4"></svg> Numbered List
         </button>
       </div>
     </div>

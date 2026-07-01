@@ -2,7 +2,7 @@ import { Component, OnInit, signal, computed, ChangeDetectionStrategy, inject, o
 import { CommonModule, DatePipe } from '@angular/common'; // 🚀 DatePipe add kiya UI display ke liye
 import { FormsModule } from '@angular/forms';
 import { CalendarService } from '../../../core/services/calendar.service';
-import { MatIconModule } from '@angular/material/icon';
+import { APP_ICONS } from '../../../core/icons/lucide-icons';
 
 // Output Interface
 export interface TaskDates {
@@ -24,7 +24,7 @@ interface CalendarDay {
 @Component({
   selector: 'app-custom-datepicker',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, ...APP_ICONS], 
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [DatePipe], // Inject DatePipe for formatting
   templateUrl: './custom-datepicker.component.html'

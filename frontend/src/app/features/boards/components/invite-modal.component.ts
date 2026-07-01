@@ -8,7 +8,7 @@ import { WorkspaceApiService } from '../../workspace/data-access/workspace-api.s
   imports: [], 
   template: `
     <div class="fixed inset-0 bg-slate-950/50 flex items-center justify-center z-50 p-4" (click)="closeModal()">
-      <div class="bg-base-100 rounded-2xl shadow-xl p-6 w-full max-w-md border border-base-content/20" (click)="$event.stopPropagation()">
+      <div class="bg-base-100 rounded-2xl shadow-xl p-6 w-full max-w-md border border-base-300" (click)="$event.stopPropagation()">
         
         <div class="flex items-center justify-between mb-6">
           <div>
@@ -29,7 +29,7 @@ import { WorkspaceApiService } from '../../workspace/data-access/workspace-api.s
               name="email" 
               required
               placeholder="colleague@company.com" 
-              class="w-full px-4 py-2.5 border border-base-content/20 text-base-content focus:border-accent rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
+              class="w-full px-4 py-2.5 border border-base-300 text-base-content focus:border-accent rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
             >
           </div>
 
@@ -37,7 +37,7 @@ import { WorkspaceApiService } from '../../workspace/data-access/workspace-api.s
             <label class="block text-sm font-semibold text-base-content mb-2">Role</label>
             <select 
               name="role" 
-              class="w-full px-4 py-2.5 border border-base-content/20 text-base-content rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all bg-base-100"
+              class="w-full px-4 py-2.5 border border-base-300 text-base-content rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all bg-base-100"
             >
               <option value="MEMBER">Member (Can edit boards)</option>
               <option value="GUEST">Guest (Read-only)</option>
@@ -48,7 +48,7 @@ import { WorkspaceApiService } from '../../workspace/data-access/workspace-api.s
             <button 
               type="button" 
               (click)="closeModal()" 
-              class="flex-1 border border-base-content/20 text-base-content font-semibold rounded-box hover:bg-base-content/10 transition-colors"
+              class="flex-1 border border-base-300 text-base-content font-semibold rounded-box hover:bg-base-content/10 transition-colors"
             >
               Cancel
             </button>

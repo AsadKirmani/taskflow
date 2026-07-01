@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { ActivityItem, ActivityRef, formatActivityAction } from '../../../activity/models/activity.model';
 import { UiPageLayoutComponent } from '../../../../ui/components/layout/ui-page-layout.component';
@@ -18,6 +17,7 @@ import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.compo
 import { UiPageBodyComponent } from '../../../../ui/components/layout/ui-page-body.component';
 import { UiPanelComponent } from '../../../../ui/components/layout/ui-panel.component'
 import { UiStatCardComponent } from '../../../../ui/components/layout/ui-stat-card.component';
+import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 
 export interface DashboardTaskRow {
   id: string;
@@ -36,7 +36,6 @@ export interface DashboardTaskRow {
     CommonModule, 
     MatCardModule, 
     MatButtonModule, 
-    MatIconModule, 
     RouterLink, 
     UiPageLayoutComponent, 
     UiPageHeaderComponent, 
@@ -49,7 +48,9 @@ export interface DashboardTaskRow {
     UiSkeletonComponent, 
     UiPageBodyComponent, 
     UiPanelComponent,
-    UiStatCardComponent],
+    UiStatCardComponent,
+    ...APP_ICONS
+  ],
   templateUrl: './dashboard-page.component.html',
   styles: [`
     :host {

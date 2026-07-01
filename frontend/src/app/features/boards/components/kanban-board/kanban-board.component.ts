@@ -1,16 +1,29 @@
-import { ChangeDetectionStrategy, Component, inject, input, output, computed, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+  output,
+  computed,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
-import { MatIconModule } from '@angular/material/icon';
-// 🚀 CDK Imports for Board
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { Board } from '../../../../core/models/board.model';
 import { BoardColumn } from '../../../../core/models/column.model';
 import { Task } from '../../../../core/models/task.model';
-import { TaskDropEventPayload, ColumnDropEventPayload, AddTaskEventPayload, AddColumnEventPayload, UpdateTaskEventPayload, ToggleTaskCompletionEventPayload } from '../../models/drag-drop.model';
+import {
+  TaskDropEventPayload,
+  ColumnDropEventPayload,
+  AddTaskEventPayload,
+  AddColumnEventPayload,
+  UpdateTaskEventPayload,
+  ToggleTaskCompletionEventPayload,
+} from '../../models/drag-drop.model';
 import { TaskStore } from '../../../task/data-access/task-store.service';
 import { AuthStoreService } from '../../../auth/data-access/auth-store.service';
 import { ApplyFilterComponent } from '../filters/filter.component';
@@ -19,14 +32,26 @@ import { TaskComponent } from '../../../task/task.component';
 import { KanbanColumnComponent } from '../kanban-column/kanban-column.component';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { AvatarComponent } from '../../../../shared/components/avatar.component';
+import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.component';
+import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
   // 🚀 DragDropModule added here too
-  imports: [ApplyFilterComponent, CommonModule, TaskComponent, KanbanColumnComponent, MatIconModule, AutofocusDirective, AvatarComponent, DragDropModule],
+  imports: [
+    ApplyFilterComponent,
+    CommonModule,
+    TaskComponent,
+    KanbanColumnComponent,
+    AutofocusDirective,
+    AvatarComponent,
+    DragDropModule,
+    UiSkeletonComponent,
+    ...APP_ICONS  
+  ],
   templateUrl: './kanban-board.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class KanbanBoardComponent {
   private readonly taskStore = inject(TaskStore);
@@ -39,31 +64,31 @@ export class KanbanBoardComponent {
   emptyArray = [];
   tasksByColumn = input<Record<string, Task[] | undefined>>({});
   loading = input<boolean>(false);
-  columnIds = computed(() => this.columns().map(col => col.id));
+  columnIds = computed(() => this.columns().map((col) => col.id));
   taskMoved = output<TaskDropEventPayload>();
   columnMoved = output<ColumnDropEventPayload>();
   taskAdded = output<AddTaskEventPayload>();
   columnAdded = output<AddColumnEventPayload>();
   taskUpdated = output<UpdateTaskEventPayload>();
   taskCompletionToggled = output<ToggleTaskCompletionEventPayload>();
-  
+
   isColumnInputOpen = signal(false);
   columnInputValue = signal('');
   isFilterOpen = signal(false);
   hasActiveFilters = signal(false);
 
   activeTaskOverlayId = toSignal(
-    this.route.queryParamMap.pipe(map(params => params.get('taskId'))),
-    { initialValue: null }
+    this.route.queryParamMap.pipe(map((params) => params.get('taskId'))),
+    { initialValue: null },
   );
 
   activeTaskOverlay = computed(() => {
     const taskId = this.activeTaskOverlayId();
     if (!taskId) return null;
-    
+
     const tasksRecord = this.tasksByColumn();
     for (const tasks of Object.values(tasksRecord)) {
-      const match = tasks?.find(task => task.id === taskId);
+      const match = tasks?.find((task) => task.id === taskId);
       if (match) return match;
     }
     return null;
@@ -72,38 +97,43 @@ export class KanbanBoardComponent {
   // 🚀 COLUMN DROP LOGIC (Moved here from Column Component)
   onColumnDrop(event: CdkDragDrop<BoardColumn[]>): void {
     if (event.previousIndex === event.currentIndex) return;
-    
+
     // UI update (Optimistic)
     const currentColumns = [...this.columns()];
     moveItemInArray(currentColumns, event.previousIndex, event.currentIndex);
-    
+
     // Emit to store/facade to update API
     this.columnMoved.emit({
       fromIndex: event.previousIndex,
-      toIndex: event.currentIndex
+      toIndex: event.currentIndex,
     });
   }
 
   // Pass-through for task drops
   onTaskDrop(payload: TaskDropEventPayload): void {
-    if (payload.sourceColumnId === payload.targetColumnId && payload.sourceIndex === payload.targetIndex) {
+    if (
+      payload.sourceColumnId === payload.targetColumnId &&
+      payload.sourceIndex === payload.targetIndex
+    ) {
       return;
     }
-    this.taskMoved.emit(payload); 
+    this.taskMoved.emit(payload);
   }
 
   // --- Baaki sab same ---
   toggleFilterView(event?: MouseEvent): void {
     event?.stopPropagation();
-    this.isFilterOpen.update(v => !v);
+    this.isFilterOpen.update((v) => !v);
   }
 
   submitTaskInput(columnId: string, title: string): void {
     this.taskAdded.emit({ columnId, title });
   }
 
-  openColumnInput(): void { this.isColumnInputOpen.set(true); }
-  
+  openColumnInput(): void {
+    this.isColumnInputOpen.set(true);
+  }
+
   closeColumnInput(): void {
     this.isColumnInputOpen.set(false);
     this.columnInputValue.set('');
@@ -128,7 +158,7 @@ export class KanbanBoardComponent {
       relativeTo: this.route,
       queryParams: { taskId: task.id, taskTitle: this.toSlug(task.title) },
       queryParamsHandling: 'merge',
-      replaceUrl: true
+      replaceUrl: true,
     });
   }
 
@@ -137,28 +167,39 @@ export class KanbanBoardComponent {
       relativeTo: this.route,
       queryParams: { taskId: null, taskTitle: null },
       queryParamsHandling: 'merge',
-      replaceUrl: true
+      replaceUrl: true,
     });
   }
 
   onFiltersChanged(selection: BoardFilterSelection): void {
     this.hasActiveFilters.set(
-      selection.noMembers || 
-      selection.me || 
-      selection.completed || 
-      selection.incomplete || 
-      selection.dueDate !== 'all' || 
-      selection.labels.length > 0 || 
-      selection.activity.length > 0
+      selection.noMembers ||
+        selection.me ||
+        selection.completed ||
+        selection.incomplete ||
+        selection.dueDate !== 'all' ||
+        selection.labels.length > 0 ||
+        selection.activity.length > 0,
     );
 
     const memberScope = selection.noMembers ? 'no_members' : selection.me ? 'me' : 'all';
-    const completion = selection.completed && selection.incomplete ? 'all' : selection.completed ? 'completed' : selection.incomplete ? 'incomplete' : 'all';
+    const completion =
+      selection.completed && selection.incomplete
+        ? 'all'
+        : selection.completed
+          ? 'completed'
+          : selection.incomplete
+            ? 'incomplete'
+            : 'all';
     const currentUserId = this.authStore.currentUser()?.id ?? null;
 
     this.taskStore.updateFilters({
-      currentUserId, memberScope, completion,
-      dueType: selection.dueDate, labels: selection.labels, activity: selection.activity
+      currentUserId,
+      memberScope,
+      completion,
+      dueType: selection.dueDate,
+      labels: selection.labels,
+      activity: selection.activity,
     });
 
     this.router.navigate([], {
@@ -168,13 +209,20 @@ export class KanbanBoardComponent {
         completion: completion === 'all' ? null : completion,
         dueType: selection.dueDate === 'all' ? null : selection.dueDate,
         labels: selection.labels.length ? selection.labels.join(',') : null,
-        activity: selection.activity.length ? selection.activity.join(',') : null
+        activity: selection.activity.length ? selection.activity.join(',') : null,
       },
-      queryParamsHandling: 'merge', replaceUrl: true
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
     });
   }
 
   private toSlug(value: string): string {
-    return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'task';
+    return (
+      value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'task'
+    );
   }
 }

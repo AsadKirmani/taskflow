@@ -1,52 +1,41 @@
 <article
-  class="task-card shadow rounded-lg text-start text-base-content p-2 bg-base-100 group cursor-grab active:cursor-grabbing transition-shadow hover:ring-2 hover:ring-inset-2 hover:ring-primary overflow-hidden"
+  class="task-card flex flex-col gap-2 shadow-sm rounded-xl text-start text-base-content p-3 bg-base-100 group cursor-grab active:cursor-grabbing transition-all hover:ring-2 hover:ring-primary hover:shadow-md overflow-hidden border border-base-content/10"
   (click)="openOverlay.emit()"
 >
   @if (!isEditing()) {
-    <div class="flex items-center justify-between gap-2">
-      <div class="flex items-center justify-start gap-2 min-w-0">
+    @if (task().labels && task().labels.length > 0) {
+      <div class="flex flex-wrap gap-1 mb-1">
+        @for (label of task().labels; track $index) {
+          <span
+            class="px-2 py-0.5 text-[10px] font-bold rounded-md"
+            [style.backgroundColor]="label.color + '33'"
+            [style.color]="label.color"
+          >
+            {{ label.name }}
+          </span>
+        }
+      </div>
+    }
+
+    <div class="flex items-start justify-between gap-2">
+      <div class="flex items-start justify-start gap-2 min-w-0">
         <button
           type="button"
-          class="task-card__mark-complete-button opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer p-0 m-0 flex items-center flex-shrink-0"
+          class="task-card__mark-complete-button mt-0.5 opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer p-0 m-0 flex items-center flex-shrink-0"
           (click)="$event.stopPropagation(); toggleCompletion.emit()"
         >
           @if (task().isCompleted) {
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="text-green-600"
-            >
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
+            <svg lucideCircleCheck class="text-green-600 w-5 h-5 text-[20px]"></svg>
           } @else {
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="text-base-content/40 hover:text-green-600"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-            </svg>
+            <svg lucideCircle class="text-base-content/30 hover:text-green-600 w-5 h-5 text-[20px]"
+              ></svg>
           }
         </button>
 
         <h4
-          class="task-card__title truncate m-0 font-medium text-sm transition-transform duration-300 transform translate-x-0 md:translate-x-[-22px] md:group-hover:translate-x-0"
+          class="task-card__title leading-tight m-0 font-medium text-sm transition-transform duration-300 transform translate-x-0 md:translate-x-[-26px] md:group-hover:translate-x-0"
           [class.line-through]="task().isCompleted"
+          [class.text-base-content/60]="task().isCompleted"
         >
           {{ task().title }}
         </h4>
@@ -54,47 +43,73 @@
 
       <button
         type="button"
-        class="task-card__button opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer p-0 m-0 flex items-center flex-shrink-0 text-base-content/50 hover:text-blue-500"
+        class="task-card__button opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer p-0 m-0 flex items-center flex-shrink-0 text-base-content/40 hover:text-primary"
         (click)="startEdit($event)"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-        </svg>
+        <svg lucidePencil class="w-4 h-4 text-[16px]">edit</svg>
       </button>
     </div>
+
+    @if (
+      task().description ||
+      task().commentCount ||
+      task().checklist?.length ||
+      task().assigneeIds?.length
+    ) {
+      <div class="flex items-center justify-between mt-1 pt-2 border-t border-base-content/5">
+        <div class="flex items-center gap-3 text-base-content/50">
+          @if (task().description) {
+            <div class="flex items-center" title="This task has a description">
+              <svg lucideSubject class="w-4 h-4 text-[16px]"></svg>
+            </div>
+          }
+
+          @if (task().checklist && task().checklist!.length > 0) {
+            <div
+              class="flex items-center gap-1 text-xs font-semibold"
+              [class.text-success]="completedChecklistCount === task().checklist!.length"
+              title="Checklist items"
+            >
+              <svg lucideCheckSquare class="w-4 h-4 text-[16px]"></svg>
+              <span>{{ completedChecklistCount }}/{{ task().checklist!.length }}</span>
+            </div>
+          }
+
+          @if (task().commentCount && task().commentCount! > 0) {
+            <div class="flex items-center gap-1 text-xs font-semibold" title="Comments">
+              <svg lucideChatBubble class="w-4 h-4 text-[16px]"></svg>
+              <span>{{ task().commentCount }}</span>
+            </div>
+          }
+        </div>
+
+        @if (task().assigneeIds && task().assigneeIds!.length > 0) {
+          <ui-avatar-stack [users]="avatarUsers()" [limit]="3" size="sm" />
+        }
+      </div>
+    }
   } @else {
     <div class="flex flex-col gap-2" (click)="$event.stopPropagation()">
       <input
         type="text"
-        class="p-1 shadow rounded-lg w-full h-10 outline-none ring-1 ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-base-100 text-base-content"
+        class="p-2 shadow-sm rounded-lg w-full h-10 outline-none ring-1 ring-base-content/20 focus:ring-2 focus:ring-primary bg-base-100 text-base-content"
         [value]="editValue()"
         (input)="onInput($event)"
         (keydown.enter)="save()"
         (keydown.escape)="cancel()"
-        autofocus
+        appAutofocus
       />
       <div class="flex items-center justify-end gap-2">
         <button
           type="button"
-          class="text-xs px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 border-none cursor-pointer"
+          class="text-xs px-3 py-1.5 rounded-md bg-base-200 hover:bg-base-300 text-base-content border-none cursor-pointer transition-colors font-medium"
           (click)="cancel()"
         >
           Cancel
         </button>
         <button
           type="button"
-          class="text-xs px-2 py-1 rounded bg-blue-500 text-white hover:bg-blue-600 border-none cursor-pointer"
+          class="text-xs px-3 py-1.5 rounded-md bg-primary text-primary-content hover:bg-primary/90 border-none cursor-pointer transition-colors font-medium"
           (click)="save()"
         >
           Save

@@ -1,25 +1,25 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
 import { TaskLabel } from '../../../../core/models/task.model';
+import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-action-label',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, ...APP_ICONS],
   template: `
     <div class="relative inline-flex">
       <button 
   (click)="isOpen.set(!isOpen())" 
   [ngClass]="isOpen() ? 'bg-base-content text-base-100 hover:bg-base-content/90' : 'bg-base-100 text-base-content hover:bg-base-300'"
-  class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-content/20">
-  <mat-icon class="text-[18px] w-[18px] h-[18px]">label</mat-icon> Labels
+  class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300">
+  <svg lucideTag class="w-4 h-4"></svg> Labels
 </button>
 
       @if (isOpen()) {
         <div class="fixed inset-0 z-40" (click)="isOpen.set(false)"></div>
         
-        <div class="absolute top-full left-0 mt-2 w-64 bg-base-100 border border-base-content/20 shadow-2xl rounded-lg z-50 p-3 animate-in fade-in zoom-in-95 duration-200">
+        <div class="absolute top-full left-0 mt-2 w-64 bg-base-100 border border-base-300 shadow-2xl rounded-lg z-50 p-3 animate-in fade-in zoom-in-95 duration-200">
           <h4 class="text-xs font-bold text-base-content/70 uppercase mb-3 text-center">Labels</h4>
           
           <div class="flex flex-col gap-2">
@@ -32,7 +32,7 @@ import { TaskLabel } from '../../../../core/models/task.model';
                 <span class="text-sm font-bold text-white">{{ label.name }}</span>
                 
                 @if (hasLabel(label)) {
-                  <mat-icon class="text-[16px] w-4 h-4 font-bold">check</mat-icon>
+                  <svg lucideCheck class="w-4 h-4 font-bold"></svg>
                 }
               </div>
             }

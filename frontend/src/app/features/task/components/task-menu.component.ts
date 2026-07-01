@@ -1,23 +1,23 @@
 import { Component, inject, signal } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
 import { ShareExportComponent } from '../../../shared/components/share-export.component';
 import { TaskFacade } from '../facades/task.facade';
+import { APP_ICONS } from '../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-task-menu',
   standalone: true,
-  imports: [MatIconModule, ShareExportComponent],
+  imports: [ShareExportComponent, ...APP_ICONS],
   template: `<div class="relative">
     <button
       class="p-1 flex items-center justify-center hover:bg-base-200 rounded-full text-sm font-medium text-base-content transition-colors"
       (click)="isOpen.set(!isOpen())"
     >
-      <mat-icon>more_horiz</mat-icon>
+      <svg lucideEllipsis class="w-5 h-5"></svg>
     </button>
     @if (isOpen()) {
       <div class="absolute inset-0 z-40" (click)="isOpen.set(false)"></div>
       <div
-        class="absolute right-0 mt-2 w-48 bg-base-100 rounded-box shadow-lg border border-base-content/20 z-50"
+        class="absolute right-0 mt-2 w-48 bg-base-100 rounded-box shadow-lg border border-base-300 z-50"
       >
         <div class="p-2">
           <button
@@ -30,7 +30,7 @@ import { TaskFacade } from '../facades/task.facade';
           >
             <span>Move</span>
           </button>
-          <div class="border-t border-base-content/20 my-1">
+          <div class="border-t border-base-300 my-1">
             <app-share-export
               [dataToExport]="facade.currentTask()"
               [exportFileName]="'task-' + facade.currentTask()?.id"

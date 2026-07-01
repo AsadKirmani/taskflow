@@ -1,13 +1,13 @@
 import { Component, input, output, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
 import { User } from '../../../../core/models/user.model';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
+import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-action-members',
   standalone: true,
-  imports: [CommonModule, MatIconModule, AutofocusDirective],
+  imports: [CommonModule, AutofocusDirective, ...APP_ICONS],
   template: `
     <div class="relative inline-flex w-full">
       <button
@@ -17,14 +17,14 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
             ? 'bg-base-content text-base-100 hover:bg-base-content/90'
             : 'bg-base-100 text-base-content hover:bg-base-300'
         "
-        class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-content/20 w-full"
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300 w-full"
       >
-        <mat-icon class="text-[18px] w-[18px] h-[18px]">person_outline</mat-icon> Members
+        <svg lucideUser class="w-4 h-4"></svg> Members
       </button>
       @if (isOpen()) {
         <div class="fixed inset-0 z-40" (click)="closePicker()"></div>
         <div
-          class="absolute top-full right-0 mt-2 w-64 bg-base-100 border border-base-content/20 shadow-2xl rounded-lg z-50 p-3 animate-in fade-in zoom-in-95 duration-200"
+          class="absolute top-full right-0 mt-2 w-64 bg-base-100 border border-base-300 shadow-2xl rounded-lg z-50 p-3 animate-in fade-in zoom-in-95 duration-200"
         >
           <h4 class="text-xs font-bold text-base-content/70 mb-3 text-center">Members</h4>
           <div class="flex flex-col gap-1 relative z-50 max-h-60 overflow-y-auto">
@@ -33,7 +33,7 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
               type="text"
               appAutofocus
               placeholder="Search members..."
-              class="focus:outline-none w-full px-3 py-1.5 mb-2 text-sm text-base-content rounded-field border border-base-content/20 focus:border-primary transition-colors"
+              class="focus:outline-none w-full px-3 py-1.5 mb-2 text-sm text-base-content rounded-field border border-base-300 focus:border-primary transition-colors"
               (keyup.enter)="onSearch(searchInput.value)"
             />
             @for (member of filteredMembers(); track member.id) {
@@ -58,7 +58,7 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
                 </div>
 
                 @if (isAssigned(member.id)) {
-                  <mat-icon class="text-[18px] w-[18px] h-[18px]">check</mat-icon>
+                  <svg lucideCheck class="w-4 h-4"></svg>
                 }
               </div>
             }

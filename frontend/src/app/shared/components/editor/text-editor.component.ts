@@ -1,16 +1,16 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation, model, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
 import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { AutofocusDirective } from '../../directives/autofocus.directive';
+import { APP_ICONS } from '../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-text-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, TiptapEditorDirective],
+  imports: [CommonModule, FormsModule, TiptapEditorDirective, AutofocusDirective, ...APP_ICONS],
   templateUrl: './text-editor.component.html',
   encapsulation: ViewEncapsulation.None
 })

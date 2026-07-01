@@ -110,7 +110,6 @@
   opacity: 0.8;
 }
 
-/* TipTap Editor ke andar Headings aur Lists ko force-style karne ke liye */
 .tiptap {
   outline: none;
 }
@@ -154,17 +153,10 @@
   color: #4b5563 !important;
 }
 
-/* src/styles.css */
-/* Jab task drag ho raha ho, toh list mein jo jagah chhutti hai (placeholder), use dhundhla karo */
 .kanban-column__task-list .cdk-drag-placeholder {
   opacity: 0.4 !important;
 }
 
-/* Jo card aapke mouse ke saath ghoom raha hai (preview), agar use thoda alag dikhana hai */
-/* 1. Pure floating preview block ko target karo jo body me append hua hai */
 .cdk-drag-preview .task-card {
   background-color: var(--color-base-200) !important;
 }
-
-/* 2. Agar aapko task card ke andar ka 'hover ring' preview me nahi chahiye */
-

@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
 import { ThemeService, AppTheme } from '../../../core/services/theme.service';
+import { APP_ICONS } from '../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-theme-toggle',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, ...APP_ICONS],
   template: `
     <div class="flex items-center p-1 space-x-1 bg-base-300 border border-base-300 rounded-box shadow-sm justify-between w-max">
       

@@ -1,15 +1,15 @@
 import { Component, input, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
 import { ExportService } from '../../core/services/export.service'; 
+import { APP_ICONS } from '../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-share-export',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, ...APP_ICONS],
   template: `
     <div class="w-full rounded-lg transition-all duration-200 overflow-hidden mt-2 border"
-         [class.border-base-content/20]="isOpen()"
+         [class.border-base-300]="isOpen()"
          [class.border-none]="!isOpen()"
          [class.bg-base-200]="isOpen()"
          [class.bg-base-100]="!isOpen()">
@@ -22,38 +22,37 @@ import { ExportService } from '../../core/services/export.service';
           <span>Share</span>
         </div>
         
-        <mat-icon 
+        <svg lucideChevronDown
           class="text-[18px] w-[18px] h-[18px] transition-transform duration-300"
           [class.rotate-180]="isOpen()"
           [class.text-base-content]="isOpen()">
-          keyboard_arrow_down
-        </mat-icon>
+        </svg>
       </button>
 
       @if (isOpen()) {
-        <div class="bg-base-100 border-t border-base-content/20 pb-1 px-1.5 rounded-b-lg transition-all duration-200">
+        <div class="bg-base-100 border-t border-base-300 pb-1 px-1.5 rounded-b-lg transition-all duration-200">
           
           <div class="px-3 pt-3 pb-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Share</div>
           <button 
             (click)="copyLink()"
             class="w-full text-left px-4 py-2 text-sm text-base-content rounded-field hover:bg-base-200 flex items-center gap-2 transition-colors">
-            <mat-icon class="text-[18px] w-[18px] h-[18px]">link</mat-icon>
+            <svg lucideLink class="text-[18px] w-[18px] h-[18px]"></svg>
             <span>{{ copied() ? 'Link Copied!' : 'Copy Link' }}</span>
           </button>
           
-          <div class="border-t border-base-content/20 mx-3 my-1"></div>
+          <div class="border-t border-base-300 mx-3 my-1"></div>
           
           <div class="px-3 pt-2 pb-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Export</div>
           <button 
             (click)="exportJson()"
             class="w-full text-left px-4 py-2 text-sm text-base-content rounded-field hover:bg-base-200 flex items-center gap-2 transition-colors">
-            <mat-icon class="text-[18px] w-[18px] h-[18px] ">data_object</mat-icon>
+            <svg lucideData class="text-[18px] w-[18px] h-[18px]"></svg>
             <span>Export to JSON</span>
           </button>
           <button 
             (click)="exportCsv()"
             class="w-full text-left px-4 py-2 text-sm text-base-content rounded-field hover:bg-base-200 flex items-center gap-2 transition-colors">
-            <mat-icon class="text-[18px] w-[18px] h-[18px] ">table_chart</mat-icon>
+            <svg lucideFileText class="text-[18px] w-[18px] h-[18px]"></svg>
             <span>Export to CSV</span>
           </button>
 

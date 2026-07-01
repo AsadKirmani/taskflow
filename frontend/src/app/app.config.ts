@@ -5,6 +5,8 @@ import { appRoutes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
+import { provideLucideIcons } from '@lucide/angular';
+import { APP_ICONS } from './core/icons/lucide-icons';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { AuthStoreService } from './features/auth/data-access/auth-store.service';
 
@@ -22,5 +24,6 @@ export const appConfig: ApplicationConfig = {
     //   const authStore = inject(AuthStoreService);
     //   return firstValueFrom(authStore.initializeSession());
     // })
+    provideLucideIcons(...APP_ICONS)
   ]
 };

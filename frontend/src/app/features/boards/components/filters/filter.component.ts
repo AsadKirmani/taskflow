@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output, model } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
 import { BoardFilterSelection } from './filter-selection.model';
+import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-apply-filter',
   standalone: true,
-    imports: [MatIconModule, CommonModule],
+    imports: [CommonModule, ...APP_ICONS],
     templateUrl: './filter.component.html',
     host: {
       'document:click': 'close()'

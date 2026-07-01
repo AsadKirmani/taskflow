@@ -5,7 +5,9 @@ import { BoardStore } from '../../boards/data-access/board-store.service';
 import { User } from '../../../core/models/user.model';
 import { TaskComment } from '../../../core/models/comment.model';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class TaskFacade {
   constructor() {
     // Initialize any necessary state or services here
