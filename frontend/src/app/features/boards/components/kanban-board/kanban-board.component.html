@@ -61,7 +61,7 @@
       </div>
       <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
         <app-avatar name="User Name"></app-avatar>
-        
+
         <ui-button
           variant="ghost"
           size="icon"
@@ -69,24 +69,67 @@
           [attr.aria-pressed]="isFilterOpen()"
           (clicked)="toggleFilterView($event)"
         >
-          <svg lucideFunnel> </svg>
+          <svg lucideFunnel></svg>
         </ui-button>
-        
+
         <ui-button variant="ghost" size="icon">
           <svg lucideStar></svg>
         </ui-button>
-        
-        <ui-button variant="ghost" size="icon">
-          <svg lucideEye></svg>
-        </ui-button>
-        
-        <ui-button variant="ghost" size="icon">
-          <svg lucideUserPlus></svg>
-        </ui-button>
-        
-        <ui-button variant="ghost" size="icon">
-          <svg lucideEllipsis></svg>
-        </ui-button>
+        <ui-dropdown-menu>
+          <ui-dropdown-menu-trigger>
+            <ui-button variant="ghost" size="icon">
+              <svg lucideEye></svg>
+            </ui-button>
+          </ui-dropdown-menu-trigger>
+          <ui-dropdown-menu-content direction="left">
+            <ui-dropdown-menu-item>
+              <svg lucideLock class="w-4 h-4"></svg>
+              <span>Private</span>
+            </ui-dropdown-menu-item>
+            <ui-dropdown-menu-item>
+              <svg lucideGlobe class="w-4 h-4"></svg>
+              <span>Workspace</span>
+            </ui-dropdown-menu-item>
+            <ui-dropdown-menu-item>
+              <svg lucideGlobe class="w-4 h-4"></svg>
+              <span>Public</span>
+            </ui-dropdown-menu-item>
+          </ui-dropdown-menu-content>
+        </ui-dropdown-menu>
+        <ui-dropdown-menu>
+          <ui-dropdown-menu-trigger>
+            <ui-button variant="ghost" size="icon">
+              <svg lucideUserPlus></svg>
+            </ui-button>
+          </ui-dropdown-menu-trigger>
+          <ui-dropdown-menu-content direction="left">
+            <ui-dropdown-menu-item>
+              <svg lucideCopy class="w-4 h-4"></svg>
+              <span>Copy Link</span>
+            </ui-dropdown-menu-item>
+            <ui-dropdown-menu-item>
+              <svg lucideMail class="w-4 h-4"></svg>
+              <span>Share via Email</span>
+            </ui-dropdown-menu-item>
+          </ui-dropdown-menu-content>
+        </ui-dropdown-menu>
+        <ui-dropdown-menu>
+          <ui-dropdown-menu-trigger>
+            <ui-button variant="ghost" size="icon">
+              <svg lucideEllipsis></svg>
+            </ui-button>
+          </ui-dropdown-menu-trigger>
+          <ui-dropdown-menu-content direction="left">
+            <ui-dropdown-menu-item>
+              <svg lucidePencil class="w-4 h-4"></svg>
+              <span>Edit Board</span>
+            </ui-dropdown-menu-item>
+            <ui-dropdown-menu-item>
+              <svg lucideArchive class="w-4 h-4"></svg>
+              <span>Archive Board</span>
+            </ui-dropdown-menu-item>
+          </ui-dropdown-menu-content>
+        </ui-dropdown-menu>
       </div>
     </header>
 
@@ -127,12 +170,7 @@
         class="bg-base-200 w-64 flex-shrink-0 hover:bg-base-300 p-2 rounded-box text-base-content border border-base-300 hover:border-primary hover:ring-primary/30 hover:ring-2 shadow transition-colors"
       >
         @if (!isColumnInputOpen()) {
-          <ui-button
-            variant="ghost"
-            size="md"
-      
-            (clicked)="openColumnInput()"
-          >
+          <ui-button variant="ghost" size="md" (clicked)="openColumnInput()">
             <svg lucidePlus class="w-4 h-4 mr-1"></svg>
             Add Column
           </ui-button>
@@ -150,19 +188,11 @@
               autofocus
             />
             <div class="flex items-center justify-end gap-2 mt-1">
-              <ui-button
-                variant="secondary"
-                size="sm"
-                (clicked)="closeColumnInput()"
-              >
+              <ui-button variant="secondary" size="sm" (clicked)="closeColumnInput()">
                 Cancel
               </ui-button>
-              
-              <ui-button
-                variant="primary"
-                size="sm"
-                (clicked)="submitColumnInput()"
-              >
+
+              <ui-button variant="primary" size="sm" (clicked)="submitColumnInput()">
                 Add Column
               </ui-button>
             </div>

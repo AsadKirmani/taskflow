@@ -37,6 +37,8 @@ import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.compo
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
 import { KeyboardShortcutsService } from '../../../../core/services/keyboard-shortcuts.service';
+import { UiDropdownMenuComponent, UiDropdownMenuContent, UiDropdownMenuTrigger } from '../../../../ui/components/ui-dropdown-menu.component';
+import { UiDropdownMenuItemComponent } from '../../../../ui/components/ui-dropdown-menu-item.component';
 
 @Component({
   selector: 'app-kanban-board',
@@ -52,6 +54,10 @@ import { KeyboardShortcutsService } from '../../../../core/services/keyboard-sho
     DragDropModule,
     UiSkeletonComponent,
     UiButtonComponent,
+    UiDropdownMenuComponent,
+    UiDropdownMenuItemComponent,
+    UiDropdownMenuTrigger,
+    UiDropdownMenuContent,
     ...APP_ICONS  
   ],
   templateUrl: './kanban-board.component.html',

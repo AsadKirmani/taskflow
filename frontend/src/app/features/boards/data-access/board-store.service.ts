@@ -172,6 +172,15 @@ export const BoardStore = signalStore(
         patchState(store, { columns: currentColumns });
         notification.error('Failed to reorder columns');
       }
+    },
+    resetBoardState() {
+      patchState(store, { 
+        board: null, 
+        columns: [], 
+        members: [], 
+        loadedBoardIds: [], 
+        loadedColumnBoardIds: [] 
+      });
     }
 
   }))

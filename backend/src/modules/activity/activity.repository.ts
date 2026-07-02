@@ -47,28 +47,9 @@ export const activityRepository = {
     limit: number,
   ) {
     const skip = (page - 1) * limit;
-
-    const allowedBoards = await BoardModel.find({
-      $or: [
-        { createdBy: userId },
-        { memberIds: userId },
-        {
-          workspaceId: { $in: workspaceIds },
-          visibility: "workspace",
-        },
-      ],
-    }).select("_id");
-
-    const allowedBoardIds = allowedBoards.map((b) => b._id.toString());
-
     const query = {
       workspaceId: { $in: workspaceIds },
-      $or: [
-        { boardId: { $in: allowedBoardIds } },
-
-        { boardId: { $exists: false } },
-        { boardId: null },
-      ],
+      userId: userId,
     };
 
     const [items, total] = await Promise.all([
@@ -95,21 +76,23 @@ export const activityRepository = {
     limit: number,
   ) {
     const skip = (page - 1) * limit;
-
+    
     const membership = await WorkspaceMemberModel.findOne({
       workspaceId,
       userId,
     }).lean();
-
+    
     if (!membership) {
       return { items: [], total: 0 };
     }
-
+    
+    const isOwnerOrAdmin = membership.role === "OWNER" || membership.role === "ADMIN";
     const isGuest = membership.role === "GUEST";
-
+    
     let boardQuery: any = { workspaceId };
-
-    if (isGuest) {
+    
+    if (!isOwnerOrAdmin) {
+      if (isGuest) {
       boardQuery.$or = [{ memberIds: userId }, { createdBy: userId }];
     } else {
       boardQuery.$or = [
@@ -118,6 +101,7 @@ export const activityRepository = {
         { createdBy: userId },
       ];
     }
+  }
 
     const allowedBoards = await BoardModel.find(boardQuery).select("_id");
     const allowedBoardIds = allowedBoards.map((b) => b._id.toString());

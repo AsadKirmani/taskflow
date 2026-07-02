@@ -9,8 +9,26 @@
           class="bg-base-100 text-base-content px-2 py-0.5 rounded-full text-xs font-semibold"
           >{{ tasks().length }}</span>
       </header>
-        <svg lucideEllipsisVertical
-          class="cursor-pointer text-base-content hover:text-base-content/70 transition-colors"></svg>
+      <ui-dropdown-menu direction="left">
+        <ui-dropdown-menu-trigger>
+        <ui-button
+          variant="ghost"
+          size="icon"
+        >
+          <svg lucideEllipsisVertical class="w-4 h-4"></svg>
+        </ui-button>
+        </ui-dropdown-menu-trigger>
+        <ui-dropdown-menu-content>
+          <ui-dropdown-menu-item>
+            <svg lucideArchive class="w-4 h-4 mr-2"></svg>
+            Archive Column
+          </ui-dropdown-menu-item>
+          <ui-dropdown-menu-item>
+            <svg lucideTrash class="w-4 h-4 mr-2"></svg>
+            Delete Column
+          </ui-dropdown-menu-item>
+        </ui-dropdown-menu-content>
+      </ui-dropdown-menu>
     </div>
     @if (hasActiveFilters()) {
       <span class="text-xs text-primary font-semibold">{{ tasks().length }} matching tasks</span>

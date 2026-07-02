@@ -25,7 +25,7 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiButtonComponent {
-  variant = input<'primary' | 'secondary' | 'ghost' | 'danger'>('primary');
+  variant = input<'primary' | 'secondary' | 'ghost' | 'danger' | 'icon'>('primary');
   // 🚀 Yahan 'icon-sm' add kiya
   size = input<'sm' | 'md' | 'lg' | 'icon' | 'icon-sm'>('md'); 
   disabled = input(false);
@@ -40,8 +40,9 @@ export class UiButtonComponent {
     const variants = {
       primary: 'bg-primary text-primary-content hover:bg-primary/90 focus:ring-primary/50 shadow-sm',
       secondary: 'bg-secondary text-secondary-content hover:bg-secondary/90 border border-secondary-content/10 focus:ring-secondary/20',
-      ghost: 'bg-transparent text-base-content hover:bg-base-200 focus:ring-base-content/20',
-      danger: 'bg-error text-error-content hover:bg-error/90 focus:ring-error/50 shadow-sm'
+      ghost: 'bg-transparent text-base-content hover:bg-base-300 focus:ring-base-content/20',
+      danger: 'bg-error text-error-content hover:bg-error/90 focus:ring-error/50 shadow-sm',
+      icon: 'bg-transparent text-base-content hover:bg-base-300 focus:ring-base-content/20 border border-base-300', // Icon buttons ke liye transparent background
     };
 
     const sizes = {

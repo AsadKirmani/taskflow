@@ -1,10 +1,10 @@
-import { Component, signal, OnInit, inject, HostListener } from '@angular/core';
+import { Component, signal, OnInit, inject, HostListener, } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { MatIconRegistry } from '@angular/material/icon';
-import { polyfill } from 'mobile-drag-drop';
+import { ThemeService } from './core/services/theme.service';
 import { ToastContainerComponent } from './shared/components/toast-container.component';
 import { AuthStoreService } from './features/auth/data-access/auth-store.service';
 import { KeyboardShortcutsService } from './core/services/keyboard-shortcuts.service';
+import { DashboardStore } from './features/dashboard/data-access/dashboard-store.service';
 
 @Component({
   selector: 'app-root',
@@ -13,22 +13,13 @@ import { KeyboardShortcutsService } from './core/services/keyboard-shortcuts.ser
 })
 export class App implements OnInit {
   protected readonly title = signal('Taskflow');
+  private themeService = inject(ThemeService);
   private authStore = inject(AuthStoreService);
+  private dashboardStore = inject(DashboardStore);
   private shortcuts = inject(KeyboardShortcutsService);
  
-  constructor(private matIconRegistry: MatIconRegistry) {
-    polyfill({
-      holdToDrag: 500
-    })
-    window.addEventListener('contextmenu', (e) => {
-      const target = e.target as HTMLElement;
-      if(target.closest('[draggable="true"]')) {
-        e.preventDefault();
-      }
-    })
-  }
   ngOnInit(): void {
-    this.matIconRegistry.setDefaultFontSetClass('material-symbols-outlined');
+    this.themeService.setTheme(this.themeService.currentTheme());
     this.authStore.initializeSession().subscribe();
   }
   @HostListener('document:keydown', ['$event'])

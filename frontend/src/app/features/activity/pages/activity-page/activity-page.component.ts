@@ -22,7 +22,7 @@ import { UiPageHeaderComponent } from '../../../../ui/components/layout/ui-page-
           </span>
           </ui-page-header>
         } @else {
-          <ui-page-header title="Global activity feed" subtitle="Activities across all boards and workspaces"></ui-page-header>
+          <ui-page-header title="Your activity feed" subtitle="Activities across all your boards and workspaces"></ui-page-header>
         }
     </div>
 

@@ -205,7 +205,8 @@
           </div>
 
           <ui-panel>
-            @if (store.activities().length === 0) {
+            <!-- 🚀 FIX: Used recentActivities() here -->
+            @if (store.recentActivities().length === 0) {
               <div class="py-8">
                 <ui-empty-state
                   title="No Recent Activity"
@@ -216,7 +217,11 @@
               </div>
             } @else {
               <ul class="divide-y divide-base-300 max-h-[400px] overflow-y-auto">
-                @for (item of store.activities(); track item._id ?? item.id ?? item.createdAt) {
+                <!-- 🚀 FIX: Used recentActivities() here too -->
+                @for (
+                  item of store.recentActivities();
+                  track item._id ?? item.id ?? item.createdAt
+                ) {
                   <li
                     class="flex items-start justify-between gap-4 p-4 hover:bg-base-300 transition-colors"
                   >

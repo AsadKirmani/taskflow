@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { AppError } from "../../shared/errors/app-error";
 import { PermissionService } from "../../services/permission.service";
 import { PERMISSION } from "../../config/roles";
@@ -7,7 +7,7 @@ import { redisClient } from "../../config/redis";
 import { BoardModel } from "../../models/board.model";
 
 export const boardController = {
-  async createBoard(req: Request, res: Response) {
+  async createBoard(req: Request, res: Response, next: NextFunction) {
     const userId = req.auth!.userId;
     const { name, description, visibility, workspaceId } = req.body;
     
@@ -23,13 +23,17 @@ export const boardController = {
       { workspaceId },
       PERMISSION.BOARD_CREATE,
     );
-    const board = await boardService.createBoard(req.body, userId);
-    await redisClient.del(`workspace:${workspaceId}:boards`); // Invalidate the cache for boards in this workspace
-    await redisClient.del(`user:${userId}:all_boards`); // Invalidate the cache for all boards for this user
-    res.status(201).json({ success: true, data: board });
+    try {
+      const board = await boardService.createBoard(req.body, userId);
+      await redisClient.del(`workspace:${workspaceId}:boards`); // Invalidate the cache for boards in this workspace
+      await redisClient.del(`user:${userId}:all_boards`); // Invalidate the cache for all boards for this user
+      res.status(201).json({ success: true, data: board });
+    } catch (error) {
+      return next(new AppError("Failed to create board", 500, "INTERNAL_SERVER_ERROR", error));
+    }
   },
 
-  async getBoardById(req: Request, res: Response) {
+  async getBoardById(req: Request, res: Response, next: NextFunction) {
     const userId = req.auth!.userId;
     const { boardId } = req.params as { boardId: string };
     let board: any;
@@ -40,7 +44,7 @@ export const boardController = {
     } else {
       board = await boardService.getBoardById(userId, boardId);
       if (!board) {
-        throw new AppError("Board not found", 404, "NOT_FOUND");
+        return next(new AppError("Board not found", 404, "NOT_FOUND"));
       }
       await redisClient.set(cacheKey, JSON.stringify(board), { ex: 3600 });
     }
@@ -54,7 +58,7 @@ export const boardController = {
     return res.json(responsePayload);
   },
   
-  async getBoardsInWorkspace(req: Request, res: Response) {
+  async getBoardsInWorkspace(req: Request, res: Response, next: NextFunction) {
     const userId = req.auth!.userId;
     const { workspaceId } = req.params as { workspaceId: string };
     const cacheKey = `workspace:${workspaceId}:boards`;
@@ -76,13 +80,13 @@ export const boardController = {
     return res.json(responseData);
   },
   
-  async updateBoard(req: Request, res: Response) {
+  async updateBoard(req: Request, res: Response, next: NextFunction) {
     const userId = req.auth!.userId;
     const { boardId } = req.params as { boardId: string };
     
     const existingBoard = await boardService.getBoardById(userId, boardId);
     if (!existingBoard) {
-      throw new AppError("Board not found", 404, "NOT_FOUND");
+      return next(new AppError("Board not found", 404, "NOT_FOUND"));
     }
     
     await PermissionService.ensureBoardPermission(
@@ -102,7 +106,7 @@ export const boardController = {
     res.json({ success: true, data: updatedBoard });
   },
   
-  async getBoards(req: Request, res: Response) {
+  async getBoards(req: Request, res: Response, next: NextFunction) {
     const userId = req.auth!.userId; 
     const cacheKey = `user:${userId}:all_boards`;
     const cachedBoards = await redisClient.get(cacheKey);
@@ -115,33 +119,35 @@ export const boardController = {
     return res.json(responseData);
   },
 
-  async reorderColumns(req: Request, res: Response) {
-    const { boardId } = req.params as { boardId: string };
-    const { columnIds } = req.body as { columnIds: string[] };
-    const userId = req.auth!.userId;
-
-    const board = await boardService.getBoardById(userId, boardId);
-    if (!board) {
-      throw new AppError("Board not found", 404, "NOT_FOUND");
+  async reorderColumns(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { boardId } = req.params as { boardId: string };
+      const  { columnOrder }  = req.body as { columnOrder: string[] };
+      const userId = req.auth!.userId;
+      const board = await boardService.getBoardById(userId, boardId);
+      if (!board) {
+        return next(new AppError("Board not found", 404, "NOT_FOUND"));
+      }
+      await PermissionService.ensureBoardPermission(
+        userId,
+        { workspaceId: board.workspaceId.toString() },
+        PERMISSION.BOARD_EDIT,
+      );
+  
+      await boardService.reorderColumns(boardId, columnOrder, userId);
+      await redisClient.del(`board:${boardId}:detail`); // Invalidate the cache for this board's detail
+      res.json({ success: true, message: "Column order updated" });
+    } catch (error) {
+      return next(new AppError("Failed to reorder columns", 500, "INTERNAL_SERVER_ERROR", error));
     }
-
-    await PermissionService.ensureBoardPermission(
-      userId,
-      { workspaceId: board.workspaceId.toString() },
-      PERMISSION.BOARD_EDIT,
-    );
-
-    await boardService.reorderColumns(boardId, columnIds, userId);
-    await redisClient.del(`board:${boardId}:detail`); // Invalidate the cache for this board's detail
-    res.json({ success: true, message: "Column order updated" });
   },
-  async deleteBoard(req: Request, res: Response) {
+  async deleteBoard(req: Request, res: Response, next: NextFunction) {
     const { boardId } = req.params as { boardId: string };
     const userId = req.auth!.userId;
 
     const board = await boardService.getBoardById(userId, boardId);
     if (!board) {
-      throw new AppError("Board not found", 404, "NOT_FOUND");
+      return next(new AppError("Board not found", 404, "NOT_FOUND"));
     }
 
     await PermissionService.ensureBoardPermission(

@@ -1,9 +1,9 @@
-import { Types } from 'mongoose';
+import { Types } from "mongoose";
 import { BoardModel } from "../../models/board.model";
-import { WorkspaceModel } from "../../models/workspace.model"; 
+import { WorkspaceModel } from "../../models/workspace.model";
+import { ColumnModel } from "../../models/column.model";
 
 export const boardRepository = {
-  
   async createBoard(data: {
     name: string;
     description?: string;
@@ -17,25 +17,24 @@ export const boardRepository = {
     return newboard;
   },
 
- async getBoardById(boardId: string) {
-  return await BoardModel.findById(boardId)
-    .populate('memberIds', 'name email avatarUrl')
-    .populate({
-      path: 'columnOrder',
-      populate: { path: 'taskOrder' }
-    })
-    .lean() // 🚀 YEH ZAROORI HAI CACHING KE LIYE
-    .exec();
-},
+  async getBoardById(boardId: string) {
+    return await BoardModel.findById(boardId)
+      .populate("memberIds", "name email avatarUrl")
+      .populate({
+        path: "columnOrder",
+        populate: { path: "taskOrder" },
+      })
+      .lean() // 🚀 YEH ZAROORI HAI CACHING KE LIYE
+      .exec();
+  },
 
   async getBoardsInWorkspace(workspaceId: string, userId: string) {
-
-    const boards = await BoardModel.find({ 
+    const boards = await BoardModel.find({
       workspaceId,
       $or: [
         { visibility: "workspace" },
-        { visibility: "private", createdBy: userId }
-      ]
+        { visibility: "private", createdBy: userId },
+      ],
     });
     return boards;
   },
@@ -57,20 +56,29 @@ export const boardRepository = {
 
   async getBoardsForUser(userId: string) {
     const boards = await BoardModel.find({
-      $or: [
-        { createdBy: userId },
-        { memberIds: userId }
-      ]
+      $or: [{ createdBy: userId }, { memberIds: userId }],
     });
     return boards;
   },
-   async reorderColumns(boardId: string, newColumnOrder: string[]) {
-    return await BoardModel.findByIdAndUpdate(
-      boardId, 
-      {$set: { columnOrder: newColumnOrder }}, 
-      { returnDocument: "after" });
+  async reorderColumns(boardId: string, newColumnOrder: string[]) {
+    const updatedBoard = await BoardModel.findByIdAndUpdate(
+      boardId,
+      { $set: { columnOrder: newColumnOrder } },
+      { returnDocument: "after" },
+    );
+    const updates = newColumnOrder.map((columnId, index) => ({
+      updateOne: {
+        filter: { _id: new Types.ObjectId(columnId) },
+        update: { $set: { position: index } },
+      },
+    }));
+
+    if (updates.length > 0) {
+      await ColumnModel.bulkWrite(updates);
+    }
+    return updatedBoard;
   },
   async deleteBoard(boardId: string) {
     return await BoardModel.findByIdAndDelete(boardId);
-  }
+  },
 };

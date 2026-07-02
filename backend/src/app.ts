@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRoutes from './modules/auth/auth.routes';
+import dashboardRoutes from './modules/dashboard/dashboard.routes';
 import workspaceRoutes from './modules/workspaces/worspace.routes';
 import boardRoutes from './modules/boards/board.routes';
 import columnRoutes from './modules/columns/column.routes';
@@ -64,6 +65,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/workspaces', workspaceRoutes);
 app.use('/api/v1', boardRoutes);
 app.use('/api/v1', columnRoutes);

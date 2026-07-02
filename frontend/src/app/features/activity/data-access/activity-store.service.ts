@@ -4,7 +4,6 @@ import { firstValueFrom } from 'rxjs';
 import { ActivityApiService } from './activity-api.service';
 import { ActivityItem, ActivityRef, formatActivityAction } from '../models/activity.model';
 
-// --- Pure Helper Functions (Extracted from Component) ---
 const asRef = (value: string | ActivityRef | null | undefined): ActivityRef | null => {
   if (!value || typeof value === 'string') return null;
   return value;
@@ -30,39 +29,43 @@ const sanitizeColumnText = (value: string | null): string | null => {
   return /^[a-f\d]{24}$/i.test(value) ? null : value;
 };
 
-const getEntityLabel = (item: ActivityItem): string => {
-  const board = asRef(item.boardId);
-  const column = asRef(item.columnId);
-
-  if (item.entityType === 'board') return board?.name ? `board "${board.name}"` : 'a board';
-  if (item.entityType === 'column') return column?.name ? `column "${column.name}"` : 'a column';
-  if (item.entityType === 'task') {
-    const task = asRef(item.taskId);
-    return task?.title ? `task "${task.title}"` : 'a task';
-  }
-  if (item.entityType === 'comment') {
-    const task = asRef(item.taskId);
-    return task?.title ? `comment on task "${task.title}"` : 'a comment';
-  }
-  return 'workspace';
-};
-
 const getActorName = (item: ActivityItem): string => {
   return asRef(item.userId)?.name || 'Someone';
 };
 
-const getTargetText = (item: ActivityItem): string => {
-  const task = asRef(item.taskId);
-  if (task?.title) return `task "${task.title}"`;
-  return getEntityLabel(item) || '';
-};
-
-// --- Formatters for UI ---
 const formatDescription = (item: ActivityItem): string => {
   const actor = getActorName(item);
   const action = formatActivityAction(item.actionType);
-  const target = getTargetText(item);
-  return target ? `${actor} ${action} ${target}.` : `${actor} ${action}.`;
+  
+  const boardName = asRef(item.boardId)?.name;
+  const taskTitle = asRef(item.taskId)?.title;
+  const columnName = asRef(item.columnId)?.name;
+  
+  let target = '';
+  let location = '';
+
+  if (item.entityType === 'task') {
+    target = taskTitle ? `task "${taskTitle}"` : 'a task';
+    if (boardName) location = `in "${boardName}"`;
+  } 
+  else if (item.entityType === 'comment') {
+    target = taskTitle ? `"${taskTitle}"` : 'a comment';
+    if (boardName) location = `in "${boardName}"`;
+  } 
+  else if (item.entityType === 'column') {
+    target = columnName ? `column "${columnName}"` : 'a column';
+    if (boardName) location = `in "${boardName}"`;
+  } 
+  else if (item.entityType === 'board') {
+    target = boardName ? `board "${boardName}"` : 'a board';
+  } 
+  else {
+    const wsName = asText(item.metadata?.['workspaceName']);
+    target = wsName ? `workspace "${wsName}"` : 'the workspace';
+  }
+
+  const sentence = [actor, action, target, location].filter(Boolean).join(' ');
+  return sentence;
 };
 
 const formatContext = (item: ActivityItem): string => {
@@ -71,16 +74,14 @@ const formatContext = (item: ActivityItem): string => {
   const destinationRaw = asText(metadata['destinationColumnName']) ?? asText(metadata['destinationColumnId']);
   const source = sanitizeColumnText(sourceRaw);
   const destination = sanitizeColumnText(destinationRaw);
-  const position = asText(metadata['position']);
 
   const details: string[] = [];
+  
   if (source && destination) {
     details.push(`Moved from ${source} to ${destination}`);
   } else if (item.actionType === 'task_moved') {
     details.push('Moved between columns');
   }
-
-  if (position) details.push(`at position ${position}`);
 
   const updatedFields = Array.isArray(metadata['updatedFields'])
     ? (metadata['updatedFields'] as unknown[]).map(field => String(field)).filter(Boolean)
@@ -90,12 +91,7 @@ const formatContext = (item: ActivityItem): string => {
     details.push(`Updated: ${updatedFields.join(', ')}`);
   }
 
-  if (details.length === 0) {
-    const entity = getEntityLabel(item);
-    return entity ? `Entity: ${entity}` : `Entity ID: ${item.entityId}`;
-  }
-
-  return details.join(' | ');
+  return details.join(' • '); 
 };
 
 const generateDeepLink = (item: ActivityItem, workspaceId?: string) => {
@@ -122,7 +118,7 @@ const generateDeepLink = (item: ActivityItem, workspaceId?: string) => {
     return {
       commands: ['/boards', boardId, toSlug(boardName || 'board')],
       queryParams: Object.keys(queryParams).length ? queryParams : undefined,
-      label: taskId ? 'Open task in board' : 'Open board'
+      label: taskId ? 'Open task' : 'Open board'
     };
   }
 
@@ -137,7 +133,6 @@ const generateDeepLink = (item: ActivityItem, workspaceId?: string) => {
   return null;
 };
 
-// --- State Definitions ---
 type ActivityState = {
   loading: boolean;
   error: string | null;
@@ -154,7 +149,6 @@ const initialState: ActivityState = {
   boardId: undefined
 };
 
-// --- The SignalStore ---
 export const ActivityStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
@@ -164,7 +158,6 @@ export const ActivityStore = signalStore(
     currentWorkspaceId: computed(() => workspaceId()),
     currentBoardId: computed(() => boardId()),
     
-    // 🚀 The Magic happens here: One-time mapping for the UI
     uiItems: computed(() => {
       const wId = workspaceId();
       return items().map(item => ({

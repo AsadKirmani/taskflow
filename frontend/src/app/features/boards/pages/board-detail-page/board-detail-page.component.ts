@@ -81,7 +81,9 @@ export class BoardDetailPageComponent implements OnInit {
       }
     });
   }
-
+  ngOnDestroy(): void {
+    this.boardStore.resetBoardState();
+  }
   onTaskMoved(event: TaskDropEventPayload): void {
     this.dndFacade.handleTaskDrop(event);
   }

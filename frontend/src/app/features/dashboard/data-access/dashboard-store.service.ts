@@ -1,168 +1,131 @@
 import { inject, computed } from '@angular/core';
 import { signalStore, withState, withMethods, withComputed, patchState } from '@ngrx/signals';
 import { firstValueFrom } from 'rxjs';
-import { BoardApiService } from '../../boards/data-access/board-api.service';
-import { ActivityApiService } from '../../activity/data-access/activity-api.service';
+import { DashboardApiService, DashboardSummary, DashboardTaskRow } from './dashboard-api.service';
 import { WorkspaceStoreService } from '../../workspace/data-access/workspace-store.service';
-import { Board } from '../../../core/models/board.model';
-import { Task } from '../../../core/models/task.model';
-import { ActivityItem } from '../../activity/models/activity.model';
-
-// --- Pure Helper Functions ---
-const isDueToday = (dueDate: string | null | undefined, now: Date) => {
-  if (!dueDate) return false;
-  const due = new Date(dueDate);
-  return !Number.isNaN(due.getTime()) && due.toDateString() === now.toDateString();
-};
-
-const isOverdue = (dueDate: string | null | undefined, now: Date) => {
-  if (!dueDate) return false;
-  const due = new Date(dueDate);
-  return !Number.isNaN(due.getTime()) && due.getTime() < now.getTime();
-};
-
-const isSameDay = (value: string | null | undefined, now: Date) => {
-  if (!value) return false;
-  const date = new Date(value);
-  return !Number.isNaN(date.getTime()) && date.toDateString() === now.toDateString();
-};
 
 // --- State Definitions ---
 type DashboardState = {
   loading: boolean;
   error: string | null;
-  boards: Board[];
-  tasks: Task[];
-  activities: ActivityItem[];
+  isLoaded: boolean; // 🚀 Caching guard
+  stats: DashboardSummary['stats'];
+  recentTaskRows: DashboardSummary['recentTasks'];
+  recentActivities: DashboardSummary['recentActivities'];
 };
 
 const initialState: DashboardState = {
   loading: true,
   error: null,
-  boards: [],
-  tasks: [],
-  activities: []
+  isLoaded: false,
+  stats: {
+    tasksDueToday: 0,
+    overdueTasks: 0,
+    completedTasks: 0,
+    newAssignmentsToday: 0,
+    activeBoards: 0,
+  },
+  recentTaskRows: [],
+  recentActivities: [],
 };
 
 // --- The SignalStore ---
 export const DashboardStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  
-  // 🚀 1. COMPUTED SIGNALS REFACTORED
-  withComputed(({ boards, tasks, loading, error }) => {
-    
-    // 💡 Fix #1: Dynamic 'now' generator to prevent stale dates
-    const getNow = () => new Date(); 
-    
-    // 💡 Fix #3: Reusable filtered arrays to prevent redundant filtering
-    const notCompletedTasks = computed(() => tasks().filter(t => !t.isCompleted));
-    const completedTasksArr = computed(() => tasks().filter(t => t.isCompleted));
-    
-    // 💡 Smell #2 noted: Left as Map for now, can optimize later if scale increases
-    const boardById = computed(() => new Map(boards().map(b => [b.id, b])));
-    
-    return {
-      isLoading: computed(() => loading()),
-      hasError: computed(() => error()),
-      
-      tasksDueToday: computed(() => notCompletedTasks().filter(task => isDueToday(task.dueDate, getNow())).length),
-      overdueTasks: computed(() => notCompletedTasks().filter(task => isOverdue(task.dueDate, getNow())).length),
-      activeBoards: computed(() => new Set(tasks().map(task => task.boardId)).size),
-      
-      completedTasks: computed(() => completedTasksArr().length),
-      completedOnTime: computed(() => completedTasksArr().filter(task => !isOverdue(task.dueDate, getNow())).length),
-      newAssignmentsToday: computed(() => tasks().filter(task => isSameDay(task.createdAt, getNow())).length),
-      
-      recentTaskRows: computed(() => {
-        return [...tasks()]
-          .sort((a, b) => {
-            const aDue = a.dueDate ? new Date(a.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
-            const bDue = b.dueDate ? new Date(b.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
-            return aDue - bDue;
-          })
-          .slice(0, 8)
-          .map(task => ({
-            id: task.id,
-            boardId: task.boardId,
-            boardName: boardById().get(task.boardId)?.name ?? 'Unknown board',
-            title: task.title,
-            dueDate: task.dueDate ?? null,
-            priority: task.priority,
-            isCompleted: !!task.isCompleted
-          }));
-      })
-    };
-  }),
 
-  // 🚀 2. METHODS REFACTORED (Broken down into private helpers)
-  withMethods((
-    store, 
-    boardApi = inject(BoardApiService), 
-    activityApi = inject(ActivityApiService),
-    workspaceStore = inject(WorkspaceStoreService)
-  ) => {
+  // 🚀 1. COMPUTED SIGNALS (Directly exposing state, no calculations!)
+  withComputed((state) => ({
+    isLoading: computed(() => state.loading()),
+    hasError: computed(() => state.error()),
 
-    // --- Private Helper Methods (Not exposed to Component) ---
-    
-    const fetchBoards = async (): Promise<Board[]> => {
-      const res = await firstValueFrom(boardApi.getBoards());
-      return (res.data?.items ?? []).map((b: any) => ({ ...b, id: b.id ?? b._id ?? '' }));
-    };
+    // Stats
+    tasksDueToday: computed(() => state.stats().tasksDueToday),
+    overdueTasks: computed(() => state.stats().overdueTasks),
+    activeBoards: computed(() => state.stats().activeBoards),
+    completedTasks: computed(() => state.stats().completedTasks),
+    completedOnTime: computed(() => 0), // Agar chahiye toh backend me add kar lena, warna remove kar do
+    newAssignmentsToday: computed(() => state.stats().newAssignmentsToday),
+  })),
 
-    const fetchTasksForBoards = async (boards: Board[]): Promise<Task[]> => {
-      const taskPromises = boards.map(async board => {
-        try {
-          const res = await firstValueFrom(boardApi.getTasksInBoard(board.id));
-          return (res.data?.items ?? []).map((t: any) => ({
-            ...t,
-            id: t.id ?? t._id ?? '',
-            boardId: t.boardId || board.id
-          }));
-        } catch { return []; }
-      });
-      const tasksArrays = await Promise.all(taskPromises);
-      return tasksArrays.flat();
-    };
+  // 🚀 2. METHODS (Just one API call)
+  withMethods(
+    (
+      store,
+      dashboardApi = inject(DashboardApiService),
+      workspaceStore = inject(WorkspaceStoreService),
+    ) => ({
+      async loadDashboardData(workspaceId: string, userId: string, forceReload = false) {
+       
+        // 💡 GUARD: Agar data loaded hai aur force reload nahi manga, toh skip karo (Saves API call)
+        if (store.isLoaded() && !forceReload && !store.error()) {
+          return;
+        }
+        if (!workspaceId) {
+          patchState(store, { error: 'No active workspace found', loading: false });
+          return;
+        }
 
-    const fetchActivities = async (workspaceId: string | undefined): Promise<ActivityItem[]> => {
-      if (!workspaceId) return [];
-      try {
-        const res = await firstValueFrom(activityApi.getWorkspaceActivity(workspaceId, 1, 5));
-        return res.data?.items ?? [];
-      } catch { return []; }
-    };
-
-    // --- Public Exposed Methods ---
-    
-    return {
-      async loadDashboardData() {
         patchState(store, { loading: true, error: null });
 
         try {
-          // 💡 Fix #4: Clean and readable orchestration
-          const boards = await fetchBoards();
-          patchState(store, { boards });
+          // 💡 Ek single API call jo sab kuch le aayega!
+          const response = await firstValueFrom(
+            dashboardApi.getDashboardSummary(workspaceId, userId),
+          );
+          const data = response.data;
 
-          if (boards.length === 0) {
-            patchState(store, { loading: false });
-            return;
-          }
-
-          const activeWsId = workspaceStore.activeWorkspace()?.id;
-          const workspaceId = activeWsId || boards[0]?.workspaceId;
-
-          const [tasks, activities] = await Promise.all([
-            fetchTasksForBoards(boards),
-            fetchActivities(workspaceId)
-          ]);
-
-          patchState(store, { tasks, activities, loading: false });
-
+          patchState(store, {
+            stats: data.stats,
+            recentTaskRows: data.recentTasks.map((task: DashboardTaskRow) => ({
+              id: task.id,
+              boardId: task.boardId,
+              boardName: task.boardName,
+              title: task.title,
+              dueDate: task.dueDate,
+              priority: task.priority,
+              isCompleted: task.isCompleted,
+            })),
+            recentActivities: data.recentActivities,
+            loading: false,
+            isLoaded: true, // 🚀 Set to true taaki dubara fetch na ho
+          });
         } catch (err) {
           patchState(store, { error: 'Failed to load dashboard data', loading: false });
         }
+      },
+      setEmptyWorkspaceState() {
+        patchState(store, {
+          loading: false,
+          error: null,
+          isLoaded: true,
+          stats: {
+            tasksDueToday: 0,
+            overdueTasks: 0,
+            completedTasks: 0,
+            newAssignmentsToday: 0,
+            activeBoards: 0,
+          },
+          recentTaskRows: [],
+          recentActivities: [],
+        });
+      },
+      resetDashboardState() {
+        patchState(store, {
+          loading: true,
+          error: null,
+          isLoaded: false,
+          stats: {
+            tasksDueToday: 0,
+            overdueTasks: 0,
+            completedTasks: 0,
+            newAssignmentsToday: 0,
+            activeBoards: 0,
+          },
+          recentTaskRows: [],
+          recentActivities: [],
+        });
       }
-    };
-  })
+    }),
+  ),
 );

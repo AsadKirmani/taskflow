@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -18,6 +18,8 @@ import { UiPageBodyComponent } from '../../../../ui/components/layout/ui-page-bo
 import { UiPanelComponent } from '../../../../ui/components/layout/ui-panel.component'
 import { UiStatCardComponent } from '../../../../ui/components/layout/ui-stat-card.component';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
+import { WorkspaceStoreService } from '../../../workspace/data-access/workspace-store.service';
+import { AuthStoreService } from '../../../auth/data-access/auth-store.service';
 
 export interface DashboardTaskRow {
   id: string;
@@ -61,15 +63,53 @@ export interface DashboardTaskRow {
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardPageComponent implements OnInit {
+export class DashboardPageComponent{
   
   // 🚀 Sirf aur sirf Store inject kiya hai
   readonly store = inject(DashboardStore);
+  readonly authStore = inject(AuthStoreService);
+  readonly workspaceStore = inject(WorkspaceStoreService);
 
-  ngOnInit() {
-    // 🚀 Data load karne ka command seedha store ko de diya
-    this.store.loadDashboardData();
-  }
+ constructor() {
+  effect(() => {
+      // 1. App ki loading states track karo
+      const isAuthLoading = this.authStore.isLoading();
+      const isWorkspaceLoading = this.workspaceStore.isLoading();
+      
+      // 🚀 RACE CONDITION GUARD: Jab tak user aur workspaces load na ho jayein, wait karo!
+      if (isAuthLoading || isWorkspaceLoading) {
+        return; 
+      }
+
+      const user = this.authStore.currentUser();
+      if (!user) return; // Agar user hi nahi hai toh wapas jao
+
+      // 2. Workspace ID dhoondo
+      let targetWorkspaceId = this.workspaceStore.activeWorkspace()?.id;
+
+      // 🚀 SMART FALLBACK: Agar user ne koi workspace select nahi kiya, toh uske list ka pehla workspace utha lo
+      if (!targetWorkspaceId) {
+        const allWorkspaces = this.workspaceStore.workspaces(); // Assumed array of workspaces
+        
+        if (allWorkspaces && allWorkspaces.length > 0) {
+          targetWorkspaceId = allWorkspaces[0].id;
+          
+          // Optional: Tujhe chahiye toh WorkspaceStore ka active workspace bhi set kar sakta hai bina extra API call ke
+          untracked(() => this.workspaceStore.setActiveWorkspace(allWorkspaces[0].id)); 
+        }
+      }
+
+      // 3. Agar workspace mil gaya, toh Dashboard fetch maro (userId bhi bhej do validation fix karne ke liye)
+      if (targetWorkspaceId) {
+        // userId pass kar rahe hain backend validation error fix karne ke liye
+        this.store.loadDashboardData(targetWorkspaceId, user.id); 
+      } else {
+        // 🚀 EDGE CASE: Naya user jiska koi workspace nahi hai
+        // Store mein ek action call kardo jo loading false kar de taaki infinite loader na dikhe
+        this.store.setEmptyWorkspaceState(); 
+      }
+    });
+}
 
   // --- UI Helpers (Strictly for styling and routing) ---
 
@@ -103,6 +143,7 @@ export class DashboardPageComponent implements OnInit {
     const actor = this.getRef(item.userId)?.name || 'Someone';
     const task = this.getRef(item.taskId)?.title;
     const board = this.getRef(item.boardId)?.name;
+    const workspace = this.getRef(item.workspaceId)?.name;
     const action = formatActivityAction(item.actionType);
 
     if (task) {
@@ -113,6 +154,9 @@ export class DashboardPageComponent implements OnInit {
       return `${actor} ${action} on board "${board}"`;
     }
 
+    if (workspace) {
+      return `${actor} ${action} in workspace "${workspace}"`;
+    }
     return `${actor} ${action}`;
   }
 

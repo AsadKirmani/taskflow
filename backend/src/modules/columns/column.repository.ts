@@ -1,5 +1,7 @@
+import { Types } from "mongoose";
 import { BoardModel } from "../../models/board.model";
 import { ColumnModel } from "../../models/column.model";
+import { TaskModel } from "../../models/task.model";
 
 export const columnRepository = {
   async createColumn(data: {
@@ -9,6 +11,10 @@ export const columnRepository = {
     createdBy: string;
     position?: number;
   }) {
+    if(data.position === undefined) {
+      const board = await BoardModel.findById(data.boardId).select('columnOrder');
+      data.position = board?.columnOrder?.length || 0;
+    }
     const newColumn = await ColumnModel.create(data);
     await BoardModel.findByIdAndUpdate(data.boardId, {
       $push: { columnOrder: newColumn._id },
@@ -31,9 +37,19 @@ export const columnRepository = {
     return ColumnModel.find({ boardId }).sort({ position: 1 });
   },
   async reorderTasks(columnId: string, newTaskOrder: string[]) {
-    return await ColumnModel.findByIdAndUpdate(
+    const updatedColumn = await ColumnModel.findByIdAndUpdate(
       columnId, 
       {$set: { taskOrder: newTaskOrder }}, 
       { returnDocument: "after" });
+      const updates = newTaskOrder.map((taskId, index) => ({
+        updateOne: {
+          filter: { _id: new Types.ObjectId(taskId) },
+          update: { $set: { position: index } },
+        },
+      }));
+      if (updates.length > 0) {
+      await TaskModel.bulkWrite(updates);
+      }
+      return updatedColumn;
   }
 };

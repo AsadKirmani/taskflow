@@ -13,6 +13,10 @@ export const taskRepository = {
     reporterId: string;
     position?: number;
   }) {
+    if(data.position === undefined) {
+      const column = await ColumnModel.findById(data.columnId).select('taskOrder');
+      data.position = column?.taskOrder?.length || 0;
+    }
     const newTask = await TaskModel.create(data);
     await ColumnModel.findByIdAndUpdate(data.columnId, {
       $push: { taskOrder: newTask._id },

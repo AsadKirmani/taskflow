@@ -68,8 +68,8 @@ export const boardService = {
     const boards = await boardRepository.getBoardsForUser(userId);
     return boards;
   },
-  async reorderColumns(boardId: string, columnIds: string[], userId: string) {
-      return await boardRepository.reorderColumns(boardId, columnIds);
+  async reorderColumns(boardId: string, columnOrder: string[], userId: string) {
+      return await boardRepository.reorderColumns(boardId, columnOrder);
     },
     async deleteBoard(boardId: string, userId: string) {
       const deletedBoard = await boardRepository.deleteBoard(boardId);

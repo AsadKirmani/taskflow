@@ -12,6 +12,9 @@ import {
 } from '@angular/cdk/drag-drop';
 import { UiEmptyStateComponent } from '../../../../ui/components/ui-empty-state.component';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
+import { UiDropdownMenuComponent, UiDropdownMenuContent, UiDropdownMenuTrigger } from '../../../../ui/components/ui-dropdown-menu.component';
+import { UiDropdownMenuItemComponent } from '../../../../ui/components/ui-dropdown-menu-item.component';
 
 @Component({
   selector: 'app-kanban-column',
@@ -22,7 +25,12 @@ import { APP_ICONS } from '../../../../core/icons/lucide-icons';
     CommonModule,
     AutofocusDirective,
     DragDropModule,
+    UiButtonComponent,
     UiEmptyStateComponent,
+    UiDropdownMenuComponent,
+    UiDropdownMenuItemComponent,
+    UiDropdownMenuTrigger,
+    UiDropdownMenuContent,
     ...APP_ICONS
   ],
   templateUrl: './kanban-column.component.html',
