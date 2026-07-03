@@ -10,7 +10,8 @@ import { UiAvatarComponent } from './ui-avatar.component';
       @for (user of displayUsers(); track user.id) {
         <ui-avatar 
           [src]="user.avatar" 
-          [fallback]="user.name" 
+          [name]="user.name" 
+          [title]="user.name"
           [size]="size()" 
           class="ring-2 ring-base-100" 
         />
@@ -28,7 +29,7 @@ import { UiAvatarComponent } from './ui-avatar.component';
 export class UiAvatarStackComponent {
   users = input<{id: string, name: string, avatar?: string}[]>([]);
   limit = input(3);
-  size = input<'sm' | 'md' | 'lg'>('sm');
+  size = input<'sm' | 'md' | 'lg'>('lg');
 
   displayUsers = computed(() => this.users().slice(0, this.limit()));
   remainingCount = computed(() => Math.max(0, this.users().length - this.limit()));

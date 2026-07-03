@@ -139,6 +139,7 @@ type ActivityState = {
   items: ActivityItem[];
   workspaceId: string | undefined;
   boardId: string | undefined;
+  isLoaded: boolean;
 };
 
 const initialState: ActivityState = {
@@ -146,7 +147,8 @@ const initialState: ActivityState = {
   error: null,
   items: [],
   workspaceId: undefined,
-  boardId: undefined
+  boardId: undefined,
+  isLoaded: false
 };
 
 export const ActivityStore = signalStore(
@@ -157,7 +159,6 @@ export const ActivityStore = signalStore(
     hasError: computed(() => error()),
     currentWorkspaceId: computed(() => workspaceId()),
     currentBoardId: computed(() => boardId()),
-    
     uiItems: computed(() => {
       const wId = workspaceId();
       return items().map(item => ({
@@ -171,8 +172,16 @@ export const ActivityStore = signalStore(
   })),
   withMethods((store, activityApi = inject(ActivityApiService)) => ({
     
-    async loadActivities(workspaceId?: string, boardId?: string) {
-      patchState(store, { loading: true, error: null, workspaceId, boardId });
+    async loadActivities(workspaceId?: string, boardId?: string, forceRefresh = false) {
+      
+      // 🚀 THE FIX: Cache Check
+      // Agar data loaded hai aur IDs same hain jo maangi ja rahi hain, toh API call skip kar do!
+      if (!forceRefresh && store.isLoaded() && !store.error() && store.currentWorkspaceId() === workspaceId && store.currentBoardId() === boardId) {
+        return; 
+      }
+
+      // Naya data mangwana hai toh isLoaded ko pehle false karo
+      patchState(store, { loading: true, error: null, workspaceId, boardId, isLoaded: false });
 
       try {
         let request$;
@@ -185,9 +194,9 @@ export const ActivityStore = signalStore(
         }
 
         const response = await firstValueFrom(request$);
-        patchState(store, { items: response.data?.items ?? [], loading: false });
+        patchState(store, { items: response.data?.items ?? [], loading: false, isLoaded: true });
       } catch (err) {
-        patchState(store, { error: 'Failed to load activity feed', items: [], loading: false });
+        patchState(store, { error: 'Failed to load activity feed', items: [], loading: false, isLoaded: false });
       }
     }
     

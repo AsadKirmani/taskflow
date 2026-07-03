@@ -42,7 +42,7 @@ export class UiButtonComponent {
       secondary: 'bg-secondary text-secondary-content hover:bg-secondary/90 border border-secondary-content/10 focus:ring-secondary/20',
       ghost: 'bg-transparent text-base-content hover:bg-base-300 focus:ring-base-content/20',
       danger: 'bg-error text-error-content hover:bg-error/90 focus:ring-error/50 shadow-sm',
-      icon: 'bg-transparent text-base-content hover:bg-base-300 focus:ring-base-content/20 border border-base-300', // Icon buttons ke liye transparent background
+      icon: 'bg-transparent text-base-content hover:bg-base-300 border border-base-300 active:bg-base-300 focus:ring-base-content/20', // Icon buttons ke liye transparent background
     };
 
     const sizes = {

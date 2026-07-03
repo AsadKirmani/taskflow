@@ -1,13 +1,13 @@
-import { Request, Response } from 'express';
-import { AppError } from '../../shared/errors/app-error';
-import { archiveService } from './archive.service';
+import { Request, Response } from "express";
+import { AppError } from "../../shared/errors/app-error";
+import { archiveService } from "./archive.service";
+import { redisClient } from "../../config/redis";
 
 export const archiveController = {
   async archiveEntity(req: Request, res: Response) {
-
     const { workspaceId, entityType, entityId, reason } = req.body as {
       workspaceId: string;
-      entityType: 'board' | 'column' | 'task';
+      entityType: "board" | "column" | "task";
       entityId: string;
       reason?: string;
     };
@@ -17,21 +17,36 @@ export const archiveController = {
       entityType,
       entityId,
       reason,
-      userId: req.auth!.userId
+      userId: req.auth!.userId,
     });
 
+    // 🚀 FIX: Proper error handling
     if (!result) {
-      throw new AppError('Entity not found', 404, 'NOT_FOUND');
+      throw new AppError(
+        "Entity not found or already archived",
+        400,
+        "BAD_REQUEST",
+      );
+    }
+
+    if (entityType === "board") {
+      await redisClient.del(`workspace:${workspaceId}:boards`);
+      await redisClient.del(`user:${req.auth!.userId}:all_boards`);
+      await redisClient.del(`board:${entityId}:detail`);
+    } else if (entityType === "column" || entityType === "task") {
+      const boardId = result.updated.boardId?.toString();
+      if (boardId) {
+        await redisClient.del(`board:${boardId}:detail`);
+      }
     }
 
     res.status(201).json({ success: true, data: result });
   },
 
   async restoreEntity(req: Request, res: Response) {
-
     const { workspaceId, entityType, entityId } = req.body as {
       workspaceId: string;
-      entityType: 'board' | 'column' | 'task';
+      entityType: "board" | "column" | "task";
       entityId: string;
     };
 
@@ -39,27 +54,46 @@ export const archiveController = {
       workspaceId,
       entityType,
       entityId,
-      userId: req.auth!.userId
+      userId: req.auth!.userId,
     });
 
+    // 🚀 FIX: Proper error handling
     if (!updated) {
-      throw new AppError('Entity not found', 404, 'NOT_FOUND');
+      throw new AppError(
+        "Entity not found or already restored",
+        400,
+        "BAD_REQUEST",
+      );
+    }
+
+    if (entityType === "board") {
+      await redisClient.del(`workspace:${workspaceId}:boards`);
+      await redisClient.del(`user:${req.auth!.userId}:all_boards`);
+      await redisClient.del(`board:${entityId}:detail`);
+    } else if (entityType === "column" || entityType === "task") {
+      const boardId = updated.boardId?.toString();
+      if (boardId) {
+        await redisClient.del(`board:${boardId}:detail`);
+      }
     }
 
     res.json({ success: true, data: updated });
   },
 
   async listArchived(req: Request, res: Response) {
-
     const { workspaceId } = req.params as { workspaceId: string };
-    const entityType = req.query.entityType as 'board' | 'column' | 'task' | undefined;
-    const includeRestored = req.query.includeRestored === 'true';
+    const entityType = req.query.entityType as
+      | "board"
+      | "column"
+      | "task"
+      | undefined;
+    const includeRestored = req.query.includeRestored === "true";
 
     const items = await archiveService.listArchived(workspaceId, {
       entityType,
-      includeRestored
+      includeRestored,
     });
 
     res.json({ success: true, data: { items } });
-  }
+  },
 };

@@ -13,11 +13,11 @@ import { Component, HostListener, ElementRef, inject, input } from "@angular/cor
       <!-- Dropdown Content -->
       @if (isOpen) {
   <div 
-    class="absolute mt-2 w-56 bg-base-100 border border-base-300 rounded-box text-base-content shadow-lg z-50 opacity-100 transform translate-y-0"
+    class="absolute mt-2 w-56 bg-base-100 border border-base-300 rounded-box text-base-content shadow-lg z-50 opacity-100 transform translate-y-0 p-2"
     [class.left-0]="direction() === 'left'"
     [class.right-0]="direction() === 'right'"
-    animate.enter="transition ease-out duration-150 transform opacity-0 -translate-y-2"
-    animate.leave="transition ease-in duration-100 transform opacity-0 -translate-y-1">
+    animate.enter="transition ease-out duration-75 transform opacity-0 -translate-y-2"
+    animate.leave="transition ease-in duration-75 transform opacity-0 -translate-y-1">
     <ng-content select="ui-dropdown-menu-content"></ng-content>
   </div>
 }

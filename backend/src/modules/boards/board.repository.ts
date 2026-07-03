@@ -22,6 +22,7 @@ export const boardRepository = {
       .populate("memberIds", "name email avatarUrl")
       .populate({
         path: "columnOrder",
+        match: { archived: false },
         populate: { path: "taskOrder" },
       })
       .lean() // 🚀 YEH ZAROORI HAI CACHING KE LIYE
@@ -30,6 +31,7 @@ export const boardRepository = {
 
   async getBoardsInWorkspace(workspaceId: string, userId: string) {
     const boards = await BoardModel.find({
+      archived: { $ne: true },
       workspaceId,
       $or: [
         { visibility: "workspace" },
@@ -56,6 +58,7 @@ export const boardRepository = {
 
   async getBoardsForUser(userId: string) {
     const boards = await BoardModel.find({
+      archived: false,
       $or: [{ createdBy: userId }, { memberIds: userId }],
     });
     return boards;

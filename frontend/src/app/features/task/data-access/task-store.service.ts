@@ -12,6 +12,7 @@ import { BoardApiService } from '../../boards/data-access/board-api.service';
 import { BoardFilters } from '../../boards/data-access/board-state.model';
 import { TaskState, initialTaskState } from './task-state.model';
 import { TaskComment } from '../../../core/models/comment.model';
+import { ArchiveService } from '../../../core/services/archive.service';
 
 // --- Pure Helper Functions (Store ke bahar taaki Store halka rahe) ---
 const normalizeTasks = (tasks: any[]): Task[] => tasks.map(t => ({ ...t, id: t.id ?? t._id ?? '' }));
@@ -108,7 +109,8 @@ export const TaskStore = signalStore(
   withMethods((
     store, 
     api = inject(BoardApiService), 
-    notification = inject(NotificationService)
+    notification = inject(NotificationService),
+    archive = inject(ArchiveService)
   ) => {
 
     // 🚀 Smart Debounced Filter Fetcher (Replaces the buggy Subject/Constructor logic)
@@ -265,6 +267,67 @@ export const TaskStore = signalStore(
 
       toggleTaskCompletion(taskId: string, isCompleted: boolean) {
         this.updateTask(taskId, { isCompleted });
+      },
+      async archiveTask(taskId: string, workspaceId: string, taskTitle: string, reason?: string) {
+        if (!taskId?.trim()) return;
+        
+        const existingTask = store.tasksById()[taskId];
+        if (!existingTask) return;
+        
+        const columnId = existingTask.columnId;
+        const originalTaskIdsByColumn = { ...store.taskIdsByColumn() };
+        const originalTasksById = { ...store.tasksById() };
+
+        // 🚀 Optimistic UI Update: Turant screen se hatao
+        const updatedTaskIdsByColumn = { ...originalTaskIdsByColumn };
+        updatedTaskIdsByColumn[columnId] = (updatedTaskIdsByColumn[columnId] ?? []).filter(id => id !== taskId);
+        
+        const updatedTasksById = { ...originalTasksById };
+        delete updatedTasksById[taskId];
+
+        patchState(store, { 
+          taskIdsByColumn: updatedTaskIdsByColumn, 
+          tasksById: updatedTasksById 
+        });
+
+        try {
+          await firstValueFrom(archive.archive({ 
+            workspaceId, 
+            entityType: 'task', 
+            entityId: taskId, 
+            entityName: taskTitle, 
+            reason 
+          }));
+          notification.success('Task archived successfully');
+        } catch (err) {
+          // Error aaya toh wapas purani state me le aao
+          patchState(store, { 
+            taskIdsByColumn: originalTaskIdsByColumn, 
+            tasksById: originalTasksById 
+          });
+          notification.error('Failed to archive task');
+        }
+      },
+
+      // 🚀 NAYA METHOD: RESTORE TASK
+      async restoreTask(taskId: string, workspaceId: string, taskTitle: string) {
+        try {
+          await firstValueFrom(archive.restore({ 
+            workspaceId, 
+            entityType: 'task', 
+            entityId: taskId, 
+            entityName: taskTitle 
+          }));
+          notification.success('Task restored successfully');
+          
+          // Task wapas aa gaya hai toh board ke tasks dobara fetch kar lo UI update karne ke liye
+          const currentBoardId = store.currentBoardId();
+          if (currentBoardId) {
+            await this.getTasksInBoard(currentBoardId, [], true); // Force reload tasks
+          }
+        } catch (err) {
+          notification.error('Failed to restore task');
+        }
       },
       // async deleteTask(taskId: string) {
       //   if (!taskId?.trim()) return;

@@ -156,4 +156,7 @@ export class TaskFacade {
     this.updateTaskProperty('startDate', startDateTime);
     this.updateTaskProperty('dueDate', dueDateTime);
   }
+  archiveTask(taskId: string, workspaceId: string, taskTitle: string, reason?: string) {
+    this.taskStore.archiveTask(taskId, workspaceId, taskTitle, reason);
+  }
 }

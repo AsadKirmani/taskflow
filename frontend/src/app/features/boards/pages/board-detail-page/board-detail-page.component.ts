@@ -32,6 +32,8 @@ import { TaskFacade } from '../../../task/facades/task.facade';
       (columnAdded)="onColumnAdded($event)"
       (taskUpdated)="onTaskUpdated($event)"
       (taskCompletionToggled)="onTaskCompletionToggled($event)"
+      (columnArchived)="onColumnArchived($event)"
+      [boardMembers]="boardStore.members()"
     />
   `,
   styles: [`
@@ -118,5 +120,10 @@ export class BoardDetailPageComponent implements OnInit {
     if (!board()?.id) return;
 
     this.taskStore.toggleTaskCompletion(event.taskId, event.isCompleted);
+  }
+  onColumnArchived(event: { columnId: string; columnName: string }) {
+    const board = this.currentBoard();
+    if (!board()?.id) return;
+    this.boardStore.archiveColumn(event.columnId, board()!.workspaceId, event.columnName, 'Archived from column menu');
   }
 }

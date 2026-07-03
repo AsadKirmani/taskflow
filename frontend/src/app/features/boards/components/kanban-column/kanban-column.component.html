@@ -19,7 +19,7 @@
         </ui-button>
         </ui-dropdown-menu-trigger>
         <ui-dropdown-menu-content>
-          <ui-dropdown-menu-item>
+          <ui-dropdown-menu-item (click)="columnArchived.emit({ columnId: column().id, columnName: column().name })">
             <svg lucideArchive class="w-4 h-4 mr-2"></svg>
             Archive Column
           </ui-dropdown-menu-item>

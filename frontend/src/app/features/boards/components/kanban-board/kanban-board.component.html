@@ -59,11 +59,11 @@
       <div class="flex items-center gap-2 min-w-0 text-base-content">
         <h1 class="text-lg sm:text-2xl font-bold truncate m-0">{{ board()?.name }}</h1>
       </div>
-      <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
-        <app-avatar name="User Name"></app-avatar>
+      <div class="flex items-center gap-1 sm:gap-2 flex-wrap justify-between">
+        <ui-avatar-stack [users]="boardMembers()" [limit]="5"></ui-avatar-stack>
 
         <ui-button
-          variant="ghost"
+          variant="icon"
           size="icon"
           [class.bg-base-300]="isFilterOpen()"
           [attr.aria-pressed]="isFilterOpen()"
@@ -72,12 +72,12 @@
           <svg lucideFunnel></svg>
         </ui-button>
 
-        <ui-button variant="ghost" size="icon">
+        <ui-button variant="icon" size="icon">
           <svg lucideStar></svg>
         </ui-button>
         <ui-dropdown-menu>
           <ui-dropdown-menu-trigger>
-            <ui-button variant="ghost" size="icon">
+            <ui-button variant="icon" size="icon">
               <svg lucideEye></svg>
             </ui-button>
           </ui-dropdown-menu-trigger>
@@ -98,7 +98,7 @@
         </ui-dropdown-menu>
         <ui-dropdown-menu>
           <ui-dropdown-menu-trigger>
-            <ui-button variant="ghost" size="icon">
+            <ui-button variant="icon" size="icon">
               <svg lucideUserPlus></svg>
             </ui-button>
           </ui-dropdown-menu-trigger>
@@ -115,7 +115,7 @@
         </ui-dropdown-menu>
         <ui-dropdown-menu>
           <ui-dropdown-menu-trigger>
-            <ui-button variant="ghost" size="icon">
+            <ui-button variant="icon" size="icon">
               <svg lucideEllipsis></svg>
             </ui-button>
           </ui-dropdown-menu-trigger>
@@ -163,14 +163,15 @@
             taskCompletionToggled.emit({ taskId: $event.id, isCompleted: !$event.isCompleted })
           "
           (taskClicked)="openTaskOverlay($event)"
+          (columnArchived)="columnArchived.emit({ columnId: column.id, columnName: column.name })"
         ></app-kanban-column>
       }
 
       <div
-        class="bg-base-200 w-64 flex-shrink-0 hover:bg-base-300 p-2 rounded-box text-base-content border border-base-300 hover:border-primary hover:ring-primary/30 hover:ring-2 shadow transition-colors"
+        class="bg-base-200 w-64 flex items-center justify-center hover:bg-base-300 p-2 rounded-box text-base-content border border-base-300 focus:ring-2 focus:ring-primary shadow transition-colors"
       >
         @if (!isColumnInputOpen()) {
-          <ui-button variant="ghost" size="md" (clicked)="openColumnInput()">
+          <ui-button variant="ghost" size="lg" (clicked)="openColumnInput()">
             <svg lucidePlus class="w-4 h-4 mr-1"></svg>
             Add Column
           </ui-button>
@@ -179,7 +180,7 @@
             <input
               type="text"
               appAutofocus
-              class="add-column__input p-2 shadow rounded-lg w-full h-12 outline-none ring-1 ring-base-content focus:ring-2 focus:ring-accent focus:outline-none bg-base-100"
+              class="add-column__input p-2 rounded-field w-full h-12 border border-base-300 focus:ring-2 focus:ring-accent focus:ring-offset-2 outline-none bg-base-100"
               placeholder="Column title..."
               [value]="columnInputValue()"
               (input)="onColumnInputChange($event)"

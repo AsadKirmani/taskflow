@@ -9,7 +9,6 @@ import { UiPageHeaderComponent } from '../../../../ui/components/layout/ui-page-
   selector: 'app-activity-page',
   standalone: true,
   imports: [DatePipe, RouterLink, UiSkeletonComponent, UiPageHeaderComponent],
-  providers: [ActivityStore], // Optional: Agar global chahiye toh hata dena
   template: `
     <section class="rounded-box flex flex-col">
     <div class="min-w-0">

@@ -32,13 +32,14 @@ import type { BoardFilterSelection } from '../filters/filter-selection.model';
 import { TaskComponent } from '../../../task/task.component';
 import { KanbanColumnComponent } from '../kanban-column/kanban-column.component';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
-import { AvatarComponent } from '../../../../shared/components/avatar.component';
+import { UiAvatarStackComponent } from '../../../../ui/components/ui-avatar-stack.component';
 import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.component';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
 import { KeyboardShortcutsService } from '../../../../core/services/keyboard-shortcuts.service';
 import { UiDropdownMenuComponent, UiDropdownMenuContent, UiDropdownMenuTrigger } from '../../../../ui/components/ui-dropdown-menu.component';
 import { UiDropdownMenuItemComponent } from '../../../../ui/components/ui-dropdown-menu-item.component';
+import { User } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-kanban-board',
@@ -50,7 +51,7 @@ import { UiDropdownMenuItemComponent } from '../../../../ui/components/ui-dropdo
     TaskComponent,
     KanbanColumnComponent,
     AutofocusDirective,
-    AvatarComponent,
+    UiAvatarStackComponent,
     DragDropModule,
     UiSkeletonComponent,
     UiButtonComponent,
@@ -69,9 +70,10 @@ export class KanbanBoardComponent {
   protected readonly shortcuts = inject(KeyboardShortcutsService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-
+  
   board = input<Board | null>(null);
   columns = input<BoardColumn[]>([]);
+  boardMembers = input<User[]>([]);
   emptyArray = [];
   tasksByColumn = input<Record<string, Task[] | undefined>>({});
   loading = input<boolean>(false);
@@ -82,7 +84,8 @@ export class KanbanBoardComponent {
   columnAdded = output<AddColumnEventPayload>();
   taskUpdated = output<UpdateTaskEventPayload>();
   taskCompletionToggled = output<ToggleTaskCompletionEventPayload>();
-
+  columnArchived = output<{ columnId: string; columnName: string }>();
+  
   isColumnInputOpen = signal(false);
   columnInputValue = signal('');
   isFilterOpen = signal(false);

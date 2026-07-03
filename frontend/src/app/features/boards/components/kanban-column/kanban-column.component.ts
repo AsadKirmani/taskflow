@@ -48,6 +48,7 @@ export class KanbanColumnComponent {
   taskUpdated = output<{ taskId: string; title: string }>();
   taskCompletionToggled = output<Task>();
   taskClicked = output<Task>();
+  columnArchived = output<{ columnId: string; columnName: string }>();
 
   isInputOpen = signal(false);
   inputValue = signal('');

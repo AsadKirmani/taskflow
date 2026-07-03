@@ -29,7 +29,7 @@ export const taskRepository = {
     const query = this.buildTaskQuery(boardId, filters);
     
     // DB mein seedha query pass ki aur data return kiya
-    const tasks = await TaskModel.find(query).sort({ position: 1, createdAt: 1 });
+    const tasks = await TaskModel.find({ ...query, archived: false }).sort({ position: 1, createdAt: 1 });
     return tasks;
   },
   buildTaskQuery(boardId: string, filters?: TaskFilters): Record<string, unknown> {

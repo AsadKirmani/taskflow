@@ -4,7 +4,7 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
   selector: 'ui-dropdown-menu-item',
   standalone: true,
   template: `
-    <button [class]="computedClass" (click)="onClick.emit()">
+    <button [class]="computedClass" (click)="onClick.emit()" class="active:bg-base-200">
       @if (type === 'checkbox') { <input type="checkbox" [checked]="checked" /> }
       @if (type === 'radio') { <input type="radio" [checked]="checked" /> }
       <ng-content></ng-content>

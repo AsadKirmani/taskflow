@@ -10,7 +10,6 @@ import {
 import { AuthStoreService } from '../../../features/auth/data-access/auth-store.service';
 import { ThemeService } from '../../services/theme.service';
 import { SearchOverlayComponent } from '../../../shared/components/search/search-overlay.component';
-import { AvatarComponent } from '../../../shared/components/avatar.component';
 import { APP_ICONS } from '../../icons/lucide-icons';
 import {
   UiDropdownMenuComponent,
@@ -19,13 +18,14 @@ import {
 } from '../../../ui/components/ui-dropdown-menu.component';
 import { UiDropdownMenuItemComponent } from '../../../ui/components/ui-dropdown-menu-item.component';
 import { UiButtonComponent } from '../../../ui/components/ui-button.component';
+import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [
     SearchOverlayComponent,
-    AvatarComponent,
+    UiAvatarComponent,
     UiButtonComponent,
     UiDropdownMenuComponent,
     UiDropdownMenuTrigger,
@@ -95,10 +95,11 @@ import { UiButtonComponent } from '../../../ui/components/ui-button.component';
               aria-label="User menu"
               class="border border-base-300 cursor-pointer rounded-full"
               >
-              <app-avatar
-                [name]="authStore.currentUser()?.name ?? ''"
-                [title]="authStore.currentUser()?.name ?? ''"
-              ></app-avatar>
+              <ui-avatar
+                [name]="authStore.currentUser()?.name || 'User'"
+                [title]="authStore.currentUser()?.name || 'User'"
+                size="lg"
+              ></ui-avatar>
             </ui-button>
         </ui-dropdown-menu-trigger>
         <ui-dropdown-menu-content>

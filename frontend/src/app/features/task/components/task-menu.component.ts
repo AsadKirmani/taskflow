@@ -38,7 +38,7 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
             </app-share-export>
             <button
               class="w-full mt-1 text-left px-4 py-2 text-sm text-base-content rounded-field hover:bg-base-200 flex items-center gap-2"
-            >
+            (click)="facade.archiveTask(facade.currentTask()?.id!, facade.currentTask()?.workspaceId!, facade.currentTask()?.title!, 'Archived from task menu')">
               <span>Archive</span>
             </button>
           </div>

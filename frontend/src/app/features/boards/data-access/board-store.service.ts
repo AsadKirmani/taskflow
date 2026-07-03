@@ -8,6 +8,7 @@ import { Board } from '../../../core/models/board.model';
 import { BoardColumn } from '../../../core/models/column.model';
 import { ColumnDropEventPayload } from '../models/drag-drop.model';
 import { User } from '../../../core/models/user.model';
+import { ArchiveService } from '../../../core/services/archive.service';
 
 // --- Extended State ---
 // Sets ko Arrays mein badal diya taaki immutability maintain rahe
@@ -46,7 +47,8 @@ export const BoardStore = signalStore(
   withMethods((
     store, 
     boardApi = inject(BoardApiService), 
-    notification = inject(NotificationService)
+    notification = inject(NotificationService),
+    archive = inject(ArchiveService)
   ) => ({
 
     async createBoard(name: string, workspaceName: string, workspaceId: string, visibility: 'private' | 'workspace') {
@@ -171,6 +173,60 @@ export const BoardStore = signalStore(
         // Rollback snapshot on error
         patchState(store, { columns: currentColumns });
         notification.error('Failed to reorder columns');
+      }
+    },
+    async archiveBoard(boardId: string, workspaceId: string, boardName: string, reason?: string) {
+      const originalBoards = store.boards();
+      
+      // 🚀 Optimistic Update: UI se board turant hata do
+      patchState(store, { boards: originalBoards.filter(b => b.id !== boardId) });
+
+      try {
+        await firstValueFrom(archive.archive({ workspaceId, entityType: 'board', entityId: boardId, entityName: boardName, reason }));
+        notification.success('Board archived successfully');
+      } catch (err) {
+        // Rollback on error
+        patchState(store, { boards: originalBoards });
+        notification.error('Failed to archive board');
+      }
+    },
+
+    async restoreBoard(boardId: string, workspaceId: string, boardName: string) {
+      try {
+        await firstValueFrom(archive.restore({ workspaceId, entityType: 'board', entityId: boardId, entityName: boardName }));
+        notification.success('Board restored');
+        await this.loadAllBoards(true); // List refresh kar lo
+      } catch (err) {
+        notification.error('Failed to restore board');
+      }
+    },
+
+    async archiveColumn(columnId: string, workspaceId: string, columnName: string, reason?: string) {
+      const originalColumns = store.columns();
+      
+      // 🚀 Optimistic Update: UI se column turant hata do
+      patchState(store, { columns: originalColumns.filter(c => c.id !== columnId) });
+
+      try {
+        await firstValueFrom(archive.archive({ workspaceId, entityType: 'column', entityId: columnId, entityName: columnName, reason }));
+        notification.success('Column archived successfully');
+      } catch (err) {
+        // Rollback on error
+        patchState(store, { columns: originalColumns });
+        notification.error('Failed to archive column');
+      }
+    },
+
+    async restoreColumn(columnId: string, workspaceId: string, columnName: string) {
+      try {
+        await firstValueFrom(archive.restore({ workspaceId, entityType: 'column', entityId: columnId, entityName: columnName }));
+        notification.success('Column restored');
+        const currentBoardId = store.currentBoardId();
+        if (currentBoardId) {
+          await this.loadBoard(currentBoardId, true); // Board dobara load karo taaki naya column dikhe
+        }
+      } catch (err) {
+        notification.error('Failed to restore column');
       }
     },
     resetBoardState() {

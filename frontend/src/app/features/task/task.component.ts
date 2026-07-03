@@ -27,7 +27,7 @@ import { APP_ICONS } from '../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-task',
-  standalone: true,
+ 
   imports: [
     CommonModule,
     TaskHeaderComponent,

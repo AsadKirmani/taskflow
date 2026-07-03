@@ -14,6 +14,10 @@ const ArchiveSchema = new Schema(
       required: true,
       index: true
     },
+    entityName: {
+      type: String,
+      required: true
+    },
     entityId: {
       type: Schema.Types.ObjectId,
       required: true,
