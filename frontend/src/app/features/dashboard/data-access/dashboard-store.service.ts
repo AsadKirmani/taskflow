@@ -2,10 +2,10 @@ import { inject, computed } from '@angular/core';
 import { signalStore, withState, withMethods, withComputed, patchState } from '@ngrx/signals';
 import { firstValueFrom } from 'rxjs';
 import { DashboardApiService, DashboardSummary, DashboardTaskRow } from './dashboard-api.service';
-import { WorkspaceStoreService } from '../../workspace/data-access/workspace-store.service';
 
 // --- State Definitions ---
 type DashboardState = {
+  workspaceId: string | null;
   loading: boolean;
   error: string | null;
   isLoaded: boolean; // 🚀 Caching guard
@@ -15,6 +15,7 @@ type DashboardState = {
 };
 
 const initialState: DashboardState = {
+  workspaceId: null,
   loading: true,
   error: null,
   isLoaded: false,
@@ -53,12 +54,11 @@ export const DashboardStore = signalStore(
     (
       store,
       dashboardApi = inject(DashboardApiService),
-      workspaceStore = inject(WorkspaceStoreService),
     ) => ({
       async loadDashboardData(workspaceId: string, userId: string, forceReload = false) {
        
         // 💡 GUARD: Agar data loaded hai aur force reload nahi manga, toh skip karo (Saves API call)
-        if (store.isLoaded() && !forceReload && !store.error()) {
+        if (store.isLoaded() && !forceReload && !store.error() && store.workspaceId() === workspaceId) {
           return;
         }
         if (!workspaceId) {
@@ -76,6 +76,7 @@ export const DashboardStore = signalStore(
           const data = response.data;
 
           patchState(store, {
+            workspaceId,
             stats: data.stats,
             recentTaskRows: data.recentTasks.map((task: DashboardTaskRow) => ({
               id: task.id,
@@ -96,6 +97,7 @@ export const DashboardStore = signalStore(
       },
       setEmptyWorkspaceState() {
         patchState(store, {
+          workspaceId: null,
           loading: false,
           error: null,
           isLoaded: true,
@@ -112,6 +114,7 @@ export const DashboardStore = signalStore(
       },
       resetDashboardState() {
         patchState(store, {
+          workspaceId: null,
           loading: true,
           error: null,
           isLoaded: false,

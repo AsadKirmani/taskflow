@@ -34,6 +34,30 @@ const TaskChecklistItemSchema = new Schema(
   { _id: false }
 );
 
+const TaskAttachmentSchema = new Schema(
+  {
+    filename: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    url: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    format: {
+      type: String,
+      trim: true
+    },
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    }
+  },
+  { _id: false }
+);
+
 const TaskSchema = new Schema(
   {
     workspaceId: {
@@ -100,6 +124,10 @@ const TaskSchema = new Schema(
     coverImageUrl: {
       type: String,
       default: null
+    },
+    attachments: {
+      type: [TaskAttachmentSchema],
+      default: []
     },
     attachmentCount: {
       type: Number,

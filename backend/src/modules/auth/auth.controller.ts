@@ -149,6 +149,7 @@ async login(req: Request, res: Response) {
     const { name, email, avatarUrl, preferences } = req.body;
     const userId = req.auth!.userId;
     const updatedUser = await authService.updateProfile(userId, { name, email, avatarUrl, preferences });
+    redisClient.del(`user:${userId}:profile`); // Cache ko invalidate karo
     return res.status(200).json({
       success: true,
       message: "Profile updated successfully",
@@ -205,6 +206,24 @@ async login(req: Request, res: Response) {
       success: true,
       message: "Logged out successfully",
       data: null,
+    });
+  },
+  async uploadAvatar(req: Request, res: Response) {
+    console.log("Upload Avatar Request Body:", req.body);
+    console.log("Upload Avatar File:", req.file);
+ 
+    const file = req.file; // multer middleware se file ko access kar rahe hain
+    if (!file) {
+      throw new AppError("No file uploaded", 400, "NO_FILE_UPLOADED");
+    }
+    const updatedUser = await authService.uploadAvatar(req.auth!.userId, file);
+    redisClient.del(`user:${req.auth!.userId}:profile`); // Cache ko invalidate karo
+    return res.status(200).json({
+      success: true,
+      message: "Avatar updated successfully",
+      data: {
+        user: updatedUser,
+      },
     });
   },
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 
 @Component({
   selector: 'ui-avatar',
@@ -6,7 +6,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   template: `
     <div [class]="computedClasses()">
       @if (src()) {
-        <img [src]="src()" [alt]="alt()" class="w-full h-full object-cover" />
+        <img [src]="src() + '?t=' + lastUpdated()" [alt]="alt()" class="w-full h-full object-cover" />
       } @else {
         <span class="font-medium text-base-content">{{ initials() }}</span>
       }
@@ -38,7 +38,8 @@ export class UiAvatarComponent {
     const randomIndex = Math.floor(Math.random() * this.colors.length);
     this.avatarColor = this.colors[randomIndex];
   }
-  src = input<string>();
+  src = input<string | null | undefined>('');
+  lastUpdated = signal(Date.now());
   alt = input<string>('Avatar');
   name = input<string>('Unknown User');
   size = input<'sm' | 'md' | 'lg'>('md');

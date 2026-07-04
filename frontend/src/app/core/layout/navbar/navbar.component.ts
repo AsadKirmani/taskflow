@@ -99,6 +99,8 @@ import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
                 [name]="authStore.currentUser()?.name || 'User'"
                 [title]="authStore.currentUser()?.name || 'User'"
                 size="lg"
+                [src]="authStore.currentUser()?.avatarUrl || ''"
+                class="w-8 h-8 sm:w-10 sm:h-10 block"
               ></ui-avatar>
             </ui-button>
         </ui-dropdown-menu-trigger>

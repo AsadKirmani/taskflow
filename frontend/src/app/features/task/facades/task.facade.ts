@@ -4,6 +4,8 @@ import { Task, TaskLabel } from '../../../core/models/task.model';
 import { BoardStore } from '../../boards/data-access/board-store.service';
 import { User } from '../../../core/models/user.model';
 import { TaskComment } from '../../../core/models/comment.model';
+import { UploadService } from '../../../core/services/upload.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +16,8 @@ export class TaskFacade {
   }
   private taskStore = inject(TaskStore);
   private boardStore = inject(BoardStore);
+  private uploadService = inject(UploadService);
+  private notificationService = inject(NotificationService);
   currentTask = signal<Task | null>(null);
   boardMembers = computed(() => this.boardStore.members() ?? []);
   
@@ -23,7 +27,6 @@ export class TaskFacade {
         ?.name || '',
   );
   comments: Signal<TaskComment[]> = this.taskStore.comments;
-  attachments = signal<{ name: string; url: string }[]>([]);
 
   updateTaskProperty(key: keyof Task, value: any) {
     const task = this.currentTask();
@@ -47,15 +50,6 @@ export class TaskFacade {
       ? currentLabels.filter((l) => l.name !== label.name)
       : [...currentLabels, label];
     this.updateTaskProperty('labels', newLabels);
-  }
-  onFileSelected(file: File) {
-    this.attachments.update((current) => [
-      ...current,
-      {
-        name: file.name,
-        url: URL.createObjectURL(file),
-      },
-    ]);
   }
   addChecklistItem(text: string) {
     const task = this.currentTask();
@@ -159,4 +153,24 @@ export class TaskFacade {
   archiveTask(taskId: string, workspaceId: string, taskTitle: string, reason?: string) {
     this.taskStore.archiveTask(taskId, workspaceId, taskTitle, reason);
   }
+  uploadTaskAttachment(taskId: string, file: File) {
+  this.uploadService.uploadAttachment(taskId, file).subscribe({
+    next: (response) => {
+      // Backend se ab sirf ek attachment object aa raha hai
+      const newAttachment = response.data; 
+      const currentTask = this.currentTask();
+      
+      if (currentTask) {
+        // Purane attachments lo aur naya wala usme jod do
+        const updatedAttachments = [...(currentTask.attachments || []), newAttachment];
+        
+        // State update kar do
+        this.updateTaskProperty('attachments', updatedAttachments); 
+      }
+    },
+    error: (err) => {
+      console.error('File upload failed:', err);
+    }
+  });
+}
 }

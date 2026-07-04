@@ -1,6 +1,7 @@
 import { taskRepository } from "./task.repository";
 import { activityService } from "../activity/activity.service";
 import { ColumnModel } from "../../models/column.model";
+import { uploadBufferToCloudinary } from "../../services/cloudinary.service";
 
 export type TaskDueType = 'all' | 'none' | 'overdue' | 'today' | 'this_week';
 export type TaskMemberScope = 'all' | 'no_members' | 'me';
@@ -144,5 +145,20 @@ export const taskService = {
   async deleteTask(taskId: string, userId?: string) {
     const task = await taskRepository.getTaskById(taskId);
     await taskRepository.deleteTask(taskId);
+  },
+  async addAttachment(taskId: string, attachment: Express.Multer.File, userId?: string) {
+    const uploadAttachment = await uploadBufferToCloudinary(attachment.buffer, 'attachments', attachment.mimetype);
+    const attachmentData = {
+      filename: uploadAttachment.format ? `${attachment.originalname}.${uploadAttachment.format}` : attachment.originalname,
+      url: uploadAttachment.secure_url,
+      format: uploadAttachment.format,
+      uploadedAt: new Date()
+    };
+    await taskRepository.addAttachmentToTask(taskId, attachmentData);
+    return attachmentData;
+  },
+  async removeAttachment(taskId: string, attachmentUrl: string) {
+    const updatedTask = await taskRepository.removeAttachmentFromTask(taskId, attachmentUrl);
+    return updatedTask;
   }
 };

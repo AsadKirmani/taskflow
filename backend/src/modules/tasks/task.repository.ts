@@ -285,5 +285,27 @@ export const taskRepository = {
         $pull: { taskOrder: task._id },
       });
     }
-  }
+  },
+  async addAttachmentToTask(taskId: string, attachment: { filename: string; url: string, format?: string, uploadedAt?: Date }) {
+    const updatedTask = await TaskModel.findByIdAndUpdate(
+      taskId,
+      {
+        $push: { attachments: attachment },
+        $inc: { attachmentCount: 1 }
+      },
+      { returnDocument: "after" }
+    );
+    return updatedTask;
+  },
+  async removeAttachmentFromTask(taskId: string, attachmentUrl: string) {
+    const updatedTask = await TaskModel.findByIdAndUpdate(
+      taskId,
+      {
+        $pull: { attachments: { url: attachmentUrl } },
+        $inc: { attachmentCount: -1 }
+      },
+      { returnDocument: "after" }
+    );
+    return updatedTask;
+  } 
 };

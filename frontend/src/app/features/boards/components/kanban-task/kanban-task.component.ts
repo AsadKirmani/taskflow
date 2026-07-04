@@ -4,11 +4,12 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { TaskFacade } from '../../../task/facades/task.facade';
 import { UiAvatarStackComponent } from '../../../../ui/components/ui-avatar-stack.component';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-kanban-task',
   standalone: true,
-  imports: [DragDropModule, UiAvatarStackComponent, ...APP_ICONS],  
+  imports: [DragDropModule, UiAvatarStackComponent, ...APP_ICONS, DatePipe],  
   host: {
     'class': 'block w-full cursor-grab active:cursor-grabbing mb-2 select-none touch-none',
   },
@@ -22,7 +23,13 @@ export class KanbanTaskComponent {
   updateTitle = output<string>();
   toggleCompletion = output<void>();
   openOverlay = output<void>();
-
+  isOverdue = computed(() => {
+    const dueDate = this.task().dueDate;
+    if (!dueDate) return false;
+    const due = new Date(dueDate);
+    const now = new Date();
+    return due < now && !this.task().isCompleted;
+  });
   isEditing = signal(false);
   editValue = signal('');
  

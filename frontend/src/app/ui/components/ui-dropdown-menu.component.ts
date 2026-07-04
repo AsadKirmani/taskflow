@@ -12,7 +12,8 @@ import { Component, HostListener, ElementRef, inject, input } from "@angular/cor
       
       <!-- Dropdown Content -->
       @if (isOpen) {
-  <div 
+  <div
+    (click)="close()"
     class="absolute mt-2 w-56 bg-base-100 border border-base-300 rounded-box text-base-content shadow-lg z-50 opacity-100 transform translate-y-0 p-2"
     [class.left-0]="direction() === 'left'"
     [class.right-0]="direction() === 'right'"
@@ -31,6 +32,10 @@ export class UiDropdownMenuComponent {
 
   toggle() {
     this.isOpen = !this.isOpen;
+  }
+
+  close() {
+    this.isOpen = false;
   }
 
   @HostListener('document:click', ['$event'])

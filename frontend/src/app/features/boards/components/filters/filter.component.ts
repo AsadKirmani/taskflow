@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output, model } from '@angular/core';
 import { BoardFilterSelection } from './filter-selection.model';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-apply-filter',
   standalone: true,
-    imports: [CommonModule, ...APP_ICONS],
+    imports: [CommonModule, ...APP_ICONS, UiButtonComponent],
     templateUrl: './filter.component.html',
     host: {
       'document:click': 'close()'

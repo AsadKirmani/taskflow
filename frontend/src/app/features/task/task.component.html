@@ -34,6 +34,7 @@
               [currentUser]="currentUser()"
               (dueDateChanged)="facade.updateTaskDate($event)"
               (memberToggled)="facade.toggleTaskMember($event)"
+              (fileSelected)="facade.uploadTaskAttachment(task().id, $event)"
             >
             </app-task-quick-actions>
           </div>
@@ -52,9 +53,9 @@
           ></app-task-duedate>
         }
         </div>
-         @if (facade.attachments().length > 0) {
+         @if (facade.currentTask()?.attachments?.length) {
           <app-task-attachments
-            [attachments]="facade.attachments()"
+            [attachments]="facade.currentTask()?.attachments || []"
           ></app-task-attachments>
          }
         <app-task-description

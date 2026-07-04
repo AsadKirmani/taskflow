@@ -4,6 +4,7 @@ import { comparePassword, hashPassword } from "../../shared/utils/password";
 import { hashToken } from "../../shared/utils/token";
 import { authRepository } from "./auth.repository";
 import { redisClient } from "../../config/redis";
+import { uploadBufferToCloudinary } from "../../services/cloudinary.service";
 import {
   signAccessToken,
   signRefreshTokenJwt,
@@ -286,7 +287,17 @@ export const authService = {
   async logoutAll(userId: string) {
     await authRepository.revokeAllUserRefreshTokens(userId);
   },
-};
+  async uploadAvatar(userId: string, avatar: Express.Multer.File) {
+    if(!avatar) {
+      throw new AppError("No avatar file provided", 400, "NO_AVATAR_FILE");
+    }
+    const uploadResult = await uploadBufferToCloudinary(avatar.buffer, 'avatars', avatar.mimetype);
+    const avatarUrl = uploadResult.secure_url;
+    const updatedUser = await authRepository.updateUserProfile(userId, { avatarUrl });
+    return sanitizeUser(updatedUser);
+  },
+  }
+
 
 function cryptoRandomId(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);

@@ -150,4 +150,10 @@ export class AuthStoreService {
   private updateState(partial: Partial<SessionState>): void {
     this.state.update((current) => ({ ...current, ...partial }));
   }
+  updateUserProfile(updatedUser: any): void {
+    this.state.update((current) => ({
+      ...current,
+      user: { ...current.user, ...updatedUser },
+    }));
+  }
 }

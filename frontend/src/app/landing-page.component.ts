@@ -34,7 +34,7 @@ import { Router } from '@angular/router';
           </div>
 
           <div class="flex items-center gap-3">
-            <ui-button variant="ghost" size="sm" class="hidden sm:inline-flex" (click)="router.navigate(['/auth/login'])">Log in</ui-button>
+            <ui-button variant="ghost" size="sm" (click)="router.navigate(['/auth/login'])">Log in</ui-button>
             <ui-button variant="primary" size="sm" (click)="router.navigate(['/auth/register'])">Get Started</ui-button>
           </div>
         </div>
@@ -86,7 +86,7 @@ import { Router } from '@angular/router';
                 </ui-card>
               </div>
 
-              <div class="space-y-3 hidden md:block">
+              <div class="space-y-3">
                 <div class="flex items-center justify-between px-1">
                   <h3 class="text-sm font-semibold">In Progress</h3>
                   <ui-badge variant="info">1</ui-badge>
@@ -100,7 +100,22 @@ import { Router } from '@angular/router';
                   <ui-avatar-stack [users]="[{id: '1', name: 'Dev'}, {id: '2', name: 'Design'}]" size="sm" />
                 </ui-card>
               </div>
-
+              
+              <div class="space-y-3">
+                <div class="flex items-center justify-between px-1">
+                  <h3 class="text-sm font-semibold">In Progress</h3>
+                  <ui-badge variant="info">1</ui-badge>
+                </div>
+                <ui-card [interactive]="true" class="ring-1 ring-primary/20">
+                  <div class="flex justify-between items-start mb-2">
+                    <ui-badge variant="info">Feature</ui-badge>
+                    <span class="text-xs text-base-content/40">T-102</span>
+                  </div>
+                  <h4 class="text-sm font-medium mb-4">Implement real-time collaboration cursors</h4>
+                  <ui-avatar-stack [users]="[{id: '1', name: 'Dev'}, {id: '2', name: 'Design'}]" size="sm" />
+                </ui-card>
+              </div>
+              
             </div>
           </div>
         </div>

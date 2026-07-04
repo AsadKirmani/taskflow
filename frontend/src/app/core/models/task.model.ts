@@ -26,6 +26,7 @@ export interface Task {
   labels: TaskLabel[];
   checklist?: ChecklistItem[];
   commentCount: number;
+  attachments: { filename: string; url: string, format?: string, uploadedAt?: string }[];
   attachmentCount: number;
   isCompleted?: boolean;
   createdAt?: string;

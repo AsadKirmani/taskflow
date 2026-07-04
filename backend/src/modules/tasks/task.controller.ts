@@ -217,5 +217,42 @@ export const taskController = {
     await taskService.deleteTask(taskId, userId);
     await redisClient.del(`board:${task.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
     res.json({ success: true, message: "Task deleted successfully", data: null });
+  },
+  async addAttachment(req: Request, res: Response) {
+    const { taskId } = req.params as { taskId: string };
+    const userId = req.auth!.userId;
+    const task = await taskService.getTaskById(taskId);
+    if (!task) {
+      throw new AppError("Task not found", 404, "NOT_FOUND");
+    }
+    await PermissionService.ensureTaskPermission(
+      userId,
+      { workspaceId: task.workspaceId.toString() },
+      PERMISSION.TASK_EDIT
+    );
+    const attachment = req.file;
+    if (!attachment) {
+      throw new AppError("No attachment provided", 400, "BAD_REQUEST");
+    }
+    const newAttachment = await taskService.addAttachment(taskId, attachment, userId);
+    await redisClient.del(`board:${task.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
+    res.json({ success: true, message: "Attachment added successfully", data: newAttachment });
+  },
+  async removeAttachment(req: Request, res: Response) {
+    const { taskId } = req.params as { taskId: string };
+    const { attachmentUrl } = req.body as { attachmentUrl: string };
+    const userId = req.auth!.userId;
+    const task = await taskService.getTaskById(taskId);
+    if (!task) {
+      throw new AppError("Task not found", 404, "NOT_FOUND");
+    }
+    await PermissionService.ensureTaskPermission(
+      userId,
+      { workspaceId: task.workspaceId.toString() },
+      PERMISSION.TASK_EDIT
+    );
+    const updatedTask = await taskService.removeAttachment(taskId, attachmentUrl);
+    await redisClient.del(`board:${task.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
+    res.json({ success: true, message: "Attachment removed successfully", data: updatedTask });
   }
 };
