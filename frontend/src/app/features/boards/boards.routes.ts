@@ -5,18 +5,18 @@ import { BoardsPageComponent } from './pages/boards-page/boards-page.component';
 export const BOARD_ROUTES: Routes = [
   {
     path: '',
-    component: BoardsPageComponent
+    component: BoardsPageComponent,
   },
   {
     path: 'w/:workspaceId',
-    component: BoardsPageComponent
+    component: BoardsPageComponent,
   },
   {
     path: ':boardId/:boardSlug',
-    component: BoardDetailPageComponent
+    component: BoardDetailPageComponent,
   },
   {
     path: ':boardId',
-    component: BoardDetailPageComponent
-  }
+    component: BoardDetailPageComponent,
+  },
 ];

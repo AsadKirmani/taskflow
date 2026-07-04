@@ -13,17 +13,8 @@ import { AuthStoreService } from './features/auth/data-access/auth-store.service
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(appRoutes),
-    provideHttpClient(
-      withInterceptors([
-        loadingInterceptor,
-        errorInterceptor,
-        authInterceptor
-      ])
-    ),
-    // provideAppInitializer(() => {
-    //   const authStore = inject(AuthStoreService);
-    //   return firstValueFrom(authStore.initializeSession());
-    // })
-    provideLucideIcons(...APP_ICONS)
-  ]
+    provideHttpClient(withInterceptors([loadingInterceptor, errorInterceptor, authInterceptor])),
+
+    provideLucideIcons(...APP_ICONS),
+  ],
 };

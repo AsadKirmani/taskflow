@@ -72,7 +72,6 @@ import { APP_ICONS } from '../../../../core/icons/lucide-icons';
   `,
 })
 export class ActionMembersComponent {
-  
   availableMembers = input<User[]>([]);
   assignedMemberIds = input<string[]>([]);
   currentUser = input<User | null>(null);

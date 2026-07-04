@@ -1,58 +1,76 @@
-import { Router } from 'express';
-import { validate } from '../../middleware/validation.middleware';
-import { authMiddleware } from '../../middleware/auth.middleware';
+import { Router } from "express";
+import { validate } from "../../middleware/validation.middleware";
+import { authMiddleware } from "../../middleware/auth.middleware";
 import {
   createWorkspaceDto,
   inviteWorkspaceMemberDto,
   updateWorkspaceDto,
-  updateWorkspaceMemberRoleDto
-} from './workspace.dto';
-import { createBoardDto } from '../boards/board.dto';
-import { boardController } from '../boards/board.controller';
-import { asyncHandler } from '../../shared/utils/async-handler';
-import { workspaceController } from './workspace.controller';
+  updateWorkspaceMemberRoleDto,
+} from "./workspace.dto";
+import { createBoardDto } from "../boards/board.dto";
+import { boardController } from "../boards/board.controller";
+import { asyncHandler } from "../../shared/utils/async-handler";
+import { workspaceController } from "./workspace.controller";
 
 const router = Router();
 
-router.get('/', authMiddleware, asyncHandler(workspaceController.listWorkspaces));
-
-router.post('/', authMiddleware, validate(createWorkspaceDto), asyncHandler(workspaceController.createWorkspace));
-
-router.post(
-  '/invites/accept',
+router.get(
+  "/",
   authMiddleware,
-  asyncHandler(workspaceController.acceptWorkspaceInvite)
-);
-
-router.get('/:workspaceId', authMiddleware, asyncHandler(workspaceController.getWorkspaceDetail));
-
-router.patch('/:workspaceId', authMiddleware, validate(updateWorkspaceDto), asyncHandler(workspaceController.updateWorkSpace));
-
-router.post(
-  '/:workspaceId/boards',
-  authMiddleware,
-  validate(createBoardDto),
-  asyncHandler(boardController.createBoard)
+  asyncHandler(workspaceController.listWorkspaces),
 );
 
 router.post(
-  '/:workspaceId/invites',
+  "/",
   authMiddleware,
-  validate(inviteWorkspaceMemberDto),
-  asyncHandler(workspaceController.inviteWorkspaceMember)
+  validate(createWorkspaceDto),
+  asyncHandler(workspaceController.createWorkspace),
+);
+
+router.post(
+  "/invites/accept",
+  authMiddleware,
+  asyncHandler(workspaceController.acceptWorkspaceInvite),
 );
 
 router.get(
-  '/:workspaceId/members',
+  "/:workspaceId",
   authMiddleware,
-  asyncHandler(workspaceController.listWorkspaceMembers)
+  asyncHandler(workspaceController.getWorkspaceDetail),
 );
 
 router.patch(
-  '/:workspaceId/members/:memberId/role',
+  "/:workspaceId",
+  authMiddleware,
+  validate(updateWorkspaceDto),
+  asyncHandler(workspaceController.updateWorkSpace),
+);
+
+router.post(
+  "/:workspaceId/boards",
+  authMiddleware,
+  validate(createBoardDto),
+  asyncHandler(boardController.createBoard),
+);
+
+router.post(
+  "/:workspaceId/invites",
+  authMiddleware,
+  validate(inviteWorkspaceMemberDto),
+  asyncHandler(workspaceController.inviteWorkspaceMember),
+);
+
+router.get(
+  "/:workspaceId/members",
+  authMiddleware,
+  asyncHandler(workspaceController.listWorkspaceMembers),
+);
+
+router.patch(
+  "/:workspaceId/members/:memberId/role",
   authMiddleware,
   validate(updateWorkspaceMemberRoleDto),
-  asyncHandler(workspaceController.updateWorkspaceMemberRole)
+  asyncHandler(workspaceController.updateWorkspaceMemberRole),
 );
 
 export default router;

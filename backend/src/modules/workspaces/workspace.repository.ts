@@ -2,7 +2,10 @@ import { WorkspaceInvitationModel } from "../../models/workspace-invitation.mode
 import { WorkspaceModel } from "../../models/workspace.model";
 import { WorkspaceMemberModel } from "../../models/workspace-member.model";
 import { Types } from "mongoose";
-import type { WorkspaceRole, InvitationStatus } from "../../shared/constants/enums";
+import type {
+  WorkspaceRole,
+  InvitationStatus,
+} from "../../shared/constants/enums";
 
 export const workspaceRepository = {
   async createWorkspace(data: {
@@ -136,7 +139,7 @@ export const workspaceRepository = {
       workspaceId,
       userId,
       role,
-      workspaceName
+      workspaceName,
     });
 
     return newMember;
@@ -157,5 +160,5 @@ export const workspaceRepository = {
   },
   async listWorkspaceMembers(workspaceId: string) {
     return WorkspaceMemberModel.find({ workspaceId }).lean();
-  }
+  },
 };

@@ -1,30 +1,30 @@
-import { Router } from 'express';
-import { authMiddleware } from '../../middleware/auth.middleware';
-import { asyncHandler } from '../../shared/utils/async-handler';
-import { validate } from '../../middleware/validation.middleware';
-import { archiveEntityDto, restoreEntityDto } from './archive.dto';
-import { archiveController } from './archive.controller';
+import { Router } from "express";
+import { authMiddleware } from "../../middleware/auth.middleware";
+import { asyncHandler } from "../../shared/utils/async-handler";
+import { validate } from "../../middleware/validation.middleware";
+import { archiveEntityDto, restoreEntityDto } from "./archive.dto";
+import { archiveController } from "./archive.controller";
 
 const router = Router();
 
 router.post(
-  '/archive',
+  "/archive",
   authMiddleware,
   validate(archiveEntityDto),
-  asyncHandler(archiveController.archiveEntity)
+  asyncHandler(archiveController.archiveEntity),
 );
 
 router.post(
-  '/archive/restore',
+  "/archive/restore",
   authMiddleware,
   validate(restoreEntityDto),
-  asyncHandler(archiveController.restoreEntity)
+  asyncHandler(archiveController.restoreEntity),
 );
 
 router.get(
-  '/workspaces/:workspaceId/archive',
+  "/workspaces/:workspaceId/archive",
   authMiddleware,
-  asyncHandler(archiveController.listArchived)
+  asyncHandler(archiveController.listArchived),
 );
 
 export default router;

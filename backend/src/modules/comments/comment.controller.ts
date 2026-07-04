@@ -11,10 +11,10 @@ export const commentController = {
     const { taskId } = req.params as { taskId: string };
     const task = await taskService.getTaskById(taskId);
     const authorId = req.auth!.userId;
-    const author = (await authService.getCurrentUser(authorId)).name || 'Unknown User';
+    const author =
+      (await authService.getCurrentUser(authorId)).name || "Unknown User";
     const { content } = req.body as { content: string };
     try {
-
       await PermissionService.ensure(
         authorId,
         task!.workspaceId.toString(),

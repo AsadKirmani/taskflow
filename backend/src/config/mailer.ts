@@ -1,18 +1,24 @@
-const nodemailer = require('nodemailer');
-import dotenv from 'dotenv';
+const nodemailer = require("nodemailer");
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: process.env.GOOGLE_APP_EMAIL,
     pass: process.env.GOOGLE_APP_PASSWORD,
   },
 });
 
-const sendInvitationEmail = async (to: string, workspaceName: string, inviterName: string, role: string, rawToken: string) => {
-  const baseUrl = process.env.BASE_URL || 'http://localhost:4200';
+const sendInvitationEmail = async (
+  to: string,
+  workspaceName: string,
+  inviterName: string,
+  role: string,
+  rawToken: string,
+) => {
+  const baseUrl = process.env.BASE_URL || "http://localhost:4200";
   const inviteLink = `${baseUrl}/invite/accept?token=${rawToken}`;
 
   const mailOptions = {

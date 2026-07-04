@@ -11,19 +11,17 @@ export interface Toast {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NotificationService {
-  // Global state for active toasts
   toasts = signal<Toast[]>([]);
 
   show(toast: Omit<Toast, 'id'>) {
     const id = Math.random().toString(36).substring(2, 9);
     const duration = toast.duration || 3000;
-    
-    this.toasts.update(currentToasts => [...currentToasts, { ...toast, id }]);
 
-    // Auto-remove after duration
+    this.toasts.update((currentToasts) => [...currentToasts, { ...toast, id }]);
+
     if (duration > 0) {
       setTimeout(() => this.remove(id), duration);
     }
@@ -44,6 +42,6 @@ export class NotificationService {
     this.show({ type: 'warning', title, message });
   }
   remove(id: string) {
-    this.toasts.update(currentToasts => currentToasts.filter(t => t.id !== id));
+    this.toasts.update((currentToasts) => currentToasts.filter((t) => t.id !== id));
   }
 }

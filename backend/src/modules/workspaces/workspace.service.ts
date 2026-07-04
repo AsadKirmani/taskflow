@@ -1,24 +1,24 @@
-import { CreateWorkspaceDto, UpdateWorkspaceDto, } from './workspace.dto';
-import { workspaceRepository, } from './workspace.repository';
-import { sendInvitationEmail } from '../../config/mailer';
-import { authService } from '../auth/auth.service';
-import { AppError } from '../../shared/errors/app-error';
-import { activityService } from '../activity/activity.service';
-import crypto from 'crypto';
-import { PermissionService } from '../../services/permission.service';
-import { WorkspaceMemberModel } from '../../models/workspace-member.model';
-import { PERMISSION } from '../../config/roles';
-import { addInvitationEmailJob } from '../../queues/queue.service';
-import { WorkspaceRole } from '../../shared/constants/enums';
+import { CreateWorkspaceDto, UpdateWorkspaceDto } from "./workspace.dto";
+import { workspaceRepository } from "./workspace.repository";
+import { sendInvitationEmail } from "../../config/mailer";
+import { authService } from "../auth/auth.service";
+import { AppError } from "../../shared/errors/app-error";
+import { activityService } from "../activity/activity.service";
+import crypto from "crypto";
+import { PermissionService } from "../../services/permission.service";
+import { WorkspaceMemberModel } from "../../models/workspace-member.model";
+import { PERMISSION } from "../../config/roles";
+import { addInvitationEmailJob } from "../../queues/queue.service";
+import { WorkspaceRole } from "../../shared/constants/enums";
 
 const createSlug = (value: string) => {
   const slug = value
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
-  return slug || 'workspace';
+  return slug || "workspace";
 };
 
 export const workspaceService = {
@@ -39,19 +39,19 @@ export const workspaceService = {
     const workspace = await workspaceRepository.createWorkspace({
       ...input,
       slug,
-      ownerId: userId
+      ownerId: userId,
     });
 
     await activityService.logActivity({
       workspaceId: workspace._id.toString(),
       userId,
-      actionType: 'workspace_created',
-      entityType: 'workspace',
+      actionType: "workspace_created",
+      entityType: "workspace",
       entityId: workspace._id.toString(),
       metadata: {
         name: workspace.name,
-        slug: workspace.slug
-      }
+        slug: workspace.slug,
+      },
     });
 
     return workspace;
@@ -59,176 +59,242 @@ export const workspaceService = {
   async getWorkspaceDetail(workspaceId: string, userId: string) {
     const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
     if (!workspace) {
-      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+      throw new AppError("Workspace not found", 404, "WORKSPACE_NOT_FOUND");
     }
     return workspace;
-},
-async updateWorkSpace(workspaceId: string, data: Partial<UpdateWorkspaceDto>, userId: string) {
+  },
+  async updateWorkSpace(
+    workspaceId: string,
+    data: Partial<UpdateWorkspaceDto>,
+    userId: string,
+  ) {
     const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
     if (!workspace) {
-      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+      throw new AppError("Workspace not found", 404, "WORKSPACE_NOT_FOUND");
     }
     if (workspace.ownerId.toString() !== userId) {
-      throw new AppError('Unauthorized', 403, 'FORBIDDEN');
+      throw new AppError("Unauthorized", 403, "FORBIDDEN");
     }
-    const updatedWorkspace = await workspaceRepository.updateWorkspace(workspaceId, data);
+    const updatedWorkspace = await workspaceRepository.updateWorkspace(
+      workspaceId,
+      data,
+    );
     if (updatedWorkspace) {
       await activityService.logActivity({
         workspaceId,
         userId,
-        actionType: 'workspace_updated',
-        entityType: 'workspace',
+        actionType: "workspace_updated",
+        entityType: "workspace",
         entityId: workspaceId,
         metadata: {
-          updatedFields: Object.keys(data)
-        }
+          updatedFields: Object.keys(data),
+        },
       });
     }
     return updatedWorkspace;
   },
-  async inviteWorkspaceMember(workspaceId: string, email: string, userId: string, role: WorkspaceRole) {
+  async inviteWorkspaceMember(
+    workspaceId: string,
+    email: string,
+    userId: string,
+    role: WorkspaceRole,
+  ) {
     const inviter = await authService.getCurrentUser(userId);
     const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
     if (!workspace) {
-      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+      throw new AppError("Workspace not found", 404, "WORKSPACE_NOT_FOUND");
     }
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 48);
-    const status = 'pending';
+    const status = "pending";
 
     await workspaceRepository.workspaceInvitation(
-        workspaceId, 
-        email, 
-        role, 
-        userId,
-        status, 
-        tokenHash, 
-        expiresAt
+      workspaceId,
+      email,
+      role,
+      userId,
+      status,
+      tokenHash,
+      expiresAt,
     );
 
-    await addInvitationEmailJob(email, workspace.name, inviter.name, role, rawToken);
+    await addInvitationEmailJob(
+      email,
+      workspace.name,
+      inviter.name,
+      role,
+      rawToken,
+    );
     await activityService.logActivity({
       workspaceId,
       userId,
-      actionType: 'workspace_member_invited',
-      entityType: 'workspace',
+      actionType: "workspace_member_invited",
+      entityType: "workspace",
       entityId: workspaceId,
       metadata: {
         email,
         role,
-        status
-      }
+        status,
+      },
     });
 
-    return { success: true, message: `Invitation sent to ${email} from ${inviter.name}` };
+    return {
+      success: true,
+      message: `Invitation sent to ${email} from ${inviter.name}`,
+    };
   },
 
-  async updateWorkspaceMemberRole(workspaceId: string, memberId: string, newRole: WorkspaceRole, userId: string) {
-    const updatedMember = await workspaceRepository.updateMemberRole(workspaceId, memberId, newRole);
+  async updateWorkspaceMemberRole(
+    workspaceId: string,
+    memberId: string,
+    newRole: WorkspaceRole,
+    userId: string,
+  ) {
+    const updatedMember = await workspaceRepository.updateMemberRole(
+      workspaceId,
+      memberId,
+      newRole,
+    );
     if (updatedMember) {
       await activityService.logActivity({
         workspaceId,
         userId,
-        actionType: 'workspace_member_role_updated',
-        entityType: 'workspace',
+        actionType: "workspace_member_role_updated",
+        entityType: "workspace",
         entityId: workspaceId,
-        metadata: { memberId, newRole }
+        metadata: { memberId, newRole },
       });
     }
-    return { success: true, message: `Member ${memberId} role updated to ${newRole}` };
+    return {
+      success: true,
+      message: `Member ${memberId} role updated to ${newRole}`,
+    };
   },
 
   async acceptWorkspaceInvitation(token: string, userId: string) {
     if (!token) {
-      throw new AppError('Invitation token is required', 400, 'BAD_REQUEST');
+      throw new AppError("Invitation token is required", 400, "BAD_REQUEST");
     }
 
     const cleanToken = token.trim();
-    const tokenHash = crypto.createHash('sha256').update(cleanToken).digest('hex');
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(cleanToken)
+      .digest("hex");
 
-    const invitation = await workspaceRepository.getValidInvitationByHash(tokenHash);
+    const invitation =
+      await workspaceRepository.getValidInvitationByHash(tokenHash);
     if (!invitation) {
-      throw new AppError('Invalid or expired invitation link', 400, 'INVALID_INVITE');
+      throw new AppError(
+        "Invalid or expired invitation link",
+        400,
+        "INVALID_INVITE",
+      );
     }
-   
+
     const workspaceId = invitation.workspaceId.toString();
     const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
-    
+
     if (!workspace) {
-      throw new AppError('Workspace no longer exists', 404, 'NOT_FOUND');
+      throw new AppError("Workspace no longer exists", 404, "NOT_FOUND");
     }
 
-    const isAlreadyMember = await WorkspaceMemberModel.exists({ workspaceId, userId, status: 'ACTIVE' });
+    const isAlreadyMember = await WorkspaceMemberModel.exists({
+      workspaceId,
+      userId,
+      status: "ACTIVE",
+    });
 
     if (isAlreadyMember) {
-      throw new AppError('You are already a member of this workspace', 400, 'ALREADY_MEMBER');
+      throw new AppError(
+        "You are already a member of this workspace",
+        400,
+        "ALREADY_MEMBER",
+      );
     }
 
     await workspaceRepository.addMemberToWorkspace(workspaceId, {
       userId,
       role: invitation.role,
-      workspaceName: workspace.name
+      workspaceName: workspace.name,
     });
 
-    await workspaceRepository.markInvitationAsAccepted(invitation._id.toString());
+    await workspaceRepository.markInvitationAsAccepted(
+      invitation._id.toString(),
+    );
 
     await activityService.logActivity({
       workspaceId,
       userId,
-      actionType: 'workspace_member_joined',
-      entityType: 'workspace',
+      actionType: "workspace_member_joined",
+      entityType: "workspace",
       entityId: workspaceId,
-      metadata: { role: invitation.role }
+      metadata: { role: invitation.role },
     });
 
-    return { 
-      success: true, 
-      message: 'Successfully joined the workspace',
-      workspaceId 
+    return {
+      success: true,
+      message: "Successfully joined the workspace",
+      workspaceId,
     };
   },
-  async removeWorkspaceMember(workspaceId: string, memberId: string, userId: string) {
+  async removeWorkspaceMember(
+    workspaceId: string,
+    memberId: string,
+    userId: string,
+  ) {
     const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
     if (!workspace) {
-      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+      throw new AppError("Workspace not found", 404, "WORKSPACE_NOT_FOUND");
     }
-    const member = await WorkspaceMemberModel.findOne({ workspaceId, userId: memberId, status: 'ACTIVE' });
+    const member = await WorkspaceMemberModel.findOne({
+      workspaceId,
+      userId: memberId,
+      status: "ACTIVE",
+    });
     if (!member) {
-      throw new AppError('Member not found in workspace', 404, 'MEMBER_NOT_FOUND');
+      throw new AppError(
+        "Member not found in workspace",
+        404,
+        "MEMBER_NOT_FOUND",
+      );
     }
     await workspaceRepository.removeMemberFromWorkspace(workspaceId, memberId);
     await activityService.logActivity({
       workspaceId,
       userId,
-      actionType: 'workspace_member_removed',
-      entityType: 'workspace',
+      actionType: "workspace_member_removed",
+      entityType: "workspace",
       entityId: workspaceId,
-      metadata: { memberId }
+      metadata: { memberId },
     });
   },
   async deleteWorkspace(workspaceId: string, userId: string) {
     const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
     if (!workspace) {
-      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+      throw new AppError("Workspace not found", 404, "WORKSPACE_NOT_FOUND");
     }
     await workspaceRepository.deleteWorkspace(workspaceId);
     await activityService.logActivity({
       workspaceId,
       userId,
-      actionType: 'workspace_deleted',
-      entityType: 'workspace',
+      actionType: "workspace_deleted",
+      entityType: "workspace",
       entityId: workspaceId,
-      metadata: {}
+      metadata: {},
     });
-    return { success: true, message: 'Workspace deleted successfully' };
+    return { success: true, message: "Workspace deleted successfully" };
   },
   async listWorkspaceMembers(workspaceId: string, userId: string) {
     const workspace = await workspaceRepository.getWorkspaceById(workspaceId);
     if (!workspace) {
-      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+      throw new AppError("Workspace not found", 404, "WORKSPACE_NOT_FOUND");
     }
     return workspaceRepository.listWorkspaceMembers(workspaceId);
-  }
+  },
 };

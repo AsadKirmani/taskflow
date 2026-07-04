@@ -1,17 +1,25 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, computed, signal, effect } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  computed,
+  signal,
+  effect,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BoardStore } from '../../data-access/board-store.service';
 import { TaskStore } from '../../../task/data-access/task-store.service';
 import { KanbanDndFacade } from '../../data-access/kanban-dnd.facade';
 import { KanbanBoardComponent } from '../../components/kanban-board/kanban-board.component';
 import { distinctUntilChanged, map } from 'rxjs';
-import { 
-  TaskDropEventPayload, 
-  ColumnDropEventPayload, 
-  AddTaskEventPayload, 
-  AddColumnEventPayload, 
-  UpdateTaskEventPayload, 
-  ToggleTaskCompletionEventPayload 
+import {
+  TaskDropEventPayload,
+  ColumnDropEventPayload,
+  AddTaskEventPayload,
+  AddColumnEventPayload,
+  UpdateTaskEventPayload,
+  ToggleTaskCompletionEventPayload,
 } from '../../models/drag-drop.model';
 import { TaskFacade } from '../../../task/facades/task.facade';
 
@@ -36,14 +44,16 @@ import { TaskFacade } from '../../../task/facades/task.facade';
       [boardMembers]="boardStore.members()"
     />
   `,
-  styles: [`
-    :host {
-      display: block;
-      height: 100%;
-      min-height: 0;
-    }
-  `],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styles: [
+    `
+      :host {
+        display: block;
+        height: 100%;
+        min-height: 0;
+      }
+    `,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -58,12 +68,12 @@ export class BoardDetailPageComponent implements OnInit {
   currentColumns = computed(() => {
     return this.boardStore.currentColumns;
   });
-  
+
   isLoading = computed(() => {
-  const currentStoreState = (this.boardStore as any).stateSubject?.getValue();
-  const currentTaskState = (this.taskStore as any).stateSubject?.getValue();
-  return (currentStoreState?.loading || currentTaskState?.loading) ?? false;
-});
+    const currentStoreState = (this.boardStore as any).stateSubject?.getValue();
+    const currentTaskState = (this.taskStore as any).stateSubject?.getValue();
+    return (currentStoreState?.loading || currentTaskState?.loading) ?? false;
+  });
 
   tasksByColumn = computed(() => {
     const cols = this.currentColumns();
@@ -72,16 +82,18 @@ export class BoardDetailPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.route.paramMap.pipe(
-      map(params => params.get('boardId')),
-      distinctUntilChanged() 
-    ).subscribe(boardId => {
-      this.activeBoardId.set(boardId);
-      if (boardId) {
-        this.boardStore.loadBoard(boardId);
-        this.taskStore.getTasksInBoard(boardId, this.boardStore.currentColumns(), true);
-      }
-    });
+    this.route.paramMap
+      .pipe(
+        map((params) => params.get('boardId')),
+        distinctUntilChanged(),
+      )
+      .subscribe((boardId) => {
+        this.activeBoardId.set(boardId);
+        if (boardId) {
+          this.boardStore.loadBoard(boardId);
+          this.taskStore.getTasksInBoard(boardId, this.boardStore.currentColumns(), true);
+        }
+      });
   }
   ngOnDestroy(): void {
     this.boardStore.resetBoardState();
@@ -124,6 +136,11 @@ export class BoardDetailPageComponent implements OnInit {
   onColumnArchived(event: { columnId: string; columnName: string }) {
     const board = this.currentBoard();
     if (!board()?.id) return;
-    this.boardStore.archiveColumn(event.columnId, board()!.workspaceId, event.columnName, 'Archived from column menu');
+    this.boardStore.archiveColumn(
+      event.columnId,
+      board()!.workspaceId,
+      event.columnName,
+      'Archived from column menu',
+    );
   }
 }

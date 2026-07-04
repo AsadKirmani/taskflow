@@ -6,7 +6,10 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="card p-5 bg-base-100 rounded-box border border-base-300 transition-all" [ngClass]="hoverClass()">
+    <div
+      class="card p-5 bg-base-100 rounded-box border border-base-300 transition-all"
+      [ngClass]="hoverClass()"
+    >
       <div class="card-header flex gap-3 pb-3 items-center justify-between text-center">
         <h2 class="card-title font-bold text-base-content">{{ title() }}</h2>
       </div>
@@ -17,7 +20,7 @@ import { CommonModule } from '@angular/common';
         </p>
       </div>
     </div>
-  `
+  `,
 })
 export class UiStatCardComponent {
   title = input.required<string>();

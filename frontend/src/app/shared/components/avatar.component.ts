@@ -12,14 +12,13 @@ import { CommonModule } from '@angular/common';
     >
       {{ getInitials() }}
     </div>
-  `
+  `,
 })
 export class AvatarComponent implements OnInit {
   @Input() name: string = '';
-  
+
   avatarColor: string = '';
-  
-  // Predefined Tailwind background colors (using safe, visible shades)
+
   private colors: string[] = [
     'bg-red-500',
     'bg-orange-500',
@@ -35,7 +34,7 @@ export class AvatarComponent implements OnInit {
     'bg-purple-600',
     'bg-fuchsia-600',
     'bg-pink-600',
-    'bg-rose-600'
+    'bg-rose-600',
   ];
 
   ngOnInit() {
@@ -43,7 +42,6 @@ export class AvatarComponent implements OnInit {
   }
 
   assignRandomColor() {
-    // Pick a random color from the array
     const randomIndex = Math.floor(Math.random() * this.colors.length);
     this.avatarColor = this.colors[randomIndex];
   }

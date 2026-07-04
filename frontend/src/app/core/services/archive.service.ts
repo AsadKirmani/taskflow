@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../..//environments/environment'; 
+import { environment } from '../../../environments/environment';
 
 export interface ArchivePayload {
   workspaceId: string;
@@ -14,7 +14,7 @@ export interface ArchivePayload {
 @Injectable({ providedIn: 'root' })
 export class ArchiveService {
   private http = inject(HttpClient);
-  private baseUrl = environment.apiUrl; // Apne environment ke hisaab se set karna
+  private baseUrl = environment.apiUrl;
 
   archive(payload: ArchivePayload): Observable<any> {
     return this.http.post(`${this.baseUrl}/archive`, payload);

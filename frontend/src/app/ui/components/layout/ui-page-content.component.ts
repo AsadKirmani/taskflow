@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   selector: 'ui-page-content',
   standalone: true,
   template: `
-    <main 
+    <main
       class="flex-1 flex flex-col min-h-0 relative"
       [class.px-4]="padding()"
       [class.md:px-6]="padding()"
@@ -17,7 +17,5 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiPageContentComponent {
-  // If you are putting a board that needs edge-to-edge space, set this to false.
-  // If it's normal text/form content, keep it true.
-  padding = input(false); 
+  padding = input(false);
 }

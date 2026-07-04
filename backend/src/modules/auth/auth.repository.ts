@@ -1,35 +1,40 @@
-import { UserModel } from '../../models/user.model';
-import { RefreshTokenModel } from '../../models/refresh-token.model';
+import { UserModel } from "../../models/user.model";
+import { RefreshTokenModel } from "../../models/refresh-token.model";
 
 export const authRepository = {
-  
   findUserByEmail(email: string) {
-    return UserModel.findOne({ email: email.trim().toLowerCase() }).select('+passwordHash');
+    return UserModel.findOne({ email: email.trim().toLowerCase() }).select(
+      "+passwordHash",
+    );
   },
 
   findUserById(userId: string) {
-    return UserModel.findById(userId).select('+passwordHash');
+    return UserModel.findById(userId).select("+passwordHash");
   },
 
-  createUser(data: {
-    name: string;
-    email: string;
-    passwordHash: string;
-  }) {
+  createUser(data: { name: string; email: string; passwordHash: string }) {
     return UserModel.create(data);
   },
   updateUserPassword(userId: string, newPasswordHash: string) {
     return UserModel.findByIdAndUpdate(
       userId,
       { passwordHash: newPasswordHash },
-      { returnDocument: "after"}
-    ).select('+passwordHash');
+      { returnDocument: "after" },
+    ).select("+passwordHash");
   },
-  updateUserProfile(userId: string, data: { name?: string; email?: string, avatarUrl?: string, preferences?: any }) {
+  updateUserProfile(
+    userId: string,
+    data: {
+      name?: string;
+      email?: string;
+      avatarUrl?: string;
+      preferences?: any;
+    },
+  ) {
     return UserModel.findByIdAndUpdate(
       userId,
       { $set: data },
-      { returnDocument: "after" }
+      { returnDocument: "after" },
     );
   },
   createRefreshToken(data: {
@@ -52,24 +57,23 @@ export const authRepository = {
       {
         $set: {
           revokedAt: new Date(),
-          replacedByTokenHash: replacedByTokenHash ?? null
-        }
-      }
+          replacedByTokenHash: replacedByTokenHash ?? null,
+        },
+      },
     );
   },
 
   revokeAllUserRefreshTokens(userId: string) {
     return RefreshTokenModel.updateMany(
       { userId, revokedAt: null },
-      { $set: { revokedAt: new Date() } }
+      { $set: { revokedAt: new Date() } },
     );
   },
 
-async cleanupExpiredTokens(userId: string) {
-
-  return await RefreshTokenModel.deleteMany({
-    userId,
-    expiresAt: { $lt: new Date() }
-  });
-}
+  async cleanupExpiredTokens(userId: string) {
+    return await RefreshTokenModel.deleteMany({
+      userId,
+      expiresAt: { $lt: new Date() },
+    });
+  },
 };

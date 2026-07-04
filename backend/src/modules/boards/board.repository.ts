@@ -25,7 +25,7 @@ export const boardRepository = {
         match: { archived: false },
         populate: { path: "taskOrder" },
       })
-      .lean() // 🚀 YEH ZAROORI HAI CACHING KE LIYE
+      .lean()
       .exec();
   },
 

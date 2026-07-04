@@ -3,7 +3,11 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { RouterLink } from '@angular/router';
-import { ActivityItem, ActivityRef, formatActivityAction } from '../../../activity/models/activity.model';
+import {
+  ActivityItem,
+  ActivityRef,
+  formatActivityAction,
+} from '../../../activity/models/activity.model';
 import { UiPageLayoutComponent } from '../../../../ui/components/layout/ui-page-layout.component';
 import { DashboardStore } from '../../data-access/dashboard-store.service';
 import { UiPageContentComponent } from '../../../../ui/components/layout/ui-page-content.component';
@@ -15,7 +19,7 @@ import { UiCardComponent } from '../../../../ui/components/ui-card.component';
 import { UiEmptyStateComponent } from '../../../../ui/components/ui-empty-state.component';
 import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.component';
 import { UiPageBodyComponent } from '../../../../ui/components/layout/ui-page-body.component';
-import { UiPanelComponent } from '../../../../ui/components/layout/ui-panel.component'
+import { UiPanelComponent } from '../../../../ui/components/layout/ui-panel.component';
 import { UiStatCardComponent } from '../../../../ui/components/layout/ui-stat-card.component';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 import { WorkspaceStoreService } from '../../../workspace/data-access/workspace-store.service';
@@ -35,89 +39,78 @@ export interface DashboardTaskRow {
   selector: 'app-dashboard-page',
   standalone: true,
   imports: [
-    CommonModule, 
-    MatCardModule, 
-    MatButtonModule, 
-    RouterLink, 
-    UiPageLayoutComponent, 
-    UiPageHeaderComponent, 
-    UiPageContentComponent, 
-    UiButtonComponent, 
-    UiStackComponent, 
-    UiBadgeComponent, 
-    UiCardComponent, 
-    UiEmptyStateComponent, 
-    UiSkeletonComponent, 
-    UiPageBodyComponent, 
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    RouterLink,
+    UiPageLayoutComponent,
+    UiPageHeaderComponent,
+    UiPageContentComponent,
+    UiButtonComponent,
+    UiStackComponent,
+    UiBadgeComponent,
+    UiCardComponent,
+    UiEmptyStateComponent,
+    UiSkeletonComponent,
+    UiPageBodyComponent,
     UiPanelComponent,
     UiStatCardComponent,
-    ...APP_ICONS
+    ...APP_ICONS,
   ],
   templateUrl: './dashboard-page.component.html',
-  styles: [`
-    :host {
-      display: block;
-      height: 100%;
-      min-height: 0;
-    }
-  `],
+  styles: [
+    `
+      :host {
+        display: block;
+        height: 100%;
+        min-height: 0;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardPageComponent{
-  
-  // 🚀 Sirf aur sirf Store inject kiya hai
+export class DashboardPageComponent {
   readonly store = inject(DashboardStore);
   readonly authStore = inject(AuthStoreService);
   readonly workspaceStore = inject(WorkspaceStoreService);
 
- constructor() {
-  effect(() => {
-      // 1. App ki loading states track karo
+  constructor() {
+    effect(() => {
       const isAuthLoading = this.authStore.isLoading();
       const isWorkspaceLoading = this.workspaceStore.isLoading();
-      
-      // 🚀 RACE CONDITION GUARD: Jab tak user aur workspaces load na ho jayein, wait karo!
+
       if (isAuthLoading || isWorkspaceLoading) {
-        return; 
+        return;
       }
 
       const user = this.authStore.currentUser();
-      if (!user) return; // Agar user hi nahi hai toh wapas jao
+      if (!user) return;
 
-      // 2. Workspace ID dhoondo
       let targetWorkspaceId = this.workspaceStore.activeWorkspace()?.id;
 
-      // 🚀 SMART FALLBACK: Agar user ne koi workspace select nahi kiya, toh uske list ka pehla workspace utha lo
       if (!targetWorkspaceId) {
-        const allWorkspaces = this.workspaceStore.workspaces(); // Assumed array of workspaces
-        
+        const allWorkspaces = this.workspaceStore.workspaces();
+
         if (allWorkspaces && allWorkspaces.length > 0) {
           targetWorkspaceId = allWorkspaces[0].id;
-          
-          // Optional: Tujhe chahiye toh WorkspaceStore ka active workspace bhi set kar sakta hai bina extra API call ke
-          untracked(() => this.workspaceStore.setActiveWorkspace(allWorkspaces[0].id)); 
+
+          untracked(() => this.workspaceStore.setActiveWorkspace(allWorkspaces[0].id));
         }
       }
 
-      // 3. Agar workspace mil gaya, toh Dashboard fetch maro (userId bhi bhej do validation fix karne ke liye)
       if (targetWorkspaceId) {
-        // userId pass kar rahe hain backend validation error fix karne ke liye
-        this.store.loadDashboardData(targetWorkspaceId, user.id); 
+        this.store.loadDashboardData(targetWorkspaceId, user.id);
       } else {
-        // 🚀 EDGE CASE: Naya user jiska koi workspace nahi hai
-        // Store mein ek action call kardo jo loading false kar de taaki infinite loader na dikhe
-        this.store.setEmptyWorkspaceState(); 
+        this.store.setEmptyWorkspaceState();
       }
     });
-}
-
-  // --- UI Helpers (Strictly for styling and routing) ---
+  }
 
   readonly priorityClassMap: Record<string, string> = {
     low: 'text-blue-500',
     medium: 'text-yellow-500',
     high: 'text-orange-500',
-    urgent: 'text-red-500'
+    urgent: 'text-red-500',
   };
 
   getTaskStatusClass(task: DashboardTaskRow): string {
@@ -135,7 +128,7 @@ export class DashboardPageComponent{
   getTaskQueryParams(task: DashboardTaskRow): Record<string, string> {
     return {
       taskId: task.id,
-      taskTitle: this.toSlug(task.title)
+      taskTitle: this.toSlug(task.title),
     };
   }
 
@@ -168,10 +161,12 @@ export class DashboardPageComponent{
   }
 
   private toSlug(value: string): string {
-    return value
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || 'item';
+    return (
+      value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'item'
+    );
   }
 }

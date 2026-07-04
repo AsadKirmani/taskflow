@@ -1,11 +1,11 @@
-import { Resend } from 'resend';
-import { MailProvider, SendMailOptions } from './mail.interface';
-import dotenv from 'dotenv';
+import { Resend } from "resend";
+import { MailProvider, SendMailOptions } from "./mail.interface";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const fromEmail = process.env.MAIL_FROM_ADDRESS || 'onboarding@resend.dev';
+const fromEmail = process.env.MAIL_FROM_ADDRESS || "onboarding@resend.dev";
 
 export class ResendProvider implements MailProvider {
   async sendMail(options: SendMailOptions): Promise<void> {
@@ -19,11 +19,11 @@ export class ResendProvider implements MailProvider {
       });
 
       if (error) {
-        console.error('❌ Resend API Error:', error);
+        console.error("❌ Resend API Error:", error);
         throw new Error(error.message);
       }
     } catch (err) {
-      console.error('❌ Failed to send email via Resend:', err);
+      console.error("❌ Failed to send email via Resend:", err);
       throw err;
     }
   }

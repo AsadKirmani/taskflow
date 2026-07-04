@@ -7,10 +7,7 @@ export type BoardDueType = 'all' | 'none' | 'overdue' | 'today' | 'this_week';
 export type BoardMemberScope = 'all' | 'no_members' | 'me';
 export type BoardCompletionType = 'all' | 'completed' | 'incomplete';
 export type BoardActivityType =
-  | 'recentlyupdated'
-  | 'recentlycreated'
-  | 'activeinlastweek'
-  | 'activeinlastmonth';
+  'recentlyupdated' | 'recentlycreated' | 'activeinlastweek' | 'activeinlastmonth';
 
 export interface BoardFilters {
   search: string;
@@ -49,9 +46,9 @@ export const initialBoardState: BoardState = {
     completion: 'all',
     labels: [],
     dueType: 'all',
-    activity: []
+    activity: [],
   },
   loading: false,
   saving: false,
-  error: null
+  error: null,
 };

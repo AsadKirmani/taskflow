@@ -20,15 +20,15 @@ export const columnService = {
       boardId,
       columnId: column._id.toString(),
       userId,
-      actionType: 'column_created',
-      entityType: 'column',
+      actionType: "column_created",
+      entityType: "column",
       entityId: column._id.toString(),
-      metadata: { name: column.name }
+      metadata: { name: column.name },
     });
 
     return column;
   },
-    async updateColumn(
+  async updateColumn(
     columnId: string,
     data: { name?: string; archived?: boolean },
     userId?: string,
@@ -41,12 +41,13 @@ export const columnService = {
         boardId: updatedColumn.boardId.toString(),
         columnId,
         userId,
-        actionType: data.archived === true ? 'column_archived' : 'column_updated',
-        entityType: 'column',
+        actionType:
+          data.archived === true ? "column_archived" : "column_updated",
+        entityType: "column",
         entityId: columnId,
         metadata: {
-          updatedFields: Object.keys(data)
-        }
+          updatedFields: Object.keys(data),
+        },
       });
     }
 
@@ -60,5 +61,5 @@ export const columnService = {
   },
   async reorderTasks(columnId: string, taskIds: string[], userId: string) {
     return await columnRepository.reorderTasks(columnId, taskIds);
-  }
+  },
 };

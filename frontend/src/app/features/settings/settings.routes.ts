@@ -4,6 +4,6 @@ import { SettingsPageComponent } from './pages/settings-page/settings-page.compo
 export const SETTINGS_ROUTES: Routes = [
   {
     path: '',
-    component: SettingsPageComponent
-  }
+    component: SettingsPageComponent,
+  },
 ];

@@ -9,9 +9,8 @@ import { CommonModule } from '@angular/common';
   template: `
     <ui-card [interactive]="true" class="block cursor-grab active:cursor-grabbing">
       <div class="flex flex-col gap-3">
-        
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-mono text-base-content/50 uppercase tracking-wider">    
+          <span class="text-[11px] font-mono text-base-content/50 uppercase tracking-wider">
             {{ taskId() }}
           </span>
           <ng-content select="[priority-badge]"></ng-content>
@@ -29,7 +28,6 @@ import { CommonModule } from '@angular/common';
             <ng-content select="[avatars]"></ng-content>
           </div>
         </div>
-
       </div>
     </ui-card>
   `,

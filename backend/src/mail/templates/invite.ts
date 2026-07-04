@@ -2,7 +2,7 @@ export const getInviteHtmlTemplate = (
   workspaceName: string,
   inviterName: string,
   role: string,
-  inviteLink: string
+  inviteLink: string,
 ): string => {
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e5e5; border-radius: 10px;">
@@ -32,7 +32,7 @@ export const getInviteTextTemplate = (
   workspaceName: string,
   inviterName: string,
   role: string,
-  inviteLink: string
+  inviteLink: string,
 ): string => {
   return `${inviterName} has invited you to join the workspace "${workspaceName}" on TaskFlow as a ${role}.\n\nClick the link below to accept the invitation:\n${inviteLink}\n\nThis link will expire in 48 hours.`;
 };

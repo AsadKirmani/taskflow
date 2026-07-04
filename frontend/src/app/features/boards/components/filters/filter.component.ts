@@ -7,11 +7,11 @@ import { UiButtonComponent } from '../../../../ui/components/ui-button.component
 @Component({
   selector: 'app-apply-filter',
   standalone: true,
-    imports: [CommonModule, ...APP_ICONS, UiButtonComponent],
-    templateUrl: './filter.component.html',
-    host: {
-      'document:click': 'close()'
-    }
+  imports: [CommonModule, ...APP_ICONS, UiButtonComponent],
+  templateUrl: './filter.component.html',
+  host: {
+    'document:click': 'close()',
+  },
 })
 export class ApplyFilterComponent {
   readonly filter: BoardFilterSelection = {
@@ -21,11 +21,11 @@ export class ApplyFilterComponent {
     incomplete: false,
     dueDate: 'all',
     labels: [],
-    activity: []
+    activity: [],
   };
   @Output() filtersChanged = new EventEmitter<BoardFilterSelection>();
   @Output() filterClose = new EventEmitter<void>();
-  
+
   isOpen = model<boolean>(false);
   close(): void {
     this.isOpen.set(false);
@@ -44,17 +44,17 @@ export class ApplyFilterComponent {
   toggleLabel(label: string, checked: boolean): void {
     this.filter.labels = checked
       ? [...this.filter.labels, label]
-      : this.filter.labels.filter(item => item !== label);
+      : this.filter.labels.filter((item) => item !== label);
     this.emitChange();
   }
 
   toggleActivity(
     type: 'recentlyupdated' | 'recentlycreated' | 'activeinlastweek' | 'activeinlastmonth',
-    checked: boolean
+    checked: boolean,
   ): void {
     this.filter.activity = checked
       ? [...this.filter.activity, type]
-      : this.filter.activity.filter(item => item !== type);
+      : this.filter.activity.filter((item) => item !== type);
     this.emitChange();
   }
 
@@ -62,7 +62,7 @@ export class ApplyFilterComponent {
     this.filtersChanged.emit({
       ...this.filter,
       labels: [...this.filter.labels],
-      activity: [...this.filter.activity]
+      activity: [...this.filter.activity],
     });
   }
 }

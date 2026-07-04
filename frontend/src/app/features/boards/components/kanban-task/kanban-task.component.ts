@@ -9,11 +9,11 @@ import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-kanban-task',
   standalone: true,
-  imports: [DragDropModule, UiAvatarStackComponent, ...APP_ICONS, DatePipe],  
+  imports: [DragDropModule, UiAvatarStackComponent, ...APP_ICONS, DatePipe],
   host: {
-    'class': 'block w-full cursor-grab active:cursor-grabbing mb-2 select-none touch-none',
+    class: 'block w-full cursor-grab active:cursor-grabbing mb-2 select-none touch-none',
   },
-  templateUrl: './kanban-task.component.html'
+  templateUrl: './kanban-task.component.html',
 })
 export class KanbanTaskComponent {
   task = input.required<Task>();
@@ -32,7 +32,7 @@ export class KanbanTaskComponent {
   });
   isEditing = signal(false);
   editValue = signal('');
- 
+
   startEdit(event?: MouseEvent) {
     event?.stopPropagation();
     this.editValue.set(this.task().title);
@@ -55,22 +55,22 @@ export class KanbanTaskComponent {
     this.editValue.set((event.target as HTMLInputElement).value);
   }
   get completedChecklistCount(): number {
-  const checklist = this.task().checklist;
-  if (!checklist) return 0;
-  // Assuming each checklist item has an 'isCompleted' property
-  return checklist.filter(item => item.isCompleted).length; 
-}
-protected readonly avatarUsers = computed(() => {
-  const assigneeIds = this.task().assigneeIds || [];
-  const members = this.facade.boardMembers();
+    const checklist = this.task().checklist;
+    if (!checklist) return 0;
 
-  return assigneeIds.map(id => {
-    const member = members.find(m => m.id === id);
-    return {
-      id: id,
-      name: member?.name ?? 'Unknown',
-      avatar: member?.avatarUrl ?? undefined
-    };
+    return checklist.filter((item) => item.isCompleted).length;
+  }
+  protected readonly avatarUsers = computed(() => {
+    const assigneeIds = this.task().assigneeIds || [];
+    const members = this.facade.boardMembers();
+
+    return assigneeIds.map((id) => {
+      const member = members.find((m) => m.id === id);
+      return {
+        id: id,
+        name: member?.name ?? 'Unknown',
+        avatar: member?.avatarUrl ?? undefined,
+      };
+    });
   });
-});
 }

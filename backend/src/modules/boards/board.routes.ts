@@ -18,11 +18,7 @@ router.post(
   validate(createBoardDto),
   asyncHandler(boardController.createBoard),
 );
-router.get(
-  "/boards",
-  authMiddleware,
-  asyncHandler(boardController.getBoards),
-);
+router.get("/boards", authMiddleware, asyncHandler(boardController.getBoards));
 router.get(
   "/boards/:boardId",
   authMiddleware,

@@ -33,7 +33,7 @@ import { KeyboardShortcutsService } from '../../../../core/services/keyboard-sho
     UiEmptyStateComponent,
     UiPageHeaderComponent,
     UiButtonComponent,
-    ...APP_ICONS
+    ...APP_ICONS,
   ],
   templateUrl: './boards-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

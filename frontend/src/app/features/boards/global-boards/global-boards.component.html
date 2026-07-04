@@ -7,9 +7,10 @@
   <div class="space-y-8">
     @for (workspace of workspaceStore.workspaces(); track workspace.id) {
       <section class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
-        
         <div class="flex items-center gap-3 border-b border-stone-100 pb-3 mb-4">
-          <span class="flex h-7 w-7 items-center justify-center rounded-full bg-stone-950 text-[11px] font-bold uppercase text-white">
+          <span
+            class="flex h-7 w-7 items-center justify-center rounded-full bg-stone-950 text-[11px] font-bold uppercase text-white"
+          >
             {{ workspace.name[0] }}
           </span>
           <h2 class="text-lg font-bold text-stone-800">{{ workspace.name }}</h2>
@@ -19,23 +20,25 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          
           @for (board of getBoardsByWorkspace(workspace.id); track board.id) {
-            <a 
+            <a
               [routerLink]="['/w', workspace.id, 'b', board.id]"
               class="group block p-4 h-28 bg-gradient-to-br from-stone-800 to-stone-900 rounded-xl hover:from-stone-900 hover:to-black transition-all shadow-sm hover:shadow-md relative overflow-hidden"
             >
               <h3 class="font-semibold text-white text-base truncate">{{ board.name }}</h3>
-              <span class="absolute bottom-3 right-3 text-xs text-stone-400 group-hover:text-stone-200 transition-colors">
+              <span
+                class="absolute bottom-3 right-3 text-xs text-stone-400 group-hover:text-stone-200 transition-colors"
+              >
                 Open Board →
               </span>
             </a>
           } @empty {
-            <div class="col-span-full border border-dashed border-stone-200 rounded-xl p-4 text-center text-sm text-stone-400">
+            <div
+              class="col-span-full border border-dashed border-stone-200 rounded-xl p-4 text-center text-sm text-stone-400"
+            >
               No boards created in this workspace yet.
             </div>
           }
-
         </div>
       </section>
     } @empty {

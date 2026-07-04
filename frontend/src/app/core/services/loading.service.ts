@@ -6,7 +6,7 @@ export class LoadingService {
   private readonly activeRequestsSubject = new BehaviorSubject<number>(0);
 
   readonly activeRequests$ = this.activeRequestsSubject.asObservable();
-  readonly isLoading$ = this.activeRequests$.pipe(map(count => count > 0));
+  readonly isLoading$ = this.activeRequests$.pipe(map((count) => count > 0));
 
   start(): void {
     this.activeRequestsSubject.next(this.activeRequestsSubject.getValue() + 1);

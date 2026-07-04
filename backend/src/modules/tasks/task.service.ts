@@ -3,14 +3,14 @@ import { activityService } from "../activity/activity.service";
 import { ColumnModel } from "../../models/column.model";
 import { uploadBufferToCloudinary } from "../../services/cloudinary.service";
 
-export type TaskDueType = 'all' | 'none' | 'overdue' | 'today' | 'this_week';
-export type TaskMemberScope = 'all' | 'no_members' | 'me';
-export type TaskCompletion = 'all' | 'completed' | 'incomplete';
+export type TaskDueType = "all" | "none" | "overdue" | "today" | "this_week";
+export type TaskMemberScope = "all" | "no_members" | "me";
+export type TaskCompletion = "all" | "completed" | "incomplete";
 export type TaskActivity =
-  | 'recentlyupdated'
-  | 'recentlycreated'
-  | 'activeinlastweek'
-  | 'activeinlastmonth';
+  | "recentlyupdated"
+  | "recentlycreated"
+  | "activeinlastweek"
+  | "activeinlastmonth";
 
 export interface TaskFilters {
   search?: string;
@@ -48,18 +48,18 @@ export const taskService = {
       columnId,
       taskId: newTask._id.toString(),
       userId,
-      actionType: 'task_created',
-      entityType: 'task',
+      actionType: "task_created",
+      entityType: "task",
       entityId: newTask._id.toString(),
       metadata: {
         title: newTask.title,
-        priority: newTask.priority
-      }
+        priority: newTask.priority,
+      },
     });
 
     return newTask;
   },
-    async getTasksInBoard(boardId: string, filters?: TaskFilters) {
+  async getTasksInBoard(boardId: string, filters?: TaskFilters) {
     const tasks = await taskRepository.getTasksInBoard(boardId, filters);
     return tasks;
   },
@@ -82,11 +82,11 @@ export const taskService = {
 
     if (updatedTask && userId) {
       const actionType =
-        typeof data.isCompleted === 'boolean'
+        typeof data.isCompleted === "boolean"
           ? data.isCompleted
-            ? 'task_completed'
-            : 'task_reopened'
-          : 'task_updated';
+            ? "task_completed"
+            : "task_reopened"
+          : "task_updated";
 
       await activityService.logActivity({
         workspaceId: updatedTask.workspaceId.toString(),
@@ -95,13 +95,13 @@ export const taskService = {
         taskId,
         userId,
         actionType,
-        entityType: 'task',
+        entityType: "task",
         entityId: taskId,
         metadata: {
           updatedFields: Object.keys(data),
           previousTitle: previousTask?.title,
-          title: updatedTask.title
-        }
+          title: updatedTask.title,
+        },
       });
     }
 
@@ -116,11 +116,16 @@ export const taskService = {
   ) {
     const task = await taskRepository.getTaskById(taskId);
     const [sourceColumn, destinationColumn] = await Promise.all([
-      ColumnModel.findById(sourceColumnId).select('name'),
-      ColumnModel.findById(destinationColumnId).select('name')
+      ColumnModel.findById(sourceColumnId).select("name"),
+      ColumnModel.findById(destinationColumnId).select("name"),
     ]);
 
-    await taskRepository.moveTask(taskId, sourceColumnId, destinationColumnId, position);
+    await taskRepository.moveTask(
+      taskId,
+      sourceColumnId,
+      destinationColumnId,
+      position,
+    );
 
     if (task && userId) {
       await activityService.logActivity({
@@ -129,16 +134,16 @@ export const taskService = {
         columnId: destinationColumnId,
         taskId,
         userId,
-        actionType: 'task_moved',
-        entityType: 'task',
+        actionType: "task_moved",
+        entityType: "task",
         entityId: taskId,
         metadata: {
           sourceColumnId,
           destinationColumnId,
           sourceColumnName: sourceColumn?.name,
           destinationColumnName: destinationColumn?.name,
-          position
-        }
+          position,
+        },
       });
     }
   },
@@ -146,19 +151,32 @@ export const taskService = {
     const task = await taskRepository.getTaskById(taskId);
     await taskRepository.deleteTask(taskId);
   },
-  async addAttachment(taskId: string, attachment: Express.Multer.File, userId?: string) {
-    const uploadAttachment = await uploadBufferToCloudinary(attachment.buffer, 'attachments', attachment.mimetype);
+  async addAttachment(
+    taskId: string,
+    attachment: Express.Multer.File,
+    userId?: string,
+  ) {
+    const uploadAttachment = await uploadBufferToCloudinary(
+      attachment.buffer,
+      "attachments",
+      attachment.mimetype,
+    );
     const attachmentData = {
-      filename: uploadAttachment.format ? `${attachment.originalname}.${uploadAttachment.format}` : attachment.originalname,
+      filename: uploadAttachment.format
+        ? `${attachment.originalname}.${uploadAttachment.format}`
+        : attachment.originalname,
       url: uploadAttachment.secure_url,
       format: uploadAttachment.format,
-      uploadedAt: new Date()
+      uploadedAt: new Date(),
     };
     await taskRepository.addAttachmentToTask(taskId, attachmentData);
     return attachmentData;
   },
   async removeAttachment(taskId: string, attachmentUrl: string) {
-    const updatedTask = await taskRepository.removeAttachmentFromTask(taskId, attachmentUrl);
+    const updatedTask = await taskRepository.removeAttachmentFromTask(
+      taskId,
+      attachmentUrl,
+    );
     return updatedTask;
-  }
+  },
 };

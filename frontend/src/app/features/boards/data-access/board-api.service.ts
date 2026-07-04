@@ -49,51 +49,69 @@ export class BoardApiService {
   private readonly baseUrl = `${environment.apiUrl}`;
   private readonly http = inject(HttpClient);
 
-  createBoard(name: string, workspaceName: string, workspaceId: string, visibility: 'private' | 'workspace'): Observable<ApiResponse<Board>> {
+  createBoard(
+    name: string,
+    workspaceName: string,
+    workspaceId: string,
+    visibility: 'private' | 'workspace',
+  ): Observable<ApiResponse<Board>> {
     return this.http.post<ApiResponse<Board>>(
       `${this.baseUrl}/boards`,
       { name, workspaceName, workspaceId, visibility },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
   getBoards(): Observable<ApiResponse<BoardListResponse>> {
     return this.http.get<ApiResponse<BoardListResponse>>(`${this.baseUrl}/boards`, {
-      withCredentials: true
+      withCredentials: true,
     });
   }
   getBoardByWorkspace(workspaceId: string): Observable<ApiResponse<BoardListResponse>> {
-    return this.http.get<ApiResponse<BoardListResponse>>(`${this.baseUrl}/workspaces/${workspaceId}/boards`, {
-      withCredentials: true
-    });
+    return this.http.get<ApiResponse<BoardListResponse>>(
+      `${this.baseUrl}/workspaces/${workspaceId}/boards`,
+      {
+        withCredentials: true,
+      },
+    );
   }
 
   getBoardById(boardId: string): Observable<ApiResponse<BoardDetailResponse>> {
     return this.http.get<ApiResponse<BoardDetailResponse>>(`${this.baseUrl}/boards/${boardId}`, {
-      withCredentials: true
+      withCredentials: true,
     });
   }
 
   moveTask(taskId: string, payload: MoveTaskPayload): Observable<ApiResponse<unknown>> {
     return this.http.patch<ApiResponse<unknown>>(`${this.baseUrl}/tasks/${taskId}/move`, payload, {
-      withCredentials: true
+      withCredentials: true,
     });
   }
   getBoardColumns(boardId: string): Observable<ApiResponse<{ columns: BoardColumn[] }>> {
-    return this.http.get<ApiResponse<{ columns: BoardColumn[] }>>(`${this.baseUrl}/boards/${boardId}/columns`, {
-      withCredentials: true
-    });
-  }
-
-  createColumn(boardId: string, workspaceId: string, name: string): Observable<ApiResponse<BoardColumn>> {
-    return this.http.post<ApiResponse<BoardColumn>>(
-      `${this.baseUrl}/columns`,
-      { name, boardId, workspaceId },
-      { withCredentials: true }
+    return this.http.get<ApiResponse<{ columns: BoardColumn[] }>>(
+      `${this.baseUrl}/boards/${boardId}/columns`,
+      {
+        withCredentials: true,
+      },
     );
   }
 
-  getTasksInBoard(boardId: string, filters?: TaskQueryFilters): Observable<ApiResponse<{ items: Task[] }>> {
+  createColumn(
+    boardId: string,
+    workspaceId: string,
+    name: string,
+  ): Observable<ApiResponse<BoardColumn>> {
+    return this.http.post<ApiResponse<BoardColumn>>(
+      `${this.baseUrl}/columns`,
+      { name, boardId, workspaceId },
+      { withCredentials: true },
+    );
+  }
+
+  getTasksInBoard(
+    boardId: string,
+    filters?: TaskQueryFilters,
+  ): Observable<ApiResponse<{ items: Task[] }>> {
     const params: Record<string, string> = {};
 
     if (filters?.search) params['search'] = filters.search;
@@ -101,53 +119,68 @@ export class BoardApiService {
     if (filters?.assigneeIds?.length) params['assigneeIds'] = filters.assigneeIds.join(',');
     if (filters?.labels?.length) params['labels'] = filters.labels.join(',');
     if (filters?.activity?.length) params['activity'] = filters.activity.join(',');
-    if (filters?.memberScope && filters.memberScope !== 'all') params['memberScope'] = filters.memberScope;
-    if (filters?.completion && filters.completion !== 'all') params['completion'] = filters.completion;
+    if (filters?.memberScope && filters.memberScope !== 'all')
+      params['memberScope'] = filters.memberScope;
+    if (filters?.completion && filters.completion !== 'all')
+      params['completion'] = filters.completion;
     if (filters?.dueType && filters.dueType !== 'all') params['dueType'] = filters.dueType;
 
-    return this.http.get<ApiResponse<{ items: Task[] }>>(`${this.baseUrl}/boards/${boardId}/tasks`, {
-      params,
-      withCredentials: true
-    });
+    return this.http.get<ApiResponse<{ items: Task[] }>>(
+      `${this.baseUrl}/boards/${boardId}/tasks`,
+      {
+        params,
+        withCredentials: true,
+      },
+    );
   }
-  addTask(boardId: string, columnId: string, title: string, workspaceId: string, position?: number): Observable<ApiResponse<Task>> {
+  addTask(
+    boardId: string,
+    columnId: string,
+    title: string,
+    workspaceId: string,
+    position?: number,
+  ): Observable<ApiResponse<Task>> {
     return this.http.post<ApiResponse<Task>>(
       `${this.baseUrl}/tasks`,
       { title, workspaceId, boardId, columnId, position },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
   updateTask(taskId: string, payload: UpdateTaskPayload): Observable<ApiResponse<Task>> {
-    return this.http.patch<ApiResponse<Task>>(
-      `${this.baseUrl}/tasks/${taskId}`,
-      payload,
-      { withCredentials: true }
-    );
+    return this.http.patch<ApiResponse<Task>>(`${this.baseUrl}/tasks/${taskId}`, payload, {
+      withCredentials: true,
+    });
   }
 
   reorderColumns(boardId: string, columnIds: string[]): Observable<ApiResponse<null>> {
     return this.http.patch<ApiResponse<null>>(
       `${this.baseUrl}/boards/${boardId}/reorder-columns`,
       { columnOrder: columnIds },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
   getCommentsForTask(taskId: string): Observable<ApiResponse<{ comments: TaskComment[] }>> {
-    return this.http.get<ApiResponse<{ comments: TaskComment[] }>>(`${this.baseUrl}/tasks/${taskId}/comments`, {
-      withCredentials: true
-    });
+    return this.http.get<ApiResponse<{ comments: TaskComment[] }>>(
+      `${this.baseUrl}/tasks/${taskId}/comments`,
+      {
+        withCredentials: true,
+      },
+    );
   }
-  postCommentToTask(taskId: string, content: string): Observable<ApiResponse<{ comment: TaskComment }>> {
+  postCommentToTask(
+    taskId: string,
+    content: string,
+  ): Observable<ApiResponse<{ comment: TaskComment }>> {
     return this.http.post<ApiResponse<{ comment: TaskComment }>>(
       `${this.baseUrl}/tasks/${taskId}/comments`,
       { content },
-      { withCredentials: true }
+      { withCredentials: true },
     );
-}
-deleteComment(commentId: string): Observable<ApiResponse<null>> {
+  }
+  deleteComment(commentId: string): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${this.baseUrl}/comments/${commentId}`, {
-      withCredentials: true
+      withCredentials: true,
     });
-}
+  }
 }

@@ -76,32 +76,33 @@ export const activityRepository = {
     limit: number,
   ) {
     const skip = (page - 1) * limit;
-    
+
     const membership = await WorkspaceMemberModel.findOne({
       workspaceId,
       userId,
     }).lean();
-    
+
     if (!membership) {
       return { items: [], total: 0 };
     }
-    
-    const isOwnerOrAdmin = membership.role === "OWNER" || membership.role === "ADMIN";
+
+    const isOwnerOrAdmin =
+      membership.role === "OWNER" || membership.role === "ADMIN";
     const isGuest = membership.role === "GUEST";
-    
+
     let boardQuery: any = { workspaceId };
-    
+
     if (!isOwnerOrAdmin) {
       if (isGuest) {
-      boardQuery.$or = [{ memberIds: userId }, { createdBy: userId }];
-    } else {
-      boardQuery.$or = [
-        { visibility: "workspace" },
-        { memberIds: userId },
-        { createdBy: userId },
-      ];
+        boardQuery.$or = [{ memberIds: userId }, { createdBy: userId }];
+      } else {
+        boardQuery.$or = [
+          { visibility: "workspace" },
+          { memberIds: userId },
+          { createdBy: userId },
+        ];
+      }
     }
-  }
 
     const allowedBoards = await BoardModel.find(boardQuery).select("_id");
     const allowedBoardIds = allowedBoards.map((b) => b._id.toString());
@@ -205,8 +206,7 @@ async function enrichMoveColumnNames(items: Array<Record<string, unknown>>) {
     const sourceColumnId = metadata.sourceColumnId as string | undefined;
 
     const destinationColumnId = metadata.destinationColumnId as
-      | string
-      | undefined;
+      string | undefined;
 
     if (sourceColumnId) {
       columnIds.add(sourceColumnId);
@@ -243,8 +243,7 @@ async function enrichMoveColumnNames(items: Array<Record<string, unknown>>) {
     const sourceColumnId = metadata.sourceColumnId as string | undefined;
 
     const destinationColumnId = metadata.destinationColumnId as
-      | string
-      | undefined;
+      string | undefined;
 
     if (sourceColumnId && !metadata.sourceColumnName) {
       metadata.sourceColumnName = columnMap.get(sourceColumnId);

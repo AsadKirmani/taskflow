@@ -12,15 +12,17 @@ export const commentService = {
     authorId: string,
   ) {
     const newComment = await commentRepository.createComment({
-        content,
-        taskId,
-        boardId,
-        workspaceId,
-        author,
-        authorId,
+      content,
+      taskId,
+      boardId,
+      workspaceId,
+      author,
+      authorId,
     });
     const task = await taskRepository.getTaskById(taskId);
-    await taskRepository.updateTask(taskId, { commentCount: (task?.commentCount ?? 0) + 1 });
+    await taskRepository.updateTask(taskId, {
+      commentCount: (task?.commentCount ?? 0) + 1,
+    });
 
     await activityService.logActivity({
       workspaceId,
@@ -28,12 +30,12 @@ export const commentService = {
       taskId,
       columnId: task!.columnId.toString(),
       userId: authorId,
-      actionType: 'comment_created',
-      entityType: 'comment',
+      actionType: "comment_created",
+      entityType: "comment",
       entityId: newComment._id.toString(),
       metadata: {
-        contentPreview: content.slice(0, 120)
-      }
+        contentPreview: content.slice(0, 120),
+      },
     });
 
     return newComment;
@@ -42,29 +44,32 @@ export const commentService = {
     const comments = await commentRepository.getCommentsByTaskId(taskId);
     return comments;
   },
-    async updateComment(
+  async updateComment(
     commentId: string,
     data: { content?: string; archived?: boolean },
-      userId?: string,
+    userId?: string,
   ) {
-      const existingComment = await commentRepository.getCommentById(commentId);
-    const updatedComment = await commentRepository.updateComment(commentId, data);
+    const existingComment = await commentRepository.getCommentById(commentId);
+    const updatedComment = await commentRepository.updateComment(
+      commentId,
+      data,
+    );
 
-      if (updatedComment && userId) {
-        await activityService.logActivity({
-          workspaceId: updatedComment.workspaceId.toString(),
-          boardId: updatedComment.boardId.toString(),
-          taskId: updatedComment.taskId.toString(),
-          userId,
-          actionType: 'comment_updated',
-          entityType: 'comment',
-          entityId: commentId,
-          metadata: {
-            previousContentPreview: existingComment?.content?.slice(0, 120),
-            contentPreview: updatedComment.content?.slice(0, 120)
-          }
-        });
-      }
+    if (updatedComment && userId) {
+      await activityService.logActivity({
+        workspaceId: updatedComment.workspaceId.toString(),
+        boardId: updatedComment.boardId.toString(),
+        taskId: updatedComment.taskId.toString(),
+        userId,
+        actionType: "comment_updated",
+        entityType: "comment",
+        entityId: commentId,
+        metadata: {
+          previousContentPreview: existingComment?.content?.slice(0, 120),
+          contentPreview: updatedComment.content?.slice(0, 120),
+        },
+      });
+    }
 
     return updatedComment;
   },
@@ -81,13 +86,13 @@ export const commentService = {
         boardId: existingComment.boardId.toString(),
         taskId: existingComment.taskId.toString(),
         userId,
-        actionType: 'comment_deleted',
-        entityType: 'comment',
+        actionType: "comment_deleted",
+        entityType: "comment",
         entityId: commentId,
         metadata: {
-          previousContentPreview: existingComment.content?.slice(0, 120)
-        }
+          previousContentPreview: existingComment.content?.slice(0, 120),
+        },
       });
     }
-  }
-  };
+  },
+};

@@ -11,8 +11,10 @@ export const columnRepository = {
     createdBy: string;
     position?: number;
   }) {
-    if(data.position === undefined) {
-      const board = await BoardModel.findById(data.boardId).select('columnOrder');
+    if (data.position === undefined) {
+      const board = await BoardModel.findById(data.boardId).select(
+        "columnOrder",
+      );
       data.position = board?.columnOrder?.length || 0;
     }
     const newColumn = await ColumnModel.create(data);
@@ -38,18 +40,19 @@ export const columnRepository = {
   },
   async reorderTasks(columnId: string, newTaskOrder: string[]) {
     const updatedColumn = await ColumnModel.findByIdAndUpdate(
-      columnId, 
-      {$set: { taskOrder: newTaskOrder }}, 
-      { returnDocument: "after" });
-      const updates = newTaskOrder.map((taskId, index) => ({
-        updateOne: {
-          filter: { _id: new Types.ObjectId(taskId) },
-          update: { $set: { position: index } },
-        },
-      }));
-      if (updates.length > 0) {
+      columnId,
+      { $set: { taskOrder: newTaskOrder } },
+      { returnDocument: "after" },
+    );
+    const updates = newTaskOrder.map((taskId, index) => ({
+      updateOne: {
+        filter: { _id: new Types.ObjectId(taskId) },
+        update: { $set: { position: index } },
+      },
+    }));
+    if (updates.length > 0) {
       await TaskModel.bulkWrite(updates);
-      }
-      return updatedColumn;
-  }
+    }
+    return updatedColumn;
+  },
 };

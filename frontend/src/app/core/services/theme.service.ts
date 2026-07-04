@@ -3,12 +3,10 @@ import { Injectable, signal, effect } from '@angular/core';
 export type AppTheme = 'light' | 'dark' | 'system';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ThemeService {
-  currentTheme = signal<AppTheme>(
-    (localStorage.getItem('taskflow_theme') as AppTheme) || 'system'
-  );
+  currentTheme = signal<AppTheme>((localStorage.getItem('taskflow_theme') as AppTheme) || 'system');
 
   constructor() {
     effect(() => {

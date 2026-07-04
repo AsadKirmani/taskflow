@@ -5,13 +5,10 @@ import {
   Output,
   inject,
   input,
-  signal
+  signal,
 } from '@angular/core';
 
-import {
-  RouterLink,
-  RouterLinkActive
-} from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { WorkspaceStoreService } from '../../../features/workspace/data-access/workspace-store.service';
 import { APP_ICONS } from '../../icons/lucide-icons';
@@ -19,103 +16,75 @@ import { APP_ICONS } from '../../icons/lucide-icons';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [
-    RouterLink,
-    RouterLinkActive,
-    ...APP_ICONS
-  ],
+  imports: [RouterLink, RouterLinkActive, ...APP_ICONS],
   templateUrl: './sidebar.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent {
-
   @Output()
   navigate = new EventEmitter<void>();
 
-  readonly isCollapsed =
-    input<boolean>(false);
+  readonly isCollapsed = input<boolean>(false);
 
-  protected readonly workspaceStore =
-    inject(WorkspaceStoreService);
+  protected readonly workspaceStore = inject(WorkspaceStoreService);
 
-  private readonly openWorkspaceId =
-    signal<string | null>(null);
+  private readonly openWorkspaceId = signal<string | null>(null);
 
   readonly navItems = [
     {
       label: 'Dashboard',
       route: '/dashboard',
-      icon: 'dashboard'
+      icon: 'dashboard',
     },
     {
       label: 'Boards',
       route: '/boards',
-      icon: 'boards'
+      icon: 'boards',
     },
     {
       label: 'Activity',
       route: '/activity',
-      icon: 'activity'
+      icon: 'activity',
     },
     {
       label: 'Settings',
       route: '/settings',
-      icon: 'settings'
-    }
+      icon: 'settings',
+    },
   ] as const;
 
   readonly workspaceLinks = [
     {
       label: 'Boards',
       route: 'workspaces/:workspaceId/boards',
-      path: 'boards'
+      path: 'boards',
     },
     {
       label: 'Activity',
       route: 'workspaces/:workspaceId/activity',
-      path: 'activity'
+      path: 'activity',
     },
     {
       label: 'Settings',
       route: 'workspaces/:workspaceId/settings',
-      path: 'settings'
-    }
+      path: 'settings',
+    },
   ] as const;
 
   constructor() {
     this.workspaceStore.loadWorkspaces();
   }
 
-  toggleWorkspace(
-    workspaceId: string
-  ): void {
-
-    this.openWorkspaceId.update(
-      current =>
-        current === workspaceId
-          ? null
-          : workspaceId
-    );
+  toggleWorkspace(workspaceId: string): void {
+    this.openWorkspaceId.update((current) => (current === workspaceId ? null : workspaceId));
   }
 
-  isWorkspaceOpen(
-    workspaceId: string
-  ): boolean {
-
-    return (
-      this.openWorkspaceId() ===
-      workspaceId
-    );
+  isWorkspaceOpen(workspaceId: string): boolean {
+    return this.openWorkspaceId() === workspaceId;
   }
 
-  selectWorkspace(
-    workspaceId: string
-  ): void {
-
-    this.workspaceStore
-      .setActiveWorkspace(
-        workspaceId
-      );
+  selectWorkspace(workspaceId: string): void {
+    this.workspaceStore.setActiveWorkspace(workspaceId);
 
     this.navigate.emit();
   }

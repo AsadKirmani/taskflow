@@ -7,13 +7,13 @@ import { BoardStore } from '../../../features/boards/data-access/board-store.ser
   selector: 'app-global-boards',
   standalone: true,
   imports: [RouterLink],
-  templateUrl: './global-boards.component.html'
+  templateUrl: './global-boards.component.html',
 })
 export class GlobalBoardsComponent {
   protected readonly workspaceStore = inject(WorkspaceStoreService);
   protected readonly boardStore = inject(BoardStore);
 
   getBoardsByWorkspace(workspaceId: string) {
-    return this.boardStore.allBoards().filter(board => board.workspaceId === workspaceId);
+    return this.boardStore.allBoards().filter((board) => board.workspaceId === workspaceId);
   }
 }

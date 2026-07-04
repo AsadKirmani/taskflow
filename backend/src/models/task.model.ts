@@ -1,5 +1,5 @@
-import { Schema, model, InferSchemaType } from 'mongoose';
-import { TASK_PRIORITIES } from '../shared/constants/enums';
+import { Schema, model, InferSchemaType } from "mongoose";
+import { TASK_PRIORITIES } from "../shared/constants/enums";
 
 const TaskLabelSchema = new Schema(
   {
@@ -7,15 +7,15 @@ const TaskLabelSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 40
+      maxlength: 40,
     },
     color: {
       type: String,
       required: true,
-      trim: true
-    }
+      trim: true,
+    },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const TaskChecklistItemSchema = new Schema(
@@ -24,14 +24,14 @@ const TaskChecklistItemSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 120
+      maxlength: 120,
     },
     isCompleted: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const TaskAttachmentSchema = new Schema(
@@ -39,131 +39,131 @@ const TaskAttachmentSchema = new Schema(
     filename: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
     url: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
     format: {
       type: String,
-      trim: true
+      trim: true,
     },
     uploadedAt: {
       type: Date,
-      default: Date.now
-    }
+      default: Date.now,
+    },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const TaskSchema = new Schema(
   {
     workspaceId: {
       type: Schema.Types.ObjectId,
-      ref: 'Workspace',
+      ref: "Workspace",
       required: true,
-      index: true
+      index: true,
     },
     boardId: {
       type: Schema.Types.ObjectId,
-      ref: 'Board',
+      ref: "Board",
       required: true,
-      index: true
+      index: true,
     },
     columnId: {
       type: Schema.Types.ObjectId,
-      ref: 'Column',
+      ref: "Column",
       required: true,
-      index: true
+      index: true,
     },
     title: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 200
+      maxlength: 200,
     },
     description: {
       type: String,
-      default: ''
+      default: "",
     },
     assigneeIds: {
       type: [Schema.Types.ObjectId],
-      ref: 'User',
-      default: []
+      ref: "User",
+      default: [],
     },
     reporterId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
+      ref: "User",
+      required: true,
     },
     startDate: {
       type: Date,
-      default: null
+      default: null,
     },
     dueDate: {
       type: Date,
       default: null,
-      index: true
+      index: true,
     },
     priority: {
       type: String,
       enum: TASK_PRIORITIES,
-      default: 'medium',
-      index: true
+      default: "medium",
+      index: true,
     },
     labels: {
       type: [TaskLabelSchema],
-      default: []
+      default: [],
     },
     checklist: {
       type: [TaskChecklistItemSchema],
-      default: []
+      default: [],
     },
     coverImageUrl: {
       type: String,
-      default: null
+      default: null,
     },
     attachments: {
       type: [TaskAttachmentSchema],
-      default: []
+      default: [],
     },
     attachmentCount: {
       type: Number,
-      default: 0
+      default: 0,
     },
     commentCount: {
       type: Number,
-      default: 0
+      default: 0,
     },
     isCompleted: {
       type: Boolean,
-      default: false
+      default: false,
     },
     completedAt: {
       type: Date,
-      default: null
+      default: null,
     },
     archived: {
       type: Boolean,
       default: false,
-      index: true
+      index: true,
     },
     position: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   {
     timestamps: true,
-    versionKey: false
-  }
+    versionKey: false,
+  },
 );
 
-TaskSchema.index({ title: 'text', description: 'text' });
+TaskSchema.index({ title: "text", description: "text" });
 TaskSchema.index({ boardId: 1, columnId: 1 });
 TaskSchema.index({ assigneeIds: 1 });
 
 export type TaskDocument = InferSchemaType<typeof TaskSchema>;
-export const TaskModel = model('Task', TaskSchema);
+export const TaskModel = model("Task", TaskSchema);

@@ -1,35 +1,35 @@
 export const PERMISSION = {
-  WORKSPACE_CREATE: 'workspace:create',
-  WORKSPACE_VIEW: 'workspace:view',
-  WORKSPACE_DELETE: 'workspace:delete',
-  WORKSPACE_EDIT: 'workspace:edit',
+  WORKSPACE_CREATE: "workspace:create",
+  WORKSPACE_VIEW: "workspace:view",
+  WORKSPACE_DELETE: "workspace:delete",
+  WORKSPACE_EDIT: "workspace:edit",
 
-  BOARD_CREATE: 'board:create',
-  BOARD_DELETE: 'board:delete',
-  BOARD_EDIT: 'board:edit',
-  BOARD_VIEW: 'board:view',
+  BOARD_CREATE: "board:create",
+  BOARD_DELETE: "board:delete",
+  BOARD_EDIT: "board:edit",
+  BOARD_VIEW: "board:view",
 
-  COLUMN_CREATE: 'column:create',
-  COLUMN_EDIT: 'column:edit',
-  COLUMN_MOVE: 'column:move',
-  COLUMN_DELETE: 'column:delete',
-  COLUMN_VIEW: 'column:view',
+  COLUMN_CREATE: "column:create",
+  COLUMN_EDIT: "column:edit",
+  COLUMN_MOVE: "column:move",
+  COLUMN_DELETE: "column:delete",
+  COLUMN_VIEW: "column:view",
 
-  TASK_CREATE: 'task:create',
-  TASK_EDIT: 'task:edit',
-  TASK_MOVE: 'task:move',
-  TASK_DELETE: 'task:delete',
-  TASK_VIEW: 'task:view',
+  TASK_CREATE: "task:create",
+  TASK_EDIT: "task:edit",
+  TASK_MOVE: "task:move",
+  TASK_DELETE: "task:delete",
+  TASK_VIEW: "task:view",
 
-  COMMENT_CREATE: 'comment:create',
-  COMMENT_EDIT: 'comment:edit',
-  COMMENT_DELETE: 'comment:delete',
+  COMMENT_CREATE: "comment:create",
+  COMMENT_EDIT: "comment:edit",
+  COMMENT_DELETE: "comment:delete",
 
-  MEMBER_INVITE: 'member:invite',
-  MEMBER_REMOVE: 'member:remove',
-  MEMBER_ROLE_CHANGE: 'member:role_change',
+  MEMBER_INVITE: "member:invite",
+  MEMBER_REMOVE: "member:remove",
+  MEMBER_ROLE_CHANGE: "member:role_change",
 
-  ACTIVITY_LOG_VIEW: 'activity_log:view'
+  ACTIVITY_LOG_VIEW: "activity_log:view",
 } as const;
 
 export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
@@ -55,9 +55,9 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSION.COMMENT_CREATE,
     PERMISSION.COMMENT_EDIT,
     PERMISSION.COMMENT_DELETE,
-    PERMISSION.ACTIVITY_LOG_VIEW
+    PERMISSION.ACTIVITY_LOG_VIEW,
   ],
-  
+
   MEMBER: [
     PERMISSION.WORKSPACE_VIEW,
     PERMISSION.BOARD_VIEW,
@@ -70,14 +70,14 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSION.COMMENT_EDIT,
     PERMISSION.ACTIVITY_LOG_VIEW,
   ],
-  
+
   GUEST: [
     PERMISSION.BOARD_VIEW,
     PERMISSION.COLUMN_VIEW,
     PERMISSION.TASK_VIEW,
     PERMISSION.ACTIVITY_LOG_VIEW,
-    PERMISSION.COMMENT_CREATE
-  ]
+    PERMISSION.COMMENT_CREATE,
+  ],
 };
 
 export type Permission = (typeof PERMISSION)[keyof typeof PERMISSION];

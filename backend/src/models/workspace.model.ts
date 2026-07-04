@@ -1,5 +1,5 @@
-import { Schema, model, InferSchemaType, Types } from 'mongoose';
-import { BOARD_VISIBILITY } from '../shared/constants/enums';
+import { Schema, model, InferSchemaType, Types } from "mongoose";
+import { BOARD_VISIBILITY } from "../shared/constants/enums";
 
 const WorkspaceSchema = new Schema(
   {
@@ -7,50 +7,49 @@ const WorkspaceSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 120
+      maxlength: 120,
     },
     slug: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
-      trim: true
+      trim: true,
     },
     description: {
       type: String,
-      default: ''
+      default: "",
     },
     ownerId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
-      index: true
+      index: true,
     },
     settings: {
       allowMemberInvites: {
         type: Boolean,
-        default: false
+        default: false,
       },
       allowBoardCreationByMembers: {
         type: Boolean,
-        default: false
+        default: false,
       },
       defaultBoardVisibility: {
         type: String,
         enum: BOARD_VISIBILITY,
-        default: 'workspace'
-      }
-    }
+        default: "workspace",
+      },
+    },
   },
   {
     timestamps: true,
-    versionKey: false
-  }
+    versionKey: false,
+  },
 );
-
 
 export type WorkspaceDocument = InferSchemaType<typeof WorkspaceSchema> & {
   _id: Types.ObjectId;
 };
 
-export const WorkspaceModel = model('Workspace', WorkspaceSchema);
+export const WorkspaceModel = model("Workspace", WorkspaceSchema);

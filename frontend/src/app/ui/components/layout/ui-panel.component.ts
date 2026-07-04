@@ -7,6 +7,6 @@ import { Component } from '@angular/core';
     <div class="table-body bg-base-100 rounded-box border border-base-300 overflow-hidden">
       <ng-content></ng-content>
     </div>
-  `
+  `,
 })
 export class UiPanelComponent {}

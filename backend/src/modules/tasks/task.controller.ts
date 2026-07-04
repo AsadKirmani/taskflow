@@ -7,13 +7,13 @@ import { boardService } from "../boards/board.service";
 import { redisClient } from "../../config/redis";
 
 const parseCsv = (value: unknown): string[] => {
-  if (typeof value !== 'string') {
+  if (typeof value !== "string") {
     return [];
   }
 
   return value
-    .split(',')
-    .map(item => item.trim())
+    .split(",")
+    .map((item) => item.trim())
     .filter(Boolean);
 };
 
@@ -29,12 +29,16 @@ export const taskController = {
     const userId = req.auth!.userId;
     const board = await boardService.getBoardById(userId, boardId);
     if (!board || board.workspaceId.toString() !== workspaceId) {
-      throw new AppError("Invalid Board or Workspace combination", 400, "BAD_REQUEST");
+      throw new AppError(
+        "Invalid Board or Workspace combination",
+        400,
+        "BAD_REQUEST",
+      );
     }
     await PermissionService.ensureTaskPermission(
       userId,
       { workspaceId },
-      PERMISSION.TASK_CREATE
+      PERMISSION.TASK_CREATE,
     );
     const newTask = await taskService.createTask(
       title,
@@ -44,47 +48,56 @@ export const taskController = {
       workspaceId,
       userId,
     );
-    await redisClient.del(`board:${boardId}:detail`); // Invalidate the cache for this board's detail
+    await redisClient.del(`board:${boardId}:detail`);
     res.status(201).json({ success: true, data: newTask });
   },
   async getTasksInBoard(req: Request, res: Response) {
     const { boardId } = req.params as { boardId: string };
 
-    const dueType = typeof req.query.dueType === 'string' ? req.query.dueType : 'all';
+    const dueType =
+      typeof req.query.dueType === "string" ? req.query.dueType : "all";
     const memberScope =
-      typeof req.query.memberScope === 'string' ? req.query.memberScope : 'all';
+      typeof req.query.memberScope === "string" ? req.query.memberScope : "all";
     const completion =
-      typeof req.query.completion === 'string' ? req.query.completion : 'all';
-      const userId = req.auth!.userId;
+      typeof req.query.completion === "string" ? req.query.completion : "all";
+    const userId = req.auth!.userId;
     const board = await boardService.getBoardById(userId, boardId);
     if (!board) {
       throw new AppError("Board not found", 404, "NOT_FOUND");
     }
     const tasks = await taskService.getTasksInBoard(boardId, {
-      search: typeof req.query.search === 'string' ? req.query.search : '',
+      search: typeof req.query.search === "string" ? req.query.search : "",
       priorities: parseCsv(req.query.priorities),
       assigneeIds: parseCsv(req.query.assigneeIds),
       labels: parseCsv(req.query.labels),
       activity: parseCsv(req.query.activity) as Array<
-        'recentlyupdated' | 'recentlycreated' | 'activeinlastweek' | 'activeinlastmonth'
+        | "recentlyupdated"
+        | "recentlycreated"
+        | "activeinlastweek"
+        | "activeinlastmonth"
       >,
       currentUserId: req.auth!.userId,
-      memberScope: memberScope === 'no_members' || memberScope === 'me' ? memberScope : 'all',
+      memberScope:
+        memberScope === "no_members" || memberScope === "me"
+          ? memberScope
+          : "all",
       completion:
-        completion === 'completed' || completion === 'incomplete' ? completion : 'all',
+        completion === "completed" || completion === "incomplete"
+          ? completion
+          : "all",
       dueType:
-        dueType === 'none' ||
-        dueType === 'overdue' ||
-        dueType === 'today' ||
-        dueType === 'this_week'
+        dueType === "none" ||
+        dueType === "overdue" ||
+        dueType === "today" ||
+        dueType === "this_week"
           ? dueType
-          : 'all'
+          : "all",
     });
-      await PermissionService.ensureTaskPermission(
-        userId,
-        { workspaceId: board.workspaceId.toString() },
-        PERMISSION.TASK_VIEW
-      );
+    await PermissionService.ensureTaskPermission(
+      userId,
+      { workspaceId: board.workspaceId.toString() },
+      PERMISSION.TASK_VIEW,
+    );
     res.json({ success: true, data: { items: tasks } });
   },
   async getTaskById(req: Request, res: Response) {
@@ -97,21 +110,32 @@ export const taskController = {
     await PermissionService.ensureTaskPermission(
       userId,
       { workspaceId: task.workspaceId.toString() },
-      PERMISSION.TASK_VIEW
+      PERMISSION.TASK_VIEW,
     );
     res.json({ success: true, data: { task } });
   },
   async updateTask(req: Request, res: Response) {
     const { taskId } = req.params as { taskId: string };
-    const { title, description, isCompleted, labels, checklist, dueDate, startDate, priority,  archived, assigneeIds  } = req.body as {
-        title?: string;
-        description?: string;
+    const {
+      title,
+      description,
+      isCompleted,
+      labels,
+      checklist,
+      dueDate,
+      startDate,
+      priority,
+      archived,
+      assigneeIds,
+    } = req.body as {
+      title?: string;
+      description?: string;
       isCompleted?: boolean;
       labels?: string[];
       checklist?: string[];
       dueDate?: string | null;
       startDate?: string | null;
-      priority?: 'low' | 'medium' | 'high' | 'urgent';
+      priority?: "low" | "medium" | "high" | "urgent";
       archived?: boolean;
       assigneeIds?: string[];
     };
@@ -124,16 +148,16 @@ export const taskController = {
       checklist?: string[];
       dueDate?: Date | null;
       startDate?: Date | null;
-      priority?: 'low' | 'medium' | 'high' | 'urgent';
+      priority?: "low" | "medium" | "high" | "urgent";
       archived?: boolean;
       assigneeIds?: string[];
     } = {};
 
-    if (typeof title === 'string') {
+    if (typeof title === "string") {
       updatePayload.title = title;
     }
 
-    if (typeof description === 'string') {
+    if (typeof description === "string") {
       updatePayload.description = description;
     }
 
@@ -145,24 +169,24 @@ export const taskController = {
       updatePayload.checklist = checklist;
     }
 
-    if (typeof dueDate === 'string' || dueDate === null) {
+    if (typeof dueDate === "string" || dueDate === null) {
       updatePayload.dueDate = dueDate ? new Date(dueDate) : null;
     }
 
-    if (typeof startDate === 'string' || startDate === null) {
+    if (typeof startDate === "string" || startDate === null) {
       updatePayload.startDate = startDate ? new Date(startDate) : null;
     }
 
-    if (typeof priority === 'string') {
+    if (typeof priority === "string") {
       updatePayload.priority = priority;
     }
-    if (typeof archived === 'boolean') {
+    if (typeof archived === "boolean") {
       updatePayload.archived = archived;
     }
     if (Array.isArray(assigneeIds)) {
       updatePayload.assigneeIds = assigneeIds;
     }
-    if (typeof isCompleted === 'boolean') {
+    if (typeof isCompleted === "boolean") {
       updatePayload.isCompleted = isCompleted;
       updatePayload.completedAt = isCompleted ? new Date() : null;
     }
@@ -174,19 +198,23 @@ export const taskController = {
     await PermissionService.ensureTaskPermission(
       userId,
       { workspaceId: task.workspaceId.toString() },
-      PERMISSION.TASK_EDIT
+      PERMISSION.TASK_EDIT,
     );
 
-    const updatedTask = await taskService.updateTask(taskId, updatePayload, req.auth!.userId);
-    await redisClient.del(`board:${task.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
+    const updatedTask = await taskService.updateTask(
+      taskId,
+      updatePayload,
+      req.auth!.userId,
+    );
+    await redisClient.del(`board:${task.boardId.toString()}:detail`);
     res.json({ success: true, data: updatedTask });
   },
   async moveTask(req: Request, res: Response) {
     const { taskId } = req.params as { taskId: string };
     const { sourceColumnId, targetColumnId, targetIndex } = req.body as {
-        sourceColumnId: string;
-        targetColumnId: string;
-        targetIndex: number;
+      sourceColumnId: string;
+      targetColumnId: string;
+      targetIndex: number;
     };
     const userId = req.auth!.userId;
     const task = await taskService.getTaskById(taskId);
@@ -196,10 +224,16 @@ export const taskController = {
     await PermissionService.ensureTaskPermission(
       userId,
       { workspaceId: task.workspaceId.toString() },
-      PERMISSION.TASK_EDIT
+      PERMISSION.TASK_EDIT,
     );
-    await taskService.moveTask(taskId, sourceColumnId, targetColumnId, targetIndex, userId);
-    await redisClient.del(`board:${task.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
+    await taskService.moveTask(
+      taskId,
+      sourceColumnId,
+      targetColumnId,
+      targetIndex,
+      userId,
+    );
+    await redisClient.del(`board:${task.boardId.toString()}:detail`);
     res.json({ success: true, message: "Task moved successfully", data: null });
   },
   async deleteTask(req: Request, res: Response) {
@@ -212,11 +246,15 @@ export const taskController = {
     await PermissionService.ensureTaskPermission(
       userId,
       { workspaceId: task.workspaceId.toString() },
-      PERMISSION.TASK_DELETE
+      PERMISSION.TASK_DELETE,
     );
     await taskService.deleteTask(taskId, userId);
-    await redisClient.del(`board:${task.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
-    res.json({ success: true, message: "Task deleted successfully", data: null });
+    await redisClient.del(`board:${task.boardId.toString()}:detail`);
+    res.json({
+      success: true,
+      message: "Task deleted successfully",
+      data: null,
+    });
   },
   async addAttachment(req: Request, res: Response) {
     const { taskId } = req.params as { taskId: string };
@@ -228,15 +266,23 @@ export const taskController = {
     await PermissionService.ensureTaskPermission(
       userId,
       { workspaceId: task.workspaceId.toString() },
-      PERMISSION.TASK_EDIT
+      PERMISSION.TASK_EDIT,
     );
     const attachment = req.file;
     if (!attachment) {
       throw new AppError("No attachment provided", 400, "BAD_REQUEST");
     }
-    const newAttachment = await taskService.addAttachment(taskId, attachment, userId);
-    await redisClient.del(`board:${task.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
-    res.json({ success: true, message: "Attachment added successfully", data: newAttachment });
+    const newAttachment = await taskService.addAttachment(
+      taskId,
+      attachment,
+      userId,
+    );
+    await redisClient.del(`board:${task.boardId.toString()}:detail`);
+    res.json({
+      success: true,
+      message: "Attachment added successfully",
+      data: newAttachment,
+    });
   },
   async removeAttachment(req: Request, res: Response) {
     const { taskId } = req.params as { taskId: string };
@@ -249,10 +295,17 @@ export const taskController = {
     await PermissionService.ensureTaskPermission(
       userId,
       { workspaceId: task.workspaceId.toString() },
-      PERMISSION.TASK_EDIT
+      PERMISSION.TASK_EDIT,
     );
-    const updatedTask = await taskService.removeAttachment(taskId, attachmentUrl);
-    await redisClient.del(`board:${task.boardId.toString()}:detail`); // Invalidate the cache for this board's detail
-    res.json({ success: true, message: "Attachment removed successfully", data: updatedTask });
-  }
+    const updatedTask = await taskService.removeAttachment(
+      taskId,
+      attachmentUrl,
+    );
+    await redisClient.del(`board:${task.boardId.toString()}:detail`);
+    res.json({
+      success: true,
+      message: "Attachment removed successfully",
+      data: updatedTask,
+    });
+  },
 };

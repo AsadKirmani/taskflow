@@ -4,6 +4,6 @@ import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.co
 export const DASHBOARD_ROUTES: Routes = [
   {
     path: '',
-    component: DashboardPageComponent
-  }
+    component: DashboardPageComponent,
+  },
 ];

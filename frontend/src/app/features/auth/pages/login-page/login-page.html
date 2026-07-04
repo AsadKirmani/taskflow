@@ -4,7 +4,9 @@
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="mb-5">
-        <label for="email" class="block mb-1.5 text-sm font-semibold text-base-content/90">Your email</label>
+        <label for="email" class="block mb-1.5 text-sm font-semibold text-base-content/90"
+          >Your email</label
+        >
         <input
           type="email"
           id="email"
@@ -14,9 +16,11 @@
           placeholder="name@email.com"
         />
       </div>
-      
+
       <div class="mb-5">
-        <label for="password" class="block mb-1.5 text-sm font-semibold text-base-content/90">Your password</label>
+        <label for="password" class="block mb-1.5 text-sm font-semibold text-base-content/90"
+          >Your password</label
+        >
         <input
           type="password"
           id="password"
@@ -25,7 +29,7 @@
           placeholder="••••••••"
         />
       </div>
-      
+
       <label for="remember" class="flex items-center mb-6 cursor-pointer">
         <input
           id="remember"
@@ -35,10 +39,14 @@
         />
         <p class="ms-2 text-sm font-medium text-base-content select-none">
           I agree with the
-          <a routerLink="/terms" class="text-primary hover:text-primary/80 hover:underline transition-colors">terms and conditions</a>.
+          <a
+            routerLink="/terms"
+            class="text-primary hover:text-primary/80 hover:underline transition-colors"
+            >terms and conditions</a
+          >.
         </p>
       </label>
-      
+
       <button
         type="submit"
         class="w-full p-field rounded-field bg-primary text-primary-content font-bold cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 border-none"
@@ -49,7 +57,11 @@
 
     <p class="mt-6 text-sm text-center text-base-content/70">
       Don’t have an account?
-      <a routerLink="/auth/register" class="text-primary font-semibold hover:underline transition-colors">Register</a>
+      <a
+        routerLink="/auth/register"
+        class="text-primary font-semibold hover:underline transition-colors"
+        >Register</a
+      >
     </p>
   </div>
 </section>

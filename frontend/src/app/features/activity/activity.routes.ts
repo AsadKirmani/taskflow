@@ -4,10 +4,10 @@ import { ActivityPageComponent } from './pages/activity-page/activity-page.compo
 export const ACTIVITY_ROUTES: Routes = [
   {
     path: '',
-    component: ActivityPageComponent
+    component: ActivityPageComponent,
   },
   {
     path: 'w/:workspaceId',
-    component: ActivityPageComponent
-  }
+    component: ActivityPageComponent,
+  },
 ];

@@ -1,49 +1,49 @@
-import { Schema, model, InferSchemaType } from 'mongoose';
+import { Schema, model, InferSchemaType } from "mongoose";
 
 const ColumnSchema = new Schema(
   {
     workspaceId: {
       type: Schema.Types.ObjectId,
-      ref: 'Workspace',
+      ref: "Workspace",
       required: true,
-      index: true
+      index: true,
     },
     boardId: {
       type: Schema.Types.ObjectId,
-      ref: 'Board',
+      ref: "Board",
       required: true,
-      index: true
+      index: true,
     },
     name: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 80
+      maxlength: 80,
     },
     position: {
       type: Number,
       required: true,
       default: 0,
       index: true,
-      auto: true
+      auto: true,
     },
     taskOrder: {
       type: [Schema.Types.ObjectId],
-      ref: 'Task',
-      default: []
+      ref: "Task",
+      default: [],
     },
     archived: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   {
     timestamps: true,
-    versionKey: false
-  }
+    versionKey: false,
+  },
 );
 
 ColumnSchema.index({ boardId: 1, position: 1 });
 
 export type ColumnDocument = InferSchemaType<typeof ColumnSchema>;
-export const ColumnModel = model('Column', ColumnSchema);
+export const ColumnModel = model("Column", ColumnSchema);

@@ -4,11 +4,9 @@ import { AuthStoreService } from '../../features/auth/data-access/auth-store.ser
 
 export function initializeApp(): () => Promise<any> {
   const authStore = inject(AuthStoreService);
-  const injector = inject(EnvironmentInjector); 
+  const injector = inject(EnvironmentInjector);
 
   return () => {
-    return runInInjectionContext(injector, () => 
-      firstValueFrom(authStore.initializeSession())
-    );
+    return runInInjectionContext(injector, () => firstValueFrom(authStore.initializeSession()));
   };
 }

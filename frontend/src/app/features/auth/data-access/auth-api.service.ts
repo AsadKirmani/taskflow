@@ -13,33 +13,37 @@ export class AuthApiService {
 
   login(payload: LoginRequest): Observable<ApiResponse<AuthSession>> {
     return this.http.post<ApiResponse<AuthSession>>(`${this.baseUrl}/login`, payload, {
-      withCredentials: true
+      withCredentials: true,
     });
   }
 
   register(payload: RegisterRequest): Observable<ApiResponse<AuthSession>> {
     return this.http.post<ApiResponse<AuthSession>>(`${this.baseUrl}/register`, payload, {
-      withCredentials: true
+      withCredentials: true,
     });
   }
 
   me(): Observable<ApiResponse<{ user: User }>> {
     return this.http.get<ApiResponse<{ user: User }>>(`${this.baseUrl}/me`, {
-      withCredentials: true
+      withCredentials: true,
     });
   }
 
-  refreshToken(): Observable<ApiResponse<{ accessToken: string, user: User }>> {
-    return this.http.post<ApiResponse<{ accessToken: string, user: User }>>(
+  refreshToken(): Observable<ApiResponse<{ accessToken: string; user: User }>> {
+    return this.http.post<ApiResponse<{ accessToken: string; user: User }>>(
       `${this.baseUrl}/refresh-token`,
       {},
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
   logout(): Observable<ApiResponse<null>> {
-    return this.http.post<ApiResponse<null>>(`${this.baseUrl}/logout`, {}, {
-      withCredentials: true
-    });
+    return this.http.post<ApiResponse<null>>(
+      `${this.baseUrl}/logout`,
+      {},
+      {
+        withCredentials: true,
+      },
+    );
   }
 }

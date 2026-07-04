@@ -29,19 +29,19 @@ export interface DashboardSummary {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DashboardApiService {
   constructor(private http: HttpClient) {}
   private readonly baseUrl = `${environment.apiUrl}`;
 
-  getDashboardSummary(workspaceId: string, userId: string): Observable<ApiResponse<DashboardSummary>> {
-    return this.http.get<ApiResponse<DashboardSummary>>(
-      `${this.baseUrl}/dashboard/summary`,
-      {
-        params: { workspaceId, userId },
-        withCredentials: true
-      }
-    );
+  getDashboardSummary(
+    workspaceId: string,
+    userId: string,
+  ): Observable<ApiResponse<DashboardSummary>> {
+    return this.http.get<ApiResponse<DashboardSummary>>(`${this.baseUrl}/dashboard/summary`, {
+      params: { workspaceId, userId },
+      withCredentials: true,
+    });
   }
 }

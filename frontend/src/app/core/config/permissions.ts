@@ -27,7 +27,7 @@ export const PERMISSION = {
   MEMBER_REMOVE: 'member:remove',
   MEMBER_ROLE_CHANGE: 'member:role_change',
 
-  ACTIVITY_LOG_VIEW: 'activity_log:view'
+  ACTIVITY_LOG_VIEW: 'activity_log:view',
 } as const;
 
 export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
@@ -52,9 +52,9 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSION.COMMENT_CREATE,
     PERMISSION.COMMENT_EDIT,
     PERMISSION.COMMENT_DELETE,
-    PERMISSION.ACTIVITY_LOG_VIEW
+    PERMISSION.ACTIVITY_LOG_VIEW,
   ],
-  
+
   MEMBER: [
     PERMISSION.BOARD_VIEW,
     PERMISSION.COLUMN_VIEW,
@@ -64,15 +64,15 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSION.TASK_VIEW,
     PERMISSION.COMMENT_CREATE,
     PERMISSION.COMMENT_EDIT,
-    PERMISSION.ACTIVITY_LOG_VIEW
+    PERMISSION.ACTIVITY_LOG_VIEW,
   ],
-  
+
   GUEST: [
     PERMISSION.BOARD_VIEW,
     PERMISSION.COLUMN_VIEW,
     PERMISSION.TASK_VIEW,
-    PERMISSION.COMMENT_CREATE
-  ]
+    PERMISSION.COMMENT_CREATE,
+  ],
 };
 
 export type Permission = (typeof PERMISSION)[keyof typeof PERMISSION];

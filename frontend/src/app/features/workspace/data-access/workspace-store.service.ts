@@ -17,18 +17,18 @@ export class WorkspaceStoreService {
   private readonly authStore = inject(AuthStoreService);
   private readonly workspaceApi = inject(WorkspaceApiService);
   private readonly permissionService = inject(PermissionService);
-  
+
   private readonly state = signal<WorkspaceState>({
     workspaces: [],
     activeWorkspaceId: null,
     loading: false,
     loaded: false,
-    error: null
+    error: null,
   });
 
   readonly workspaces = computed(() => this.state().workspaces);
-  readonly activeWorkspace = computed(() => 
-    this.state().workspaces.find(w => w.id === this.state().activeWorkspaceId) || null
+  readonly activeWorkspace = computed(
+    () => this.state().workspaces.find((w) => w.id === this.state().activeWorkspaceId) || null,
   );
   readonly isLoading = computed(() => this.state().loading);
   readonly isLoaded = computed(() => this.state().loaded);
@@ -45,27 +45,27 @@ export class WorkspaceStoreService {
         const userWorkspaces = response?.data?.workspaces || [];
 
         const mappedWorkspaces: Workspace[] = userWorkspaces.map((ws: any) => ({
-          id: ws.id,                           
-          name: ws.name,                      
-          slug: ws.name.toLowerCase().replace(/\s+/g, '-'), 
-          description: '', 
-          currentUserRole: ws.role
+          id: ws.id,
+          name: ws.name,
+          slug: ws.name.toLowerCase().replace(/\s+/g, '-'),
+          description: '',
+          currentUserRole: ws.role,
         }));
 
         this.updateState({
           workspaces: mappedWorkspaces,
           loading: false,
           loaded: true,
-          error: null
+          error: null,
         });
       },
       error: (error: any) => {
-        this.updateState({ 
-          loading: false, 
-          loaded: true, 
-          error: error?.message || 'Failed to load workspaces' 
+        this.updateState({
+          loading: false,
+          loaded: true,
+          error: error?.message || 'Failed to load workspaces',
         });
-      }
+      },
     });
   }
 
@@ -75,7 +75,6 @@ export class WorkspaceStoreService {
     if (workspaceId) {
       const selectedWs = this.activeWorkspace();
       if (selectedWs && selectedWs.currentUserRole) {
-
         this.permissionService.setRole(selectedWs.currentUserRole.toUpperCase() as WorkspaceRole);
       }
     } else {
@@ -84,6 +83,6 @@ export class WorkspaceStoreService {
   }
 
   private updateState(partial: Partial<WorkspaceState>): void {
-    this.state.update(current => ({ ...current, ...partial }));
+    this.state.update((current) => ({ ...current, ...partial }));
   }
 }

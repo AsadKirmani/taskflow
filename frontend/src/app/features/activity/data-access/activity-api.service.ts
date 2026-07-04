@@ -11,32 +11,38 @@ export class ActivityApiService {
   private readonly http = inject(HttpClient);
 
   getGlobalActivity(page = 1, limit = 30): Observable<ApiResponse<ActivityListData>> {
-    return this.http.get<ApiResponse<ActivityListData>>(
-      `${this.baseUrl}`,
-      {
-        params: { page, limit },
-        withCredentials: true
-      }
-    );
+    return this.http.get<ApiResponse<ActivityListData>>(`${this.baseUrl}`, {
+      params: { page, limit },
+      withCredentials: true,
+    });
   }
 
-  getWorkspaceActivity(workspaceId: string, page = 1, limit = 30): Observable<ApiResponse<ActivityListData>> {
+  getWorkspaceActivity(
+    workspaceId: string,
+    page = 1,
+    limit = 30,
+  ): Observable<ApiResponse<ActivityListData>> {
     return this.http.get<ApiResponse<ActivityListData>>(
       `${this.baseUrl}/workspaces/${workspaceId}/activity`,
       {
         params: { page, limit },
-        withCredentials: true
-      }
+        withCredentials: true,
+      },
     );
   }
 
-  getBoardActivity(workspaceId: string, boardId: string, page = 1, limit = 30): Observable<ApiResponse<ActivityListData>> {
+  getBoardActivity(
+    workspaceId: string,
+    boardId: string,
+    page = 1,
+    limit = 30,
+  ): Observable<ApiResponse<ActivityListData>> {
     return this.http.get<ApiResponse<ActivityListData>>(
       `${this.baseUrl}/workspaces/${workspaceId}/boards/${boardId}/activity`,
       {
         params: { page, limit },
-        withCredentials: true
-      }
+        withCredentials: true,
+      },
     );
   }
 }

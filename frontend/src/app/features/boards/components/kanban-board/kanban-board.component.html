@@ -61,11 +61,7 @@
       </div>
       <div class="flex items-center gap-1 sm:gap-2 flex-wrap justify-between">
         <ui-avatar-stack [users]="boardMembers()" [limit]="5"></ui-avatar-stack>
-        <ui-button
-          variant="icon"
-          size="icon"
-          (clicked)="toggleFilterView($event)"
-        >
+        <ui-button variant="icon" size="icon" (clicked)="toggleFilterView($event)">
           <svg lucideFunnel></svg>
         </ui-button>
 

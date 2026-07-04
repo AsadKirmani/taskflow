@@ -1,5 +1,5 @@
-import { Schema, model, InferSchemaType } from 'mongoose';
-import { THEMES } from '../shared/constants/enums';
+import { Schema, model, InferSchemaType } from "mongoose";
+import { THEMES } from "../shared/constants/enums";
 
 const UserSchema = new Schema(
   {
@@ -7,7 +7,7 @@ const UserSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 100
+      maxlength: 100,
     },
     email: {
       type: String,
@@ -15,50 +15,50 @@ const UserSchema = new Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      index: true
+      index: true,
     },
     passwordHash: {
       type: String,
       required: true,
-      select: false
+      select: false,
     },
     avatarUrl: {
       type: String,
-      default: null
+      default: null,
     },
     isActive: {
       type: Boolean,
-      default: true
+      default: true,
     },
     emailVerified: {
       type: Boolean,
-      default: false
+      default: false,
     },
     lastLoginAt: {
       type: Date,
-      default: null
+      default: null,
     },
     preferences: {
       theme: {
         type: String,
         enum: THEMES,
-        default: 'system'
+        default: "system",
       },
       timezone: {
         type: String,
-        default: 'UTC'
+        default: "UTC",
       },
       locale: {
         type: String,
-        default: 'en'
-      }
-    }
+        default: "en",
+      },
+    },
   },
   {
     timestamps: true,
-    versionKey: false
-  }
+    versionKey: false,
+  },
 );
 
 export type UserDocument = InferSchemaType<typeof UserSchema>;
-export const UserModel = model('User', UserSchema);
+export const UserModel = model("User", UserSchema);

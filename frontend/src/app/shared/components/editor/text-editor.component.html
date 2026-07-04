@@ -1,7 +1,7 @@
 <div
   class="bg-base-200 rounded-field border border-base-300 overflow-hidden focus-within:ring-2 focus-within:ring-base-content flex flex-col shadow-sm"
 >
-<!-- <tiptap-bubble-menu [editor]="descEditor">
+  <!-- <tiptap-bubble-menu [editor]="descEditor">
     <div
       class="flex items-center gap-1 bg-[#172b4d] p-1.5 rounded-lg shadow-xl border border-gray-700 text-white animate-in zoom-in-95 duration-150"
     >
@@ -70,7 +70,7 @@
       >
         <span class="font-bold">B</span>
       </ui-button>
-      
+
       <ui-button
         variant="ghost"
         size="sm"
@@ -80,7 +80,7 @@
       >
         <span class="italic">I</span>
       </ui-button>
-      
+
       <ui-button
         variant="ghost"
         size="sm"
@@ -95,11 +95,7 @@
     <div class="w-px h-4 bg-base-content/30 mx-1"></div>
 
     <div class="relative group">
-      <ui-button
-        variant="ghost"
-        size="sm"
-        title="Text Style & Headings"
-      >
+      <ui-button variant="ghost" size="sm" title="Text Style & Headings">
         <div class="flex items-center justify-between gap-1 min-w-[40px]">
           <div class="flex items-center justify-center w-6">
             @if (editor.isActive('heading', { level: 1 })) {
@@ -115,7 +111,7 @@
           <svg lucideChevronDown class="w-4 h-4"></svg>
         </div>
       </ui-button>
-      
+
       <div
         class="absolute left-0 mt-0 w-44 bg-base-100 border border-base-300 rounded-md shadow-lg hidden group-hover:flex flex-col py-1 z-50"
       >
@@ -157,11 +153,7 @@
     <div class="w-px h-4 bg-base-content/30 mx-1"></div>
 
     <div class="relative group">
-      <ui-button
-        variant="ghost"
-        size="sm"
-        title="Lists"
-      >
+      <ui-button variant="ghost" size="sm" title="Lists">
         <div class="flex items-center gap-1">
           <div class="flex items-center justify-center w-5">
             @if (editor.isActive('orderedList')) {
@@ -173,7 +165,7 @@
           <svg lucideChevronDown class="w-4 h-4"></svg>
         </div>
       </ui-button>
-      
+
       <div
         class="absolute left-0 mt-0 w-48 bg-base-100 border border-base-300 rounded-md shadow-lg hidden group-hover:flex flex-col py-1 z-50"
       >
@@ -208,7 +200,7 @@
       >
         Quote
       </ui-button>
-      
+
       <ui-button
         variant="ghost"
         size="sm"
@@ -217,11 +209,13 @@
       >
         Divider
       </ui-button>
-      
+
       <ui-button
         variant="ghost"
         size="sm"
-        (clicked)="editor.chain().focus().unsetAllMarks().run(); editor.chain().focus().clearNodes().run()"
+        (clicked)="
+          editor.chain().focus().unsetAllMarks().run(); editor.chain().focus().clearNodes().run()
+        "
         title="Clear All Formatting"
       >
         <span class="text-warning">Reset Format</span>
@@ -240,7 +234,7 @@
       >
         Undo
       </ui-button>
-      
+
       <ui-button
         variant="ghost"
         size="sm"

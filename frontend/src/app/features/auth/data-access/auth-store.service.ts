@@ -1,14 +1,6 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  Observable,
-  of,
-  tap,
-  catchError,
-  shareReplay,
-  throwError,
-  finalize,
-} from 'rxjs';
+import { Observable, of, tap, catchError, shareReplay, throwError, finalize } from 'rxjs';
 import { SessionState, LoginRequest, RegisterRequest } from '../../../core/models/auth.model';
 import { AuthApiService } from './auth-api.service';
 import { TokenService } from '../../../core/services/token.service';

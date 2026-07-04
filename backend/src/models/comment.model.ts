@@ -1,52 +1,52 @@
-import { Schema, model, InferSchemaType } from 'mongoose';
+import { Schema, model, InferSchemaType } from "mongoose";
 
 const CommentSchema = new Schema(
   {
     workspaceId: {
       type: Schema.Types.ObjectId,
-      ref: 'Workspace',
+      ref: "Workspace",
       required: true,
-      index: true
+      index: true,
     },
     boardId: {
       type: Schema.Types.ObjectId,
-      ref: 'Board',
+      ref: "Board",
       required: true,
-      index: true
+      index: true,
     },
     taskId: {
       type: Schema.Types.ObjectId,
-      ref: 'Task',
+      ref: "Task",
       required: true,
-      index: true
+      index: true,
     },
     author: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 255
+      maxlength: 255,
     },
     authorId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
+      ref: "User",
+      required: true,
     },
     content: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 5000
+      maxlength: 5000,
     },
     edited: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   {
     timestamps: true,
-    versionKey: false
-  }
+    versionKey: false,
+  },
 );
 
 export type CommentDocument = InferSchemaType<typeof CommentSchema>;
-export const CommentModel = model('Comment', CommentSchema);
+export const CommentModel = model("Comment", CommentSchema);

@@ -9,15 +9,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       const message =
-        error.error?.message ||
-        error.message ||
-        'Something went wrong. Please try again.';
+        error.error?.message || error.message || 'Something went wrong. Please try again.';
 
       if (!req.headers.has('x-skip-global-error')) {
         notificationService.error(message);
       }
 
       return throwError(() => error);
-    })
+    }),
   );
 };

@@ -28,62 +28,71 @@ export const SettingsStoreService = signalStore(
     loaded: computed(() => isLoaded()),
     profileData: computed(() => user()),
   })),
-  withMethods((store, api = inject(SettingsApiService), notification = inject(NotificationService), authStore = inject(AuthStoreService)) => ({
-    
-    async loadProfile(forceRefresh = false) {
-      if (!forceRefresh && store.loaded()) return;
-      patchState(store, { isLoading: true });
-      try {
-        const res = await firstValueFrom(api.getProfile());
-        patchState(store, { user: res.data.user, isLoading: false, isLoaded: true });
-      } catch (err) {
-        notification.error('Failed to load settings');
-        patchState(store, { isLoading: false, isLoaded: false });
-      }
-    },
-
-    async updateProfile(data: { name: string; email: string, avatarUrl: string }) {
-      patchState(store, { isSaving: true });
-      try {
-        await firstValueFrom(api.updateProfile(data));
-        patchState(store, { user: data, isSaving: false });
-        notification.success('Profile updated successfully!');
-      } catch (err) {
-        notification.error('Failed to update profile');
-        patchState(store, { isSaving: false });
-      }
-    },
-
-    async updatePassword(data: any) {
-      patchState(store, { isSaving: true });
-      try {
-        await firstValueFrom(api.updatePassword(data));
-        patchState(store, { isSaving: false });
-        notification.success('Password changed successfully!');
-        return true; // Form reset karne ke liye UI ko signal
-      } catch (err) {
-        notification.error('Failed to change password. Check your current password.');
-        patchState(store, { isSaving: false });
-        return false;
-      }
-    },
-    async uploadAvatar(file: File) {
-      patchState(store, { isSaving: true });
-      try {
-        const res = await firstValueFrom(api.uploadAvatar(file));
-        const updatedUser = res.data.user;
-        const currentUser = store.user();
-        if (currentUser) {
-          patchState(store, { user: { ...currentUser, avatarUrl: updatedUser.avatarUrl }, isSaving: false });
+  withMethods(
+    (
+      store,
+      api = inject(SettingsApiService),
+      notification = inject(NotificationService),
+      authStore = inject(AuthStoreService),
+    ) => ({
+      async loadProfile(forceRefresh = false) {
+        if (!forceRefresh && store.loaded()) return;
+        patchState(store, { isLoading: true });
+        try {
+          const res = await firstValueFrom(api.getProfile());
+          patchState(store, { user: res.data.user, isLoading: false, isLoaded: true });
+        } catch (err) {
+          notification.error('Failed to load settings');
+          patchState(store, { isLoading: false, isLoaded: false });
         }
-        authStore.updateUserProfile({ avatarUrl: updatedUser.avatarUrl });
-        notification.success('Avatar uploaded successfully!');
-        return updatedUser.avatarUrl;
-      } catch (err) {
-        notification.error('Failed to upload avatar.');
-        patchState(store, { isSaving: false });
-        return null;
-      }
-    }
-  }))
+      },
+
+      async updateProfile(data: { name: string; email: string; avatarUrl: string }) {
+        patchState(store, { isSaving: true });
+        try {
+          await firstValueFrom(api.updateProfile(data));
+          patchState(store, { user: data, isSaving: false });
+          notification.success('Profile updated successfully!');
+        } catch (err) {
+          notification.error('Failed to update profile');
+          patchState(store, { isSaving: false });
+        }
+      },
+
+      async updatePassword(data: any) {
+        patchState(store, { isSaving: true });
+        try {
+          await firstValueFrom(api.updatePassword(data));
+          patchState(store, { isSaving: false });
+          notification.success('Password changed successfully!');
+          return true;
+        } catch (err) {
+          notification.error('Failed to change password. Check your current password.');
+          patchState(store, { isSaving: false });
+          return false;
+        }
+      },
+      async uploadAvatar(file: File) {
+        patchState(store, { isSaving: true });
+        try {
+          const res = await firstValueFrom(api.uploadAvatar(file));
+          const updatedUser = res.data.user;
+          const currentUser = store.user();
+          if (currentUser) {
+            patchState(store, {
+              user: { ...currentUser, avatarUrl: updatedUser.avatarUrl },
+              isSaving: false,
+            });
+          }
+          authStore.updateUserProfile({ avatarUrl: updatedUser.avatarUrl });
+          notification.success('Avatar uploaded successfully!');
+          return updatedUser.avatarUrl;
+        } catch (err) {
+          notification.error('Failed to upload avatar.');
+          patchState(store, { isSaving: false });
+          return null;
+        }
+      },
+    }),
+  ),
 );

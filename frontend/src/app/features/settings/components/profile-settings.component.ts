@@ -9,7 +9,6 @@ import { SettingsStoreService } from '../data-access/settings-store.service';
   template: `
     <h2 class="text-lg font-semibold mb-4">Edit Profile</h2>
 
-    <!-- Avatar Section -->
     <div class="flex items-center gap-6 mb-6">
       <div class="w-20 h-20 rounded-full bg-base-300 overflow-hidden border border-base-300">
         @if (store.profileData()?.avatarUrl) {
@@ -97,7 +96,6 @@ export class ProfileSettingsComponent {
     effect(() => {
       const user = this.store.profileData();
       if (user) {
-        // avatarUrl ko bhi patchValue mein include kar diya
         this.profileForm.patchValue(
           {
             name: user.name,
@@ -121,7 +119,7 @@ export class ProfileSettingsComponent {
     if (file) {
       this.store.uploadAvatar(file).then((avatarUrl) => {
         if (avatarUrl) {
-          this.lastUpdated.set(Date.now()); // Avatar update hone ke baad lastUpdated ko update karo
+          this.lastUpdated.set(Date.now());
         }
       });
     }

@@ -122,7 +122,9 @@ export const authService = {
       userAgent: meta?.userAgent ?? null,
     });
     await authRepository.cleanupExpiredTokens(user._id.toString());
-    await UserModel.findByIdAndUpdate(user._id.toString(), { lastLoginAt: new Date() });
+    await UserModel.findByIdAndUpdate(user._id.toString(), {
+      lastLoginAt: new Date(),
+    });
     return {
       user: sanitizeUser(user),
       accessToken,
@@ -153,18 +155,34 @@ export const authService = {
       user.passwordHash,
     );
     if (!isPasswordValid) {
-      throw new AppError("Invalid current password", 401, "INVALID_CURRENT_PASSWORD");
+      throw new AppError(
+        "Invalid current password",
+        401,
+        "INVALID_CURRENT_PASSWORD",
+      );
     }
     if (await comparePassword(newPassword, user.passwordHash)) {
-  throw new AppError("New password cannot be the same as current password", 400, "SAME_PASSWORD");
-}
+      throw new AppError(
+        "New password cannot be the same as current password",
+        400,
+        "SAME_PASSWORD",
+      );
+    }
     const newPasswordHash = await hashPassword(newPassword);
-    const updatedUser = await authRepository.updateUserPassword(userId, newPasswordHash);
+    const updatedUser = await authRepository.updateUserPassword(
+      userId,
+      newPasswordHash,
+    );
     return sanitizeUser(updatedUser);
   },
   async updateProfile(
     userId: string,
-    data: { name?: string; email?: string, avatarUrl?: string, preferences?: any },
+    data: {
+      name?: string;
+      email?: string;
+      avatarUrl?: string;
+      preferences?: any;
+    },
   ) {
     const updatedUser = await authRepository.updateUserProfile(userId, data);
     return sanitizeUser(updatedUser);
@@ -188,9 +206,6 @@ export const authService = {
 
     let sessionData: any;
 
-    // =========================
-    // REDIS GET
-    // =========================
     const redisGetStart = Date.now();
 
     const cachedSession = await redisClient.get(cacheKey);
@@ -226,10 +241,6 @@ export const authService = {
       };
     }
 
-    // =========================
-    // TOKEN GENERATION
-    // =========================
-
     const tokenStart = Date.now();
 
     const newAccessToken = signAccessToken({
@@ -250,16 +261,14 @@ export const authService = {
 
     const ttlSeconds = 7 * 24 * 60 * 60;
 
-    // =========================
-    // REDIS + DB WRITES
-    // =========================
-
     const writeStart = Date.now();
 
     await Promise.all([
       redisClient.del(cacheKey),
 
-      redisClient.set(newCacheKey, JSON.stringify(sessionData), { ex: ttlSeconds }),
+      redisClient.set(newCacheKey, JSON.stringify(sessionData), {
+        ex: ttlSeconds,
+      }),
 
       authRepository.revokeRefreshToken(tokenHash, newRefreshTokenHash),
 
@@ -288,16 +297,21 @@ export const authService = {
     await authRepository.revokeAllUserRefreshTokens(userId);
   },
   async uploadAvatar(userId: string, avatar: Express.Multer.File) {
-    if(!avatar) {
+    if (!avatar) {
       throw new AppError("No avatar file provided", 400, "NO_AVATAR_FILE");
     }
-    const uploadResult = await uploadBufferToCloudinary(avatar.buffer, 'avatars', avatar.mimetype);
+    const uploadResult = await uploadBufferToCloudinary(
+      avatar.buffer,
+      "avatars",
+      avatar.mimetype,
+    );
     const avatarUrl = uploadResult.secure_url;
-    const updatedUser = await authRepository.updateUserProfile(userId, { avatarUrl });
+    const updatedUser = await authRepository.updateUserProfile(userId, {
+      avatarUrl,
+    });
     return sanitizeUser(updatedUser);
   },
-  }
-
+};
 
 function cryptoRandomId(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);

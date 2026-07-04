@@ -29,7 +29,7 @@ export interface ActivityListData {
 
 export function formatActivityAction(actionType: string): string {
   const safeAction = (actionType || '').trim().toLowerCase();
-  
+
   const actionMap: Record<string, string> = {
     workspace_created: 'created',
     workspace_updated: 'updated',
@@ -50,16 +50,12 @@ export function formatActivityAction(actionType: string): string {
     task_archived: 'archived',
     task_restored: 'restored',
     comment_created: 'commented on',
-    comment_updated: 'edited a comment on'
+    comment_updated: 'edited a comment on',
   };
 
   if (actionMap[safeAction]) {
     return actionMap[safeAction];
   }
 
-  return safeAction
-    .split('_')
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase(); 
+  return safeAction.split('_').filter(Boolean).join(' ').toLowerCase();
 }

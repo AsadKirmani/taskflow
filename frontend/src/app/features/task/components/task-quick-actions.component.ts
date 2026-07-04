@@ -19,29 +19,22 @@ import { CommonModule } from '@angular/common';
     ActionChecklistComponent,
     ActionAttachmentsComponent,
     ActionMembersComponent,
-    CustomDatepickerComponent
+    CustomDatepickerComponent,
   ],
   template: `
     <div class="flex flex-wrap gap-2">
-      <app-action-label
-        [labels]="appliedLabels()"
-        (labelToggled)="labelToggled.emit($event)"
-      >
+      <app-action-label [labels]="appliedLabels()" (labelToggled)="labelToggled.emit($event)">
       </app-action-label>
-      <app-action-checklist
-        (itemAdded)="checklistAdded.emit($event)"
-      ></app-action-checklist>
-      <app-custom-datepicker
-        (dateApplied)="dueDateChanged.emit($event)"
-      ></app-custom-datepicker>
-      
-      <app-action-members 
+      <app-action-checklist (itemAdded)="checklistAdded.emit($event)"></app-action-checklist>
+      <app-custom-datepicker (dateApplied)="dueDateChanged.emit($event)"></app-custom-datepicker>
+
+      <app-action-members
         [availableMembers]="availableMembers()"
         [currentUser]="currentUser()"
         [assignedMemberIds]="assignedMemberIds()"
         (memberToggled)="memberToggled.emit($event)"
       ></app-action-members>
-      
+
       <app-action-attachments (fileSelected)="fileSelected.emit($event)"></app-action-attachments>
     </div>
   `,
@@ -57,8 +50,4 @@ export class TaskQuickActionsComponent {
   task = input.required<Task>();
   appliedLabels = input<TaskLabel[]>([]);
   assignedMemberIds = input<string[]>([]);
-  // dueDate = input<string | null | undefined>(null);
-  //labelsClicked = output<void>();
- // checklistToggled = output<{ index: number, isCompleted: boolean }>();
- // checklistDeleted = output<number>();
 }

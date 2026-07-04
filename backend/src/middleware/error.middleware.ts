@@ -1,18 +1,18 @@
-import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../shared/errors/app-error';
+import { Request, Response, NextFunction } from "express";
+import { AppError } from "../shared/errors/app-error";
 
 export const errorMiddleware = (
   err: unknown,
   _req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ): void => {
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
       success: false,
       message: err.message,
       code: err.code,
-      errors: err.details ?? null
+      errors: err.details ?? null,
     });
     return;
   }
@@ -21,7 +21,7 @@ export const errorMiddleware = (
 
   res.status(500).json({
     success: false,
-    message: 'Internal server error',
-    code: 'INTERNAL_SERVER_ERROR'
+    message: "Internal server error",
+    code: "INTERNAL_SERVER_ERROR",
   });
 };

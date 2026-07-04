@@ -1,14 +1,14 @@
-import { Router } from 'express';
-import { dashboardController } from './dashboard.controller';
-import { authMiddleware } from '../../middleware/auth.middleware';
-import { asyncHandler } from '../../shared/utils/async-handler';
+import { Router } from "express";
+import { dashboardController } from "./dashboard.controller";
+import { authMiddleware } from "../../middleware/auth.middleware";
+import { asyncHandler } from "../../shared/utils/async-handler";
 
 const router = Router();
 
 router.get(
-  '/summary', 
+  "/summary",
   authMiddleware,
-  asyncHandler(dashboardController.getDashboardSummary)
+  asyncHandler(dashboardController.getDashboardSummary),
 );
 
 export default router;

@@ -1,65 +1,65 @@
-import { Schema, model, InferSchemaType } from 'mongoose';
-import { BOARD_VISIBILITY } from '../shared/constants/enums';
+import { Schema, model, InferSchemaType } from "mongoose";
+import { BOARD_VISIBILITY } from "../shared/constants/enums";
 
 const BoardSchema = new Schema(
   {
     workspaceId: {
       type: Schema.Types.ObjectId,
-      ref: 'Workspace',
+      ref: "Workspace",
       required: true,
-      index: true
+      index: true,
     },
     workSpaceName: {
       type: String,
       required: false,
       trim: true,
-      maxlength: 120
+      maxlength: 120,
     },
     name: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 120
+      maxlength: 120,
     },
     description: {
       type: String,
-      default: ''
+      default: "",
     },
     visibility: {
       type: String,
       enum: BOARD_VISIBILITY,
-      default: 'workspace'
+      default: "workspace",
     },
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
-      index: true
+      index: true,
     },
     memberIds: {
       type: [Schema.Types.ObjectId],
-      ref: 'User',
+      ref: "User",
       default: [],
-      index: true
+      index: true,
     },
     columnOrder: {
       type: [Schema.Types.ObjectId],
-      ref: 'Column',
-      default: []
+      ref: "Column",
+      default: [],
     },
     archived: {
       type: Boolean,
       default: false,
-      index: true
-    }
+      index: true,
+    },
   },
   {
     timestamps: true,
-    versionKey: false
-  }
+    versionKey: false,
+  },
 );
 
 BoardSchema.index({ workspaceId: 1, archived: 1 });
 
 export type BoardDocument = InferSchemaType<typeof BoardSchema>;
-export const BoardModel = model('Board', BoardSchema);
+export const BoardModel = model("Board", BoardSchema);

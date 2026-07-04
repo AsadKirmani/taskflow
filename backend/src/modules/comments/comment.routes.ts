@@ -1,32 +1,36 @@
-import { Router } from 'express';
-import { validate } from '../../middleware/validation.middleware';
-import { authMiddleware } from '../../middleware/auth.middleware';
-import { createCommentDto, updateCommentDto } from './comment.dto';
-import { asyncHandler } from '../../shared/utils/async-handler';
-import { commentController } from './comment.controller';
+import { Router } from "express";
+import { validate } from "../../middleware/validation.middleware";
+import { authMiddleware } from "../../middleware/auth.middleware";
+import { createCommentDto, updateCommentDto } from "./comment.dto";
+import { asyncHandler } from "../../shared/utils/async-handler";
+import { commentController } from "./comment.controller";
 
 const router = Router();
 
-router.get('/tasks/:taskId/comments', authMiddleware, asyncHandler(commentController.getCommentsByTaskId));
+router.get(
+  "/tasks/:taskId/comments",
+  authMiddleware,
+  asyncHandler(commentController.getCommentsByTaskId),
+);
 
 router.post(
-  '/tasks/:taskId/comments',
+  "/tasks/:taskId/comments",
   authMiddleware,
   validate(createCommentDto),
-  asyncHandler(commentController.createComment)
+  asyncHandler(commentController.createComment),
 );
 
 router.patch(
-  '/comments/:commentId',
+  "/comments/:commentId",
   authMiddleware,
   validate(updateCommentDto),
-  asyncHandler(commentController.updateComment)
+  asyncHandler(commentController.updateComment),
 );
 
 router.delete(
-  '/comments/:commentId',
+  "/comments/:commentId",
   authMiddleware,
-  asyncHandler(commentController.deleteComment)
+  asyncHandler(commentController.deleteComment),
 );
 
 export default router;

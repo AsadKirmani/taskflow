@@ -20,7 +20,6 @@ export const archiveController = {
       userId: req.auth!.userId,
     });
 
-    // 🚀 FIX: Proper error handling
     if (!result) {
       throw new AppError(
         "Entity not found or already archived",
@@ -57,7 +56,6 @@ export const archiveController = {
       userId: req.auth!.userId,
     });
 
-    // 🚀 FIX: Proper error handling
     if (!updated) {
       throw new AppError(
         "Entity not found or already restored",
@@ -83,10 +81,7 @@ export const archiveController = {
   async listArchived(req: Request, res: Response) {
     const { workspaceId } = req.params as { workspaceId: string };
     const entityType = req.query.entityType as
-      | "board"
-      | "column"
-      | "task"
-      | undefined;
+      "board" | "column" | "task" | undefined;
     const includeRestored = req.query.includeRestored === "true";
 
     const items = await archiveService.listArchived(workspaceId, {

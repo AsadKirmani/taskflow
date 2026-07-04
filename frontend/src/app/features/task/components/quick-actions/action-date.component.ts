@@ -9,19 +9,30 @@ import { APP_ICONS } from '../../../../core/icons/lucide-icons';
   imports: [...APP_ICONS],
   template: `
     <div class="relative overflow-hidden group w-full">
-      <input #datePicker type="date" [value]="currentDate" (change)="onChange($event)" class="absolute opacity-0 w-0 h-0 pointer-events-none" />
-      <button (click)="openPicker(datePicker)" class="flex items-center gap-1.5 bg-base-100 group-hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300 w-full">
+      <input
+        #datePicker
+        type="date"
+        [value]="currentDate"
+        (change)="onChange($event)"
+        class="absolute opacity-0 w-0 h-0 pointer-events-none"
+      />
+      <button
+        (click)="openPicker(datePicker)"
+        class="flex items-center gap-1.5 bg-base-100 group-hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300 w-full"
+      >
         <svg lucideCalendar class="w-4 h-4"></svg> Dates
       </button>
     </div>
-  `
+  `,
 })
 export class ActionDatesComponent {
   dateSelected = output<TaskDates>();
   task = input.required<Task>();
 
   get currentDate(): string {
-    return this.task().dueDate ? new Date(this.task().dueDate ?? Date.now()).toISOString().split('T')[0] : '';
+    return this.task().dueDate
+      ? new Date(this.task().dueDate ?? Date.now()).toISOString().split('T')[0]
+      : '';
   }
 
   openPicker(el: HTMLInputElement) {
@@ -41,5 +52,3 @@ export class ActionDatesComponent {
     }
   }
 }
-// startTime: this.task().startTime || null,
-// endTime: this.task().endTime || null

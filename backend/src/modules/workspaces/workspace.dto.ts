@@ -1,9 +1,9 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const createWorkspaceDto = z.object({
   name: z.string().min(2).max(120),
   slug: z.string().min(2).max(120),
-  description: z.string().max(500).optional().default('')
+  description: z.string().max(500).optional().default(""),
 });
 
 export const updateWorkspaceDto = z.object({
@@ -13,21 +13,23 @@ export const updateWorkspaceDto = z.object({
     .object({
       allowMemberInvites: z.boolean().optional(),
       allowBoardCreationByMembers: z.boolean().optional(),
-      defaultBoardVisibility: z.enum(['private', 'workspace']).optional()
+      defaultBoardVisibility: z.enum(["private", "workspace"]).optional(),
     })
-    .optional()
+    .optional(),
 });
 
 export const inviteWorkspaceMemberDto = z.object({
   email: z.string().email(),
-  role: z.enum(['ADMIN', 'MEMBER', 'GUEST'])
+  role: z.enum(["ADMIN", "MEMBER", "GUEST"]),
 });
 
 export const updateWorkspaceMemberRoleDto = z.object({
-  role: z.enum(['ADMIN', 'MEMBER', 'GUEST'])
+  role: z.enum(["ADMIN", "MEMBER", "GUEST"]),
 });
 
 export type CreateWorkspaceDto = z.infer<typeof createWorkspaceDto>;
 export type UpdateWorkspaceDto = z.infer<typeof updateWorkspaceDto>;
 export type InviteWorkspaceMemberDto = z.infer<typeof inviteWorkspaceMemberDto>;
-export type UpdateWorkspaceMemberRoleDto = z.infer<typeof updateWorkspaceMemberRoleDto>;
+export type UpdateWorkspaceMemberRoleDto = z.infer<
+  typeof updateWorkspaceMemberRoleDto
+>;

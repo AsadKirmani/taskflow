@@ -9,13 +9,12 @@ export const appRoutes: Routes = [
   {
     path: 'auth',
     canActivate: [guestGuard],
-    loadChildren: () =>
-      import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
+    loadChildren: () => import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   {
     path: '',
     component: LandingPageComponent,
-    canActivate: [guestGuard]
+    canActivate: [guestGuard],
   },
   {
     path: '',
@@ -25,51 +24,49 @@ export const appRoutes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'dashboard'
+        redirectTo: 'dashboard',
       },
       {
         path: 'dashboard',
         loadChildren: () =>
-          import('./features/dashboard/dashboard.routes').then(m => m.DASHBOARD_ROUTES)
+          import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
       },
       {
         path: 'workspaces',
         loadChildren: () =>
-          import('./features/workspace/workspace.routes').then(m => m.WORKSPACE_ROUTES)
+          import('./features/workspace/workspace.routes').then((m) => m.WORKSPACE_ROUTES),
       },
       {
         path: 'boards',
-        loadChildren: () =>
-          import('./features/boards/boards.routes').then(m => m.BOARD_ROUTES)
+        loadChildren: () => import('./features/boards/boards.routes').then((m) => m.BOARD_ROUTES),
       },
       {
         path: 'w/:workspaceId/boards',
-        loadChildren: () =>
-          import('./features/boards/boards.routes').then(m => m.BOARD_ROUTES)
+        loadChildren: () => import('./features/boards/boards.routes').then((m) => m.BOARD_ROUTES),
       },
       {
         path: 'activity',
         loadChildren: () =>
-          import('./features/activity/activity.routes').then(m => m.ACTIVITY_ROUTES)
+          import('./features/activity/activity.routes').then((m) => m.ACTIVITY_ROUTES),
       },
       {
         path: 'w/:workspaceId/activity',
         loadChildren: () =>
-          import('./features/activity/activity.routes').then(m => m.ACTIVITY_ROUTES)
+          import('./features/activity/activity.routes').then((m) => m.ACTIVITY_ROUTES),
       },
       {
         path: 'settings',
         loadChildren: () =>
-          import('./features/settings/settings.routes').then(m => m.SETTINGS_ROUTES)
+          import('./features/settings/settings.routes').then((m) => m.SETTINGS_ROUTES),
       },
       {
         path: 'invite/accept',
         component: AcceptInviteComponent,
-      }
-    ]
+      },
+    ],
   },
   {
     path: '**',
-    redirectTo: ''
-  }
+    redirectTo: '',
+  },
 ];

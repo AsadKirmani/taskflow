@@ -8,6 +8,6 @@ export interface DashboardSummary {
     newAssignmentsToday: number;
     activeBoards: number;
   };
-  recentTasks: Task[]; // Yahan tera TaskType aayega
-  recentActivities: ActivityItem[]; // Yahan tera ActivityType aayega
+  recentTasks: Task[];
+  recentActivities: ActivityItem[];
 }

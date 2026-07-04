@@ -6,20 +6,21 @@ import { KanbanTaskComponent } from '../kanban-task/kanban-task.component';
 import { TaskDropEventPayload } from '../../models/drag-drop.model';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { ChangeDetectorRef } from '@angular/core';
-import {
-  CdkDragDrop,
-  DragDropModule,
-} from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { UiEmptyStateComponent } from '../../../../ui/components/ui-empty-state.component';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
-import { UiDropdownMenuComponent, UiDropdownMenuContent, UiDropdownMenuTrigger } from '../../../../ui/components/ui-dropdown-menu.component';
+import {
+  UiDropdownMenuComponent,
+  UiDropdownMenuContent,
+  UiDropdownMenuTrigger,
+} from '../../../../ui/components/ui-dropdown-menu.component';
 import { UiDropdownMenuItemComponent } from '../../../../ui/components/ui-dropdown-menu-item.component';
 
 @Component({
   selector: 'app-kanban-column',
   standalone: true,
-  // 🚀 Imports me DragDropModule add kiya
+
   imports: [
     KanbanTaskComponent,
     CommonModule,
@@ -31,7 +32,7 @@ import { UiDropdownMenuItemComponent } from '../../../../ui/components/ui-dropdo
     UiDropdownMenuItemComponent,
     UiDropdownMenuTrigger,
     UiDropdownMenuContent,
-    ...APP_ICONS
+    ...APP_ICONS,
   ],
   templateUrl: './kanban-column.component.html',
 })
@@ -41,8 +42,8 @@ export class KanbanColumnComponent {
   tasks = input<Task[]>([]);
   columnIndex = input.required<number>();
   hasActiveFilters = input<boolean>(false);
-  connectedTo = input<string[]>([]); // CDK DropList ke liye connected lists
-  // Sirf Task related outputs bachenge yahan
+  connectedTo = input<string[]>([]);
+
   nativeTaskDrop = output<TaskDropEventPayload>();
   taskAdded = output<string>();
   taskUpdated = output<{ taskId: string; title: string }>();
@@ -54,8 +55,6 @@ export class KanbanColumnComponent {
   inputValue = signal('');
 
   onTaskDrop(event: CdkDragDrop<any[]>) {
-    // Hum array mutations store pe chhod rahe hain (kyunki optimistic handle wahan hai)
-    // Hum seedha text representation ya task objects se store ke standard parameters bhejenge
     const previousList = event.previousContainer.data;
     const movedTask = previousList[event.previousIndex];
     if (!movedTask) {

@@ -8,7 +8,6 @@ export const guestGuard: CanActivateFn = () => {
   const authStore = inject(AuthStoreService);
   const router = inject(Router);
 
-  // SCENARIO 1: Agar state already load ho chuki hai (Normal link click)
   if (authStore.isInitialized()) {
     if (authStore.isAuthenticated()) {
       return router.createUrlTree(['/dashboard']);
@@ -16,16 +15,14 @@ export const guestGuard: CanActivateFn = () => {
     return true;
   }
 
-  // SCENARIO 2: Agar user ne page refresh kiya hai (Wait for state)
-  // toObservable use karke hum signal ko rxjs stream bana rahe hain
   return toObservable(authStore.isInitialized).pipe(
-    filter((isInit) => isInit === true), // ⏳ Yahan code tab tak rukega jab tak API check complete na ho
-    take(1), // Angular guards ke liye observable ko close karna zaroori hai
+    filter((isInit) => isInit === true),
+    take(1),
     map(() => {
       if (authStore.isAuthenticated()) {
         return router.createUrlTree(['/dashboard']);
       }
-      return true; // Token fail hua, landing page dikhao
-    })
+      return true;
+    }),
   );
 };

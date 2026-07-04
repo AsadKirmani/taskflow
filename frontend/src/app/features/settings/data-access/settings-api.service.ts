@@ -20,12 +20,12 @@ export class SettingsApiService {
     return this.http.patch(`${this.apiUrl}/auth/reset-password`, data);
   }
   uploadAvatar(file: File): Observable<{ data: { user: { avatarUrl: string } } }> {
-      const formData = new FormData();
-      formData.append('avatar', file); // 'avatar' key backend expect karega
-      // Backend pe POST request bhejo
-      return this.http.post<{ data: { user: { avatarUrl: string } } }>(
-        `${this.apiUrl}/auth/upload-avatar`,
-        formData
-      );  
-    }
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    return this.http.post<{ data: { user: { avatarUrl: string } } }>(
+      `${this.apiUrl}/auth/upload-avatar`,
+      formData,
+    );
+  }
 }

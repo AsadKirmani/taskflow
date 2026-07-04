@@ -21,7 +21,11 @@ import { WorkspaceStoreService } from '../../data-access/workspace-store.service
             <li class="bg-white p-3 rounded shadow-sm border border-gray-100">
               <a
                 class="text-blue-600 hover:underline font-medium"
-                [routerLink]="['/workspaces', workspace.id, workspace.slug || toSlug(workspace.name)]"
+                [routerLink]="[
+                  '/workspaces',
+                  workspace.id,
+                  workspace.slug || toSlug(workspace.name),
+                ]"
               >
                 {{ workspace.name }}
               </a>
@@ -34,12 +38,10 @@ import { WorkspaceStoreService } from '../../data-access/workspace-store.service
         <p class="text-gray-500">No workspaces found.</p>
       }
 
-    
-
       <p class="text-xs text-gray-400 mt-6">Workspace list placeholder page.</p>
     </section>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkspaceListPageComponent implements OnInit {
   protected readonly workspaceStore = inject(WorkspaceStoreService);
@@ -49,10 +51,12 @@ export class WorkspaceListPageComponent implements OnInit {
   }
 
   protected toSlug(value: string): string {
-    return value
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || 'workspace';
+    return (
+      value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'workspace'
+    );
   }
 }

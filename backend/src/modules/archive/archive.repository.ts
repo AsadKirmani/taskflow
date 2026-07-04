@@ -22,7 +22,6 @@ export const archiveRepository = {
   }) {
     const model = getEntityModel(data.entityType);
 
-    // 🚀 FIX: Sirf tab update karo jab archived false ho, aur updatedAt change mat karo
     const updated = await model.findOneAndUpdate(
       { _id: data.entityId, archived: { $ne: true } },
       { archived: true },
@@ -55,7 +54,6 @@ export const archiveRepository = {
   }) {
     const model = getEntityModel(data.entityType);
 
-    // 🚀 FIX: Sirf tab update karo jab item actual mein archived ho
     const updated = await model.findOneAndUpdate(
       { _id: data.entityId, archived: true },
       { archived: false },

@@ -9,7 +9,9 @@
       <h1 class="text-xl font-bold tracking-tight text-base-content">TaskFlow</h1>
       <p class="text-xs uppercase tracking-[0.24em] text-base-content">Organize Your Work</p>
     } @else {
-      <span class="text-xl font-extrabold text-base-content tracking-tighter" aria-label="TaskFlow">TF</span>
+      <span class="text-xl font-extrabold text-base-content tracking-tighter" aria-label="TaskFlow"
+        >TF</span
+      >
     }
   </div>
 
@@ -17,7 +19,11 @@
     <li>
       <a
         #dashboardRla="routerLinkActive"
-        [class]="dashboardRla.isActive ? 'bg-base-content text-base-100' : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'"
+        [class]="
+          dashboardRla.isActive
+            ? 'bg-base-content text-base-100'
+            : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
+        "
         class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
         [class.px-3]="!isCollapsed()"
         [class.justify-center]="isCollapsed()"
@@ -38,7 +44,11 @@
     <li>
       <a
         #boardsRla="routerLinkActive"
-        [class]="boardsRla.isActive ? 'bg-base-content text-base-100' : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'"
+        [class]="
+          boardsRla.isActive
+            ? 'bg-base-content text-base-100'
+            : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
+        "
         class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
         [class.px-3]="!isCollapsed()"
         [class.justify-center]="isCollapsed()"
@@ -59,7 +69,11 @@
     <li>
       <a
         #activityRla="routerLinkActive"
-        [class]="activityRla.isActive ? 'bg-base-content text-base-100' : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'"
+        [class]="
+          activityRla.isActive
+            ? 'bg-base-content text-base-100'
+            : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
+        "
         class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
         [class.px-3]="!isCollapsed()"
         [class.justify-center]="isCollapsed()"
@@ -75,11 +89,15 @@
         }
       </a>
     </li>
-    
+
     <li>
       <a
         #settingsRla="routerLinkActive"
-        [class]="settingsRla.isActive ? 'bg-base-content text-base-100' : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'"
+        [class]="
+          settingsRla.isActive
+            ? 'bg-base-content text-base-100'
+            : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
+        "
         class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
         [class.px-3]="!isCollapsed()"
         [class.justify-center]="isCollapsed()"
@@ -96,16 +114,21 @@
       </a>
     </li>
   </ul>
-  
+
   <section class="mt-6 border-t border-base-300 pt-4" aria-labelledby="workspaces-heading">
     @if (!isCollapsed()) {
-      <h2 id="workspaces-heading" class="mb-3 px-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-base-content/70">
+      <h2
+        id="workspaces-heading"
+        class="mb-3 px-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-base-content/70"
+      >
         Workspaces
       </h2>
     } @else {
-      <div class="text-center mb-3 text-xs font-bold text-base-content/70" aria-hidden="true">W</div>
+      <div class="text-center mb-3 text-xs font-bold text-base-content/70" aria-hidden="true">
+        W
+      </div>
     }
-    
+
     <ul class="space-y-2" role="list">
       @for (workspace of workspaceStore.workspaces(); track workspace.id) {
         <li>
@@ -114,7 +137,6 @@
             [class.rounded-2xl]="!isCollapsed()"
             [class.rounded-full]="isCollapsed()"
           >
-            
             <button
               type="button"
               class="flex w-full items-center gap-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -129,33 +151,50 @@
               [attr.aria-controls]="'workspace-menu-' + workspace.id"
             >
               <span class="flex items-center gap-3 min-w-0">
-                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-base-content text-xs font-semibold uppercase text-base-300 shadow-sm" aria-hidden="true">
+                <span
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-base-content text-xs font-semibold uppercase text-base-300 shadow-sm"
+                  aria-hidden="true"
+                >
                   {{ workspace.name[0] }}
                 </span>
                 @if (!isCollapsed()) {
                   <span class="min-w-0">
-                    <span class="block truncate text-sm font-semibold text-base-content">{{ workspace.name }}</span>
-                    <span class="block truncate text-xs text-base-content/70">{{ workspace.slug }}</span>
+                    <span class="block truncate text-sm font-semibold text-base-content">{{
+                      workspace.name
+                    }}</span>
+                    <span class="block truncate text-xs text-base-content/70">{{
+                      workspace.slug
+                    }}</span>
                   </span>
                 }
               </span>
-              
+
               @if (!isCollapsed()) {
-                <svg lucideChevronDown 
+                <svg
+                  lucideChevronDown
                   class="text-base-content/70 transition-transform duration-200 w-4 h-4"
-                  [class.rotate-180]="isWorkspaceOpen(workspace.id)">
+                  [class.rotate-180]="isWorkspaceOpen(workspace.id)"
+                >
                   expand_more
-              </svg>
+                </svg>
               }
             </button>
-            
+
             @if (!isCollapsed() && isWorkspaceOpen(workspace.id)) {
-              <ul [id]="'workspace-menu-' + workspace.id" class="border-t border-base-300 bg-base-200 px-2 py-2.5 space-y-1" role="list">
+              <ul
+                [id]="'workspace-menu-' + workspace.id"
+                class="border-t border-base-300 bg-base-200 px-2 py-2.5 space-y-1"
+                role="list"
+              >
                 <li>
                   <a
                     #wsBoardsRla="routerLinkActive"
                     class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors"
-                    [class]="wsBoardsRla.isActive ? 'bg-base-content text-base-100 shadow-sm' : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'"
+                    [class]="
+                      wsBoardsRla.isActive
+                        ? 'bg-base-content text-base-100 shadow-sm'
+                        : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
+                    "
                     [routerLink]="['/w', workspace.id, 'boards']"
                     (click)="navigate.emit()"
                     routerLinkActive="active"
@@ -168,7 +207,11 @@
                   <a
                     #wsActivityRla="routerLinkActive"
                     class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors"
-                    [class]="wsActivityRla.isActive ? 'bg-base-content text-base-100 shadow-sm' : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'"
+                    [class]="
+                      wsActivityRla.isActive
+                        ? 'bg-base-content text-base-100 shadow-sm'
+                        : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
+                    "
                     [routerLink]="['/w', workspace.id, 'activity']"
                     (click)="navigate.emit()"
                     routerLinkActive="active"
@@ -181,7 +224,11 @@
                   <a
                     #wsSettingsRla="routerLinkActive"
                     class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors"
-                    [class]="wsSettingsRla.isActive ? 'bg-base-content text-base-100 shadow-sm' : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'"
+                    [class]="
+                      wsSettingsRla.isActive
+                        ? 'bg-base-content text-base-100 shadow-sm'
+                        : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
+                    "
                     [routerLink]="['/w', workspace.id, 'settings']"
                     (click)="navigate.emit()"
                     routerLinkActive="active"

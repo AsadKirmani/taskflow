@@ -27,8 +27,10 @@
           @if (task().isCompleted) {
             <svg lucideCircleCheck class="text-green-600 w-5 h-5 text-[20px]"></svg>
           } @else {
-            <svg lucideCircle class="text-base-content/30 hover:text-green-600 w-5 h-5 text-[20px]"
-              ></svg>
+            <svg
+              lucideCircle
+              class="text-base-content/30 hover:text-green-600 w-5 h-5 text-[20px]"
+            ></svg>
           }
         </button>
 
@@ -59,49 +61,64 @@
       task().assigneeIds.length
     ) {
       <!-- Main Footer Container: Added flex-wrap and items-center -->
-    <div class="flex items-center justify-start border-t border-base-300/5 flex-wrap gap-x-3 gap-y-2 text-base-content/50 text-[12px]">
-      
-      <!-- Left side icons container (Due date, Description, Comments, etc.) -->
-      <div class="flex items-center gap-3 flex-wrap">
-        @if (task().dueDate && task().startDate) {
-          <div class="flex items-center gap-1 text-xs font-semibold" [class.text-error]="isOverdue()">
-            <svg lucideClock class="w-4 h-4"></svg>
-            <span>{{ task().startDate | date: 'MMM d' }} - {{ task().dueDate | date: 'MMM d' }}</span>
-          </div>
-        }
-        @else if (task().dueDate || task().startDate) {
-          <div class="flex items-center gap-1 text-xs font-semibold" [class.text-error]="isOverdue()">
-            <svg lucideClock class="w-4 h-4"></svg>
-            <span>{{ task().dueDate ? (task().dueDate | date: 'MMM d') : ('Starts ' + (task().startDate | date: 'MMM d')) }}</span>
-          </div>
-        }
-        
-        @if (task().description) {
-          <svg lucideTextAlignStart class="w-4 h-4"></svg>
-        }
+      <div
+        class="flex items-center justify-start border-t border-base-300/5 flex-wrap gap-x-3 gap-y-2 text-base-content/50 text-[12px]"
+      >
+        <!-- Left side icons container (Due date, Description, Comments, etc.) -->
+        <div class="flex items-center gap-3 flex-wrap">
+          @if (task().dueDate && task().startDate) {
+            <div
+              class="flex items-center gap-1 text-xs font-semibold"
+              [class.text-error]="isOverdue()"
+            >
+              <svg lucideClock class="w-4 h-4"></svg>
+              <span
+                >{{ task().startDate | date: 'MMM d' }} - {{ task().dueDate | date: 'MMM d' }}</span
+              >
+            </div>
+          } @else if (task().dueDate || task().startDate) {
+            <div
+              class="flex items-center gap-1 text-xs font-semibold"
+              [class.text-error]="isOverdue()"
+            >
+              <svg lucideClock class="w-4 h-4"></svg>
+              <span>{{
+                task().dueDate
+                  ? (task().dueDate | date: 'MMM d')
+                  : 'Starts ' + (task().startDate | date: 'MMM d')
+              }}</span>
+            </div>
+          }
 
-        @if (task().commentCount && task().commentCount! > 0) {
-          <div class="flex items-center gap-1 text-xs font-semibold">
-            <svg lucideMessageSquare class="w-4 h-4"></svg>
-            <span>{{ task().commentCount }}</span>
-          </div>
-        }
+          @if (task().description) {
+            <svg lucideTextAlignStart class="w-4 h-4"></svg>
+          }
 
-        @if (task().checklist && task().checklist!.length > 0) {
-          <div class="flex items-center gap-1 text-xs font-semibold" [class.text-success]="completedChecklistCount === task().checklist!.length">
-            <svg lucideSquareCheck class="w-4 h-4"></svg>
-            <span>{{ completedChecklistCount }}/{{ task().checklist!.length }}</span>
+          @if (task().commentCount && task().commentCount! > 0) {
+            <div class="flex items-center gap-1 text-xs font-semibold">
+              <svg lucideMessageSquare class="w-4 h-4"></svg>
+              <span>{{ task().commentCount }}</span>
+            </div>
+          }
+
+          @if (task().checklist && task().checklist!.length > 0) {
+            <div
+              class="flex items-center gap-1 text-xs font-semibold"
+              [class.text-success]="completedChecklistCount === task().checklist!.length"
+            >
+              <svg lucideSquareCheck class="w-4 h-4"></svg>
+              <span>{{ completedChecklistCount }}/{{ task().checklist!.length }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Avatar Stack: Hamesha right side rahega due to justify-between -->
+        @if (task().assigneeIds && task().assigneeIds!.length > 0) {
+          <div class="flex items-center flex-shrink-0 ml-auto">
+            <ui-avatar-stack [users]="avatarUsers()" [limit]="3" size="sm" />
           </div>
         }
       </div>
-
-      <!-- Avatar Stack: Hamesha right side rahega due to justify-between -->
-      @if (task().assigneeIds && task().assigneeIds!.length > 0) {
-        <div class="flex items-center flex-shrink-0 ml-auto">
-          <ui-avatar-stack [users]="avatarUsers()" [limit]="3" size="sm" />
-        </div>
-      }
-    </div>
     }
   } @else {
     <div class="flex flex-col gap-2" (click)="$event.stopPropagation()">

@@ -7,12 +7,15 @@ import { APP_ICONS } from '../../../../core/icons/lucide-icons';
   standalone: true,
   imports: [CommonModule, ...APP_ICONS],
   template: `
-    <button (click)="fileInput.click()" class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300 w-full">
+    <button
+      (click)="fileInput.click()"
+      class="flex items-center gap-1.5 bg-base-100 hover:bg-base-300 text-base-content px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300 w-full"
+    >
       <svg lucidePaperclip class="w-4 h-4"></svg>
       Attach
     </button>
     <input type="file" #fileInput class="hidden" (change)="onFileChange($event)" />
-  `
+  `,
 })
 export class ActionAttachmentsComponent {
   fileSelected = output<File>();
@@ -21,6 +24,6 @@ export class ActionAttachmentsComponent {
   onFileChange(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) this.fileSelected.emit(file);
-    this.fileInput.nativeElement.value = ''; // Taaki same file wapas select ho sake
+    this.fileInput.nativeElement.value = '';
   }
 }

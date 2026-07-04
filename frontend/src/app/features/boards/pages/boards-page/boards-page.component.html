@@ -112,7 +112,10 @@
                   class="absolute bottom-3 right-3 flex items-center gap-1 text-xs text-base-content group-hover:text-base-content/70 transition-colors font-medium"
                 >
                   <span>View</span>
-                  <svg lucideChevronRight class="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform"></svg>
+                  <svg
+                    lucideChevronRight
+                    class="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform"
+                  ></svg>
                 </div>
               </button>
             } @empty {
@@ -123,11 +126,11 @@
                 >
                   <svg lucideBox class="w-6 h-6 text-base-content/50"></svg>
 
-                  <ui-button 
+                  <ui-button
                     actions
-                    variant="primary" 
-                    size="sm" 
-                    class="mt-2" 
+                    variant="primary"
+                    size="sm"
+                    class="mt-2"
                     (clicked)="toggleBoardModal($event)"
                   >
                     Create Board
@@ -143,7 +146,7 @@
             title="No Workspaces Active"
             description="There are no matching workspace targets available for the selected view state context."
           >
-           <svg lucideBox class="w-6 h-6 text-base-content/50"></svg>
+            <svg lucideBox class="w-6 h-6 text-base-content/50"></svg>
           </ui-empty-state>
         </div>
       }

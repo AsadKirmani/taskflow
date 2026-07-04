@@ -9,7 +9,7 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, AutofocusDirective],
   templateUrl: './login-page.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginPageComponent {
   private readonly fb = inject(FormBuilder);
@@ -18,7 +18,7 @@ export class LoginPageComponent {
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]]
+    password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   submit(): void {
@@ -29,7 +29,7 @@ export class LoginPageComponent {
     }
 
     this.authStore.login(this.form.getRawValue()).subscribe({
-      next: () => this.router.navigate(['/'])
+      next: () => this.router.navigate(['/']),
     });
   }
 }

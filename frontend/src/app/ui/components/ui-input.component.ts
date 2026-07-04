@@ -12,7 +12,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
           {{ label() }}
         </label>
       }
-      
+
       <div class="relative">
         <input
           [id]="inputId"
@@ -22,7 +22,12 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
           [ngModel]="value"
           (ngModelChange)="onValueChange($event)"
           (blur)="onTouched()"
-          [class]="'w-full h-10 px-3 py-2 text-sm bg-base-100 border rounded-btn transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:bg-base-200 ' + (error() ? 'border-error focus:ring-error/30' : 'border-base-300 focus:border-primary focus:ring-primary/20')"
+          [class]="
+            'w-full h-10 px-3 py-2 text-sm bg-base-100 border rounded-btn transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:bg-base-200 ' +
+            (error()
+              ? 'border-error focus:ring-error/30'
+              : 'border-base-300 focus:border-primary focus:ring-primary/20')
+          "
         />
       </div>
 
@@ -35,8 +40,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => UiInputComponent),
-      multi: true
-    }
+      multi: true,
+    },
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -58,9 +63,14 @@ export class UiInputComponent implements ControlValueAccessor {
     this.onChange(val);
   }
 
-  // ControlValueAccessor methods
-  writeValue(val: any): void { this.value = val || ''; }
-  registerOnChange(fn: any): void { this.onChange = fn; }
-  registerOnTouched(fn: any): void { this.onTouched = fn; }
-  setDisabledState?(isDisabled: boolean): void { /* Handled via input signal if needed */ }
+  writeValue(val: any): void {
+    this.value = val || '';
+  }
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+  setDisabledState?(isDisabled: boolean): void {}
 }

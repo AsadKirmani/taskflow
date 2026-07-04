@@ -8,19 +8,17 @@ import { UploadService } from '../../../core/services/upload.service';
 import { NotificationService } from '../../../core/services/notification.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TaskFacade {
-  constructor() {
-    // Initialize any necessary state or services here
-  }
+  constructor() {}
   private taskStore = inject(TaskStore);
   private boardStore = inject(BoardStore);
   private uploadService = inject(UploadService);
   private notificationService = inject(NotificationService);
   currentTask = signal<Task | null>(null);
   boardMembers = computed(() => this.boardStore.members() ?? []);
-  
+
   columnName = computed(
     () =>
       this.boardStore.currentColumns().find((col) => col.id === this.currentTask()?.columnId)
@@ -90,14 +88,11 @@ export class TaskFacade {
 
     let newMembers;
     if (exists) {
-      // Agar pehle se hai toh remove karo
       newMembers = currentMembers.filter((id) => id !== userId);
     } else {
-      // Agar nahi hai toh add karo
       newMembers = [...currentMembers, userId];
     }
 
-    // Yeh function automatically Frontend + Backend DB dono update kar dega!
     this.updateTaskProperty('assigneeIds', newMembers);
   }
   assignedMembers = computed<User[]>(() => {
@@ -120,20 +115,18 @@ export class TaskFacade {
     let startDateTime: string | null = null;
     let dueDateTime: string | null = null;
 
-    // 1. Start Date Handling
     if (startDate) {
-      const startObj = new Date(startDate); // Naya object banaya taaki original reference change na ho
+      const startObj = new Date(startDate);
 
       if (startTime) {
         const [hours, minutes] = startTime.split(':').map(Number);
-        startObj.setHours(hours, minutes, 0, 0); // Local timezone mein time set kiya
+        startObj.setHours(hours, minutes, 0, 0);
       } else {
-        startObj.setHours(0, 0, 0, 0); // Agar time nahi diya, toh din ki shuruwat (Midnight) maan lo
+        startObj.setHours(0, 0, 0, 0);
       }
-      startDateTime = startObj.toISOString(); // Ab safely string mein badal lo
+      startDateTime = startObj.toISOString();
     }
 
-    // 2. Due Date Handling
     if (dueDate) {
       const dueObj = new Date(dueDate);
 
@@ -141,12 +134,11 @@ export class TaskFacade {
         const [hours, minutes] = endTime.split(':').map(Number);
         dueObj.setHours(hours, minutes, 0, 0);
       } else {
-        dueObj.setHours(23, 59, 59, 999); // PRO TIP: Agar due date pe time nahi hai, toh din ka aakhiri waqt (11:59 PM) maan lo
+        dueObj.setHours(23, 59, 59, 999);
       }
       dueDateTime = dueObj.toISOString();
     }
 
-    // 3. Store Update
     this.updateTaskProperty('startDate', startDateTime);
     this.updateTaskProperty('dueDate', dueDateTime);
   }
@@ -154,23 +146,20 @@ export class TaskFacade {
     this.taskStore.archiveTask(taskId, workspaceId, taskTitle, reason);
   }
   uploadTaskAttachment(taskId: string, file: File) {
-  this.uploadService.uploadAttachment(taskId, file).subscribe({
-    next: (response) => {
-      // Backend se ab sirf ek attachment object aa raha hai
-      const newAttachment = response.data; 
-      const currentTask = this.currentTask();
-      
-      if (currentTask) {
-        // Purane attachments lo aur naya wala usme jod do
-        const updatedAttachments = [...(currentTask.attachments || []), newAttachment];
-        
-        // State update kar do
-        this.updateTaskProperty('attachments', updatedAttachments); 
-      }
-    },
-    error: (err) => {
-      console.error('File upload failed:', err);
-    }
-  });
-}
+    this.uploadService.uploadAttachment(taskId, file).subscribe({
+      next: (response) => {
+        const newAttachment = response.data;
+        const currentTask = this.currentTask();
+
+        if (currentTask) {
+          const updatedAttachments = [...(currentTask.attachments || []), newAttachment];
+
+          this.updateTaskProperty('attachments', updatedAttachments);
+        }
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      },
+    });
+  }
 }

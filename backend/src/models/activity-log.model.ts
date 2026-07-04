@@ -1,61 +1,61 @@
-import { Schema, model, InferSchemaType } from 'mongoose';
+import { Schema, model, InferSchemaType } from "mongoose";
 
 const ActivityLogSchema = new Schema(
   {
     workspaceId: {
       type: Schema.Types.ObjectId,
-      ref: 'Workspace',
+      ref: "Workspace",
       required: true,
-      index: true
+      index: true,
     },
     boardId: {
       type: Schema.Types.ObjectId,
-      ref: 'Board',
+      ref: "Board",
       default: null,
-      index: true
+      index: true,
     },
     columnId: {
       type: Schema.Types.ObjectId,
-      ref: 'Column',
-      default: null
+      ref: "Column",
+      default: null,
     },
     taskId: {
       type: Schema.Types.ObjectId,
-      ref: 'Task',
+      ref: "Task",
       default: null,
-      index: true
+      index: true,
     },
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
+      ref: "User",
+      required: true,
     },
     actionType: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
     entityType: {
       type: String,
-      enum: ['workspace', 'board', 'column', 'task', 'comment'],
-      required: true
+      enum: ["workspace", "board", "column", "task", "comment"],
+      required: true,
     },
     entityId: {
       type: Schema.Types.ObjectId,
-      required: true
+      required: true,
     },
     metadata: {
       type: Schema.Types.Mixed,
-      default: {}
-    }
+      default: {},
+    },
   },
   {
     timestamps: { createdAt: true, updatedAt: false },
-    versionKey: false
-  }
+    versionKey: false,
+  },
 );
 
 ActivityLogSchema.index({ workspaceId: 1, createdAt: -1 });
 
 export type ActivityLogDocument = InferSchemaType<typeof ActivityLogSchema>;
-export const ActivityLogModel = model('ActivityLog', ActivityLogSchema);
+export const ActivityLogModel = model("ActivityLog", ActivityLogSchema);

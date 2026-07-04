@@ -37,14 +37,18 @@ import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.compo
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
 import { KeyboardShortcutsService } from '../../../../core/services/keyboard-shortcuts.service';
-import { UiDropdownMenuComponent, UiDropdownMenuContent, UiDropdownMenuTrigger } from '../../../../ui/components/ui-dropdown-menu.component';
+import {
+  UiDropdownMenuComponent,
+  UiDropdownMenuContent,
+  UiDropdownMenuTrigger,
+} from '../../../../ui/components/ui-dropdown-menu.component';
 import { UiDropdownMenuItemComponent } from '../../../../ui/components/ui-dropdown-menu-item.component';
 import { User } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  // 🚀 DragDropModule added here too
+
   imports: [
     ApplyFilterComponent,
     CommonModule,
@@ -59,7 +63,7 @@ import { User } from '../../../../core/models/user.model';
     UiDropdownMenuItemComponent,
     UiDropdownMenuTrigger,
     UiDropdownMenuContent,
-    ...APP_ICONS  
+    ...APP_ICONS,
   ],
   templateUrl: './kanban-board.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -70,7 +74,7 @@ export class KanbanBoardComponent {
   protected readonly shortcuts = inject(KeyboardShortcutsService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  
+
   board = input<Board | null>(null);
   columns = input<BoardColumn[]>([]);
   boardMembers = input<User[]>([]);
@@ -85,7 +89,7 @@ export class KanbanBoardComponent {
   taskUpdated = output<UpdateTaskEventPayload>();
   taskCompletionToggled = output<ToggleTaskCompletionEventPayload>();
   columnArchived = output<{ columnId: string; columnName: string }>();
-  
+
   isColumnInputOpen = signal(false);
   columnInputValue = signal('');
   isFilterOpen = signal(false);
@@ -108,22 +112,18 @@ export class KanbanBoardComponent {
     return null;
   });
 
-  // 🚀 COLUMN DROP LOGIC (Moved here from Column Component)
   onColumnDrop(event: CdkDragDrop<BoardColumn[]>): void {
     if (event.previousIndex === event.currentIndex) return;
 
-    // UI update (Optimistic)
     const currentColumns = [...this.columns()];
     moveItemInArray(currentColumns, event.previousIndex, event.currentIndex);
 
-    // Emit to store/facade to update API
     this.columnMoved.emit({
       fromIndex: event.previousIndex,
       toIndex: event.currentIndex,
     });
   }
 
-  // Pass-through for task drops
   onTaskDrop(payload: TaskDropEventPayload): void {
     if (
       payload.sourceColumnId === payload.targetColumnId &&
@@ -134,7 +134,6 @@ export class KanbanBoardComponent {
     this.taskMoved.emit(payload);
   }
 
-  // --- Baaki sab same ---
   toggleFilterView(event?: MouseEvent): void {
     event?.stopPropagation();
     this.isFilterOpen.update((v) => !v);
@@ -184,16 +183,15 @@ export class KanbanBoardComponent {
       replaceUrl: true,
     });
   }
-// Jab bhi document pe 'Escape' dabega, ye function chalega
+
   @HostListener('document:keydown.escape', ['$event'])
   handleEscapeKey(event: Event) {
     const keyboardEvent = event as KeyboardEvent;
-    // 1. Agar Task overlay khula hai, toh usko band kar do
+
     if (this.activeTaskOverlay()) {
       this.closeTaskOverlay();
     }
-    
-    // 3. Filter open hai toh usko band karo
+
     if (this.isFilterOpen()) {
       this.isFilterOpen.set(false);
     }

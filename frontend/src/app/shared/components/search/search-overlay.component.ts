@@ -7,11 +7,11 @@ import { Task } from '../../../core/models/task.model';
   selector: 'app-search-overlay',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './search-overlay.component.html'
+  templateUrl: './search-overlay.component.html',
 })
 export class SearchOverlayComponent {
   searchService = inject(SearchService);
-  
+
   isOpen = signal(false);
   searchQuery = signal('');
   isSearching = signal(false);
@@ -50,10 +50,10 @@ export class SearchOverlayComponent {
 
   async triggerSearch(query: string = this.searchQuery()) {
     if (!query.trim()) return;
-    
+
     this.searchQuery.set(query);
     this.isSearching.set(true);
-    
+
     try {
       const results = await this.searchService.searchFromDB(query);
       this.searchResults.set(results);

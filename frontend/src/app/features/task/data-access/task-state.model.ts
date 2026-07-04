@@ -22,9 +22,9 @@ export const initialTaskState: TaskState = {
     completion: 'all',
     labels: [],
     dueType: 'all',
-    activity: []
+    activity: [],
   },
   loading: false,
   saving: false,
-  error: null
+  error: null,
 };

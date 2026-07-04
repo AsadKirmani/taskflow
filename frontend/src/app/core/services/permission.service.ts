@@ -5,8 +5,7 @@ import { WorkspaceRole } from '../config/permissions';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionService {
- private roleSignal =
-    signal<WorkspaceRole | null>(null);
+  private roleSignal = signal<WorkspaceRole | null>(null);
 
   setRole(role: WorkspaceRole | null) {
     this.roleSignal.set(role);
@@ -16,12 +15,8 @@ export class PermissionService {
     return this.roleSignal();
   }
 
-  hasPermission(
-    requiredPermission: Permission
-  ): boolean {
-
-    const role =
-      this.roleSignal();
+  hasPermission(requiredPermission: Permission): boolean {
+    const role = this.roleSignal();
 
     if (!role) {
       return false;
@@ -29,9 +24,6 @@ export class PermissionService {
     if (role === 'OWNER') {
       return true;
     }
-    return (
-      ROLE_PERMISSIONS[role]?.includes(
-        requiredPermission
-    )) ?? false;
+    return ROLE_PERMISSIONS[role]?.includes(requiredPermission) ?? false;
   }
 }

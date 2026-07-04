@@ -11,11 +11,21 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
   standalone: true,
   imports: [CommonModule, FormsModule, ...APP_ICONS],
   template: `
-    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-10 p-2" (click)="close()">
-      <div class="bg-base-100 rounded-lg shadow p-6 w-full max-w-md border border-base-300" (click)="$event.stopPropagation()">
+    <div
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-10 p-2"
+      (click)="close()"
+    >
+      <div
+        class="bg-base-100 rounded-lg shadow p-6 w-full max-w-md border border-base-300"
+        (click)="$event.stopPropagation()"
+      >
         <div class="flex items-start justify-between gap-4 mb-4">
           <h2 class="text-2xl font-semibold text-base-content">Create New Board</h2>
-          <button type="button" class="text-base-content/70 hover:text-primary hover:bg-base-content/10 transition-colors p-2 rounded-full" (click)="close()">
+          <button
+            type="button"
+            class="text-base-content/70 hover:text-primary hover:bg-base-content/10 transition-colors p-2 rounded-full"
+            (click)="close()"
+          >
             <svg lucideX class="w-6 h-6"></svg>
           </button>
         </div>
@@ -30,7 +40,7 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
               name="boardName"
               class="w-full px-3 py-2 border border-base-300 text-base-content rounded-field focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
               placeholder="Enter board name"
-            >
+            />
           </div>
 
           <div class="mb-4">
@@ -42,7 +52,7 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
                 class="w-full px-3 py-2 border border-base-300 rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
                 [value]="selectedWorkspaceName()"
                 readonly
-              >
+              />
             </ng-container>
             <ng-template #workspacePicker>
               <select
@@ -83,24 +93,25 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
         </form>
       </div>
     </div>
-  `
+  `,
 })
 export class BoardModalComponent {
   private readonly boardStore = inject(BoardStore);
   private readonly notificationService = inject(NotificationService);
 
   readonly selectedWorkspaceId = input<string>('');
-  readonly  selectedWorkspaceName = input<string>('');
+  readonly selectedWorkspaceName = input<string>('');
   readonly availableWorkspaces = input<Pick<Workspace, 'id' | 'name'>[]>([]);
   @Output() readonly modalClosed = new EventEmitter<void>();
-  
 
-  readonly hasSelectedWorkspace = computed(() => Boolean(this.selectedWorkspaceId() && this.selectedWorkspaceName()));
+  readonly hasSelectedWorkspace = computed(() =>
+    Boolean(this.selectedWorkspaceId() && this.selectedWorkspaceName()),
+  );
 
   readonly boardDraft = {
     name: '',
     workspaceId: '',
-    visibility: 'private' as 'private' | 'workspace'
+    visibility: 'private' as 'private' | 'workspace',
   };
 
   createBoard(event?: Event): void {
@@ -111,7 +122,7 @@ export class BoardModalComponent {
     const resolvedWorkspaceId = this.selectedWorkspaceId() || workspaceId;
     const resolvedWorkspaceName =
       this.selectedWorkspaceName() ||
-      this.availableWorkspaces().find(workspace => workspace.id === resolvedWorkspaceId)?.name ||
+      this.availableWorkspaces().find((workspace) => workspace.id === resolvedWorkspaceId)?.name ||
       '';
 
     if (!trimmedName) {
@@ -124,12 +135,16 @@ export class BoardModalComponent {
       return;
     }
 
-    this.boardStore.createBoard(trimmedName, resolvedWorkspaceName, resolvedWorkspaceId, visibility);
+    this.boardStore.createBoard(
+      trimmedName,
+      resolvedWorkspaceName,
+      resolvedWorkspaceId,
+      visibility,
+    );
     this.close();
   }
 
   close(): void {
     this.modalClosed.emit();
-
   }
 }

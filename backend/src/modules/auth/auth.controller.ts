@@ -56,33 +56,27 @@ export const authController = {
     });
   },
 
-  // Upar file me import zaroor karna: 
-// import { hashToken } from '../utils/hash'; (Ya jo bhi tera path ho)
-
-async login(req: Request, res: Response) {
-    // 1. Pehle user ko authenticate karo
+  async login(req: Request, res: Response) {
     const result = await authService.login(req.body, {
       ip: req.ip,
       userAgent: req.headers["user-agent"],
     });
 
-    // 2. Redis ke liye Key aur Value tayyar karo (EXACTLY jaisa /refresh ko chahiye)
     const tokenHash = hashToken(result.refreshToken);
     const cacheKey = `refresh_token:${tokenHash}`;
     const sessionData = {
-      sub: result.user.id.toString(), // (ya result.user.id, jo bhi tere DB ka format ho)
+      sub: result.user.id.toString(),
       email: result.user.email,
       user: result.user,
     };
 
-    // 3. 💾 REDIS MEIN SAVE KARO (Response bhejne se PEHLE!)
-    // 7 din = 604800 seconds
-    await redisClient.set(cacheKey, JSON.stringify(sessionData), { ex: 604800 });
+    await redisClient.set(cacheKey, JSON.stringify(sessionData), {
+      ex: 604800,
+    });
 
-    // 4. Khushi-khushi Response bhej do
     res.cookie(jwtConfig.refreshCookieName, result.refreshToken, cookieOptions);
     res.cookie("accessToken", result.accessToken, accessTokenCookieOptions);
-    
+
     return res.json({
       success: true,
       message: "Login successful",
@@ -91,24 +85,22 @@ async login(req: Request, res: Response) {
         accessToken: result.accessToken,
       },
     });
-},
+  },
 
   async me(req: Request, res: Response) {
     const user = await authService.getCurrentUser(req.auth!.userId);
     const cacheKey = `user:${user.id}:profile`;
-    
-    // 1. ⚡ Check in Redis
+
     const cachedProfile = await redisClient.get(cacheKey);
 
     if (cachedProfile) {
       return res.status(200).json(cachedProfile);
     }
-    // 2. 🐌 Fetch from MongoDB
+
     const memberships = await WorkspaceMemberModel.find({
       userId: req.auth!.userId,
     }).populate("workspaceId");
 
-    // 3. 📦 Response ka format taiyar karo
     const responsePayload = {
       success: true,
       data: {
@@ -121,22 +113,25 @@ async login(req: Request, res: Response) {
         },
         workspaces: memberships.map((m) => ({
           id: m.workspaceId._id,
-          name: m.workspaceName, // Ensure workspaceName exists on m, or use m.workspaceId.name
+          name: m.workspaceName,
           role: m.role,
         })),
       },
     };
 
-    // 4. 💾 REDIS MEIN SAVE KARO (Yeh missing tha)
-    // ex: 86400 matlab 24 ghante ke liye cache hoga
-    await redisClient.set(cacheKey, JSON.stringify(responsePayload), { ex: 86400 });
+    await redisClient.set(cacheKey, JSON.stringify(responsePayload), {
+      ex: 86400,
+    });
 
-    // 5. User ko response bhejo
     return res.status(200).json(responsePayload);
-},
-   async updateUserPassword(req: Request, res: Response) {
+  },
+  async updateUserPassword(req: Request, res: Response) {
     const { currentPassword, newPassword } = req.body;
-    const updatedUser = await authService.updatePassword(req.auth!.userId, currentPassword, newPassword);
+    const updatedUser = await authService.updatePassword(
+      req.auth!.userId,
+      currentPassword,
+      newPassword,
+    );
     return res.status(200).json({
       success: true,
       message: "Password updated successfully",
@@ -145,11 +140,16 @@ async login(req: Request, res: Response) {
       },
     });
   },
-   async updateProfile(req: Request, res: Response) {
+  async updateProfile(req: Request, res: Response) {
     const { name, email, avatarUrl, preferences } = req.body;
     const userId = req.auth!.userId;
-    const updatedUser = await authService.updateProfile(userId, { name, email, avatarUrl, preferences });
-    redisClient.del(`user:${userId}:profile`); // Cache ko invalidate karo
+    const updatedUser = await authService.updateProfile(userId, {
+      name,
+      email,
+      avatarUrl,
+      preferences,
+    });
+    redisClient.del(`user:${userId}:profile`);
     return res.status(200).json({
       success: true,
       message: "Profile updated successfully",
@@ -160,7 +160,11 @@ async login(req: Request, res: Response) {
   },
   async updatePassword(req: Request, res: Response) {
     const { currentPassword, newPassword } = req.body;
-    const updatedUser = await authService.updatePassword(req.auth!.userId, currentPassword, newPassword);
+    const updatedUser = await authService.updatePassword(
+      req.auth!.userId,
+      currentPassword,
+      newPassword,
+    );
     return res.status(200).json({
       success: true,
       message: "Password updated successfully",
@@ -187,7 +191,7 @@ async login(req: Request, res: Response) {
       message: "Token refreshed successfully",
       data: {
         accessToken: result.accessToken,
-        user: result.user
+        user: result.user,
       },
     });
   },
@@ -209,15 +213,12 @@ async login(req: Request, res: Response) {
     });
   },
   async uploadAvatar(req: Request, res: Response) {
-    console.log("Upload Avatar Request Body:", req.body);
-    console.log("Upload Avatar File:", req.file);
- 
-    const file = req.file; // multer middleware se file ko access kar rahe hain
+    const file = req.file;
     if (!file) {
       throw new AppError("No file uploaded", 400, "NO_FILE_UPLOADED");
     }
     const updatedUser = await authService.uploadAvatar(req.auth!.userId, file);
-    redisClient.del(`user:${req.auth!.userId}:profile`); // Cache ko invalidate karo
+    redisClient.del(`user:${req.auth!.userId}:profile`);
     return res.status(200).json({
       success: true,
       message: "Avatar updated successfully",

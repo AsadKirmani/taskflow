@@ -12,15 +12,21 @@ export const commentRepository = {
     const newComment = await CommentModel.create(data);
     return newComment;
   },
-    async getCommentsByTaskId(taskId: string) {
-    const comments = await CommentModel.find({ taskId }).sort({ createdAt: -1 });
+  async getCommentsByTaskId(taskId: string) {
+    const comments = await CommentModel.find({ taskId }).sort({
+      createdAt: -1,
+    });
     return comments;
   },
   async updateComment(
     commentId: string,
     data: { content?: string; archived?: boolean },
   ) {
-    const updatedComment = await CommentModel.findByIdAndUpdate(commentId, data, { returnDocument: "after" });
+    const updatedComment = await CommentModel.findByIdAndUpdate(
+      commentId,
+      data,
+      { returnDocument: "after" },
+    );
     return updatedComment;
   },
   async getCommentById(commentId: string) {
@@ -28,5 +34,5 @@ export const commentRepository = {
   },
   async deleteComment(commentId: string) {
     await CommentModel.findByIdAndDelete(commentId);
-  }
+  },
 };

@@ -10,52 +10,50 @@ import { filter } from 'rxjs';
   standalone: true,
   imports: [RouterOutlet, SidebarComponent, NavbarComponent],
   template: `
-  <div class="flex w-full h-[100dvh] overflow-hidden bg-base-200">
-  
-  @if (isMobile() && isSidebarOpen()) {
-    <div 
-      role="button"
-      tabindex="-1"
-      aria-label="Close sidebar"
-      (click)="isSidebarOpen.set(false)"
-      class="fixed inset-0 z-40 bg-neutral-900/50 backdrop-blur-sm transition-all duration-300 ease-in-out md:hidden">
-    </div>
-  }
+    <div class="flex w-full h-[100dvh] overflow-hidden bg-base-200">
+      @if (isMobile() && isSidebarOpen()) {
+        <div
+          role="button"
+          tabindex="-1"
+          aria-label="Close sidebar"
+          (click)="isSidebarOpen.set(false)"
+          class="fixed inset-0 z-40 bg-neutral-900/50 backdrop-blur-sm transition-all duration-300 ease-in-out md:hidden"
+        ></div>
+      }
 
-  <aside 
-    [class.w-[260px]]="isSidebarOpen() && !isMobile()"
-    [class.w-[84px]]="!isSidebarOpen() && !isMobile()" 
-    [class.fixed]="isMobile()"
-    [class.inset-y-0]="isMobile()"
-    [class.left-0]="isMobile()"
-    [class.z-50]="isMobile()"
-    [class.translate-x-0]="isMobile() && isSidebarOpen()"
-    [class.-translate-x-full]="isMobile() && !isSidebarOpen()"
-    class="h-full bg-base-100 transition-all duration-300 cubic-bezier(0.4, 0, 0.2, 1) border-r border-base-300 flex-shrink-0 shadow-2xl md:shadow-none">
-    
-    <app-sidebar 
-      [isCollapsed]="!isSidebarOpen() && !isMobile()" 
-      (navigate)="handleSidebarNavigate()" 
-      class="block h-full w-full">
-    </app-sidebar>
-  </aside>
+      <aside
+        [class.w-[260px]]="isSidebarOpen() && !isMobile()"
+        [class.w-[84px]]="!isSidebarOpen() && !isMobile()"
+        [class.fixed]="isMobile()"
+        [class.inset-y-0]="isMobile()"
+        [class.left-0]="isMobile()"
+        [class.z-50]="isMobile()"
+        [class.translate-x-0]="isMobile() && isSidebarOpen()"
+        [class.-translate-x-full]="isMobile() && !isSidebarOpen()"
+        class="h-full bg-base-100 transition-all duration-300 cubic-bezier(0.4, 0, 0.2, 1) border-r border-base-300 flex-shrink-0 shadow-2xl md:shadow-none"
+      >
+        <app-sidebar
+          [isCollapsed]="!isSidebarOpen() && !isMobile()"
+          (navigate)="handleSidebarNavigate()"
+          class="block h-full w-full"
+        >
+        </app-sidebar>
+      </aside>
 
-  <div class="flex-1 flex flex-col h-full min-w-0 relative">
-    
-    <app-navbar 
-      (menuToggle)="toggleMobileSidebar()"> 
-    </app-navbar>
-    
-    <main class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8 scroll-smooth scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-base-200">
-      <div class="max-w-7xl mx-auto h-full w-full">
-        <router-outlet />
+      <div class="flex-1 flex flex-col h-full min-w-0 relative">
+        <app-navbar (menuToggle)="toggleMobileSidebar()"> </app-navbar>
+
+        <main
+          class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8 scroll-smooth scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-base-200"
+        >
+          <div class="max-w-7xl mx-auto h-full w-full">
+            <router-outlet />
+          </div>
+        </main>
       </div>
-    </main>
-    
-  </div>
-</div>
-`,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    </div>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppShellComponent implements OnDestroy {
   private readonly mobileQueryListener: () => void;
@@ -67,7 +65,7 @@ export class AppShellComponent implements OnDestroy {
   private lastDesktopSidebarOpen = true;
   private wasTaskOverlayActive = false;
   private readonly routerEventsSubscription;
-  
+
   constructor() {
     const media = inject(MediaMatcher);
     this.mobileQuery = media.matchMedia('(max-width: 767px)');
@@ -83,7 +81,7 @@ export class AppShellComponent implements OnDestroy {
 
     this.routerEventsSubscription = this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe(event => {
+      .subscribe((event) => {
         this.updateTaskOverlayState(event.urlAfterRedirects);
       });
   }
@@ -94,7 +92,7 @@ export class AppShellComponent implements OnDestroy {
   }
 
   toggleMobileSidebar(): void {
-    this.isSidebarOpen.update(open => !open);
+    this.isSidebarOpen.update((open) => !open);
   }
 
   handleSidebarNavigate(): void {

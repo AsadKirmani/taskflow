@@ -65,9 +65,9 @@ import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
 
         <div class="flex items-center justify-end gap-2">
           <ui-button
-          variant="icon"
-          size="icon"
-          aria-label="Toggle Theme"
+            variant="icon"
+            size="icon"
+            aria-label="Toggle Theme"
             (click)="themeService.toggleTheme()"
             title="Toggle Theme"
           >
@@ -78,41 +78,35 @@ import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
             }
           </ui-button>
 
-          <ui-button
-            variant="icon"
-            size="icon"
-            aria-label="Notifications"
-            title="Notifications"
-          >
+          <ui-button variant="icon" size="icon" aria-label="Notifications" title="Notifications">
             <svg lucideBell></svg>
           </ui-button>
           <div class="relative group">
             <ui-dropdown-menu>
-            <ui-dropdown-menu-trigger>
-            <ui-button
-              variant="icon"
-              size="icon"
-              aria-label="User menu"
-              class="border border-base-300 cursor-pointer rounded-full"
-              >
-              <ui-avatar
-                [name]="authStore.currentUser()?.name || 'User'"
-                [title]="authStore.currentUser()?.name || 'User'"
-                size="lg"
-                [src]="authStore.currentUser()?.avatarUrl || ''"
-                class="w-8 h-8 sm:w-10 sm:h-10 block"
-              ></ui-avatar>
-            </ui-button>
-        </ui-dropdown-menu-trigger>
-        <ui-dropdown-menu-content>
-          <div class="p-1">
-           
-            <ui-dropdown-menu-item>Profile</ui-dropdown-menu-item>
-            <ui-dropdown-menu-item>Settings</ui-dropdown-menu-item>
-            <ui-dropdown-menu-item (onClick)="logout()">Logout</ui-dropdown-menu-item>
-          </div>
-        </ui-dropdown-menu-content>
-      </ui-dropdown-menu>
+              <ui-dropdown-menu-trigger>
+                <ui-button
+                  variant="icon"
+                  size="icon"
+                  aria-label="User menu"
+                  class="border border-base-300 cursor-pointer rounded-full"
+                >
+                  <ui-avatar
+                    [name]="authStore.currentUser()?.name || 'User'"
+                    [title]="authStore.currentUser()?.name || 'User'"
+                    size="lg"
+                    [src]="authStore.currentUser()?.avatarUrl || ''"
+                    class="w-8 h-8 sm:w-10 sm:h-10 block"
+                  ></ui-avatar>
+                </ui-button>
+              </ui-dropdown-menu-trigger>
+              <ui-dropdown-menu-content>
+                <div class="p-1">
+                  <ui-dropdown-menu-item>Profile</ui-dropdown-menu-item>
+                  <ui-dropdown-menu-item>Settings</ui-dropdown-menu-item>
+                  <ui-dropdown-menu-item (onClick)="logout()">Logout</ui-dropdown-menu-item>
+                </div>
+              </ui-dropdown-menu-content>
+            </ui-dropdown-menu>
           </div>
         </div>
       </div>
@@ -128,7 +122,7 @@ export class NavbarComponent {
   logout() {
     this.authStore.logout();
   }
-  
+
   @ViewChild('searchOverlay') searchOverlay!: SearchOverlayComponent;
 
   @HostListener('document:keydown', ['$event'])

@@ -3,27 +3,23 @@ import { boardRepository } from "./board.repository";
 import { activityService } from "../activity/activity.service";
 
 export const boardService = {
-  async createBoard(
-    input: CreateBoardDto,
-    userId: string,
-  ) {
+  async createBoard(input: CreateBoardDto, userId: string) {
     const board = await boardRepository.createBoard({
       ...input,
       createdBy: userId,
     });
 
-
     await activityService.logActivity({
       workspaceId: board.workspaceId.toString(),
       boardId: board._id.toString(),
       userId,
-      actionType: 'board_created',
-      entityType: 'board',
+      actionType: "board_created",
+      entityType: "board",
       entityId: board._id.toString(),
       metadata: {
         name: board.name,
-        visibility: board.visibility
-      }
+        visibility: board.visibility,
+      },
     });
 
     return board;
@@ -33,7 +29,10 @@ export const boardService = {
     return board;
   },
   async getBoardsInWorkspace(workspaceId: string, userId: string) {
-    const boards = await boardRepository.getBoardsInWorkspace(workspaceId, userId);
+    const boards = await boardRepository.getBoardsInWorkspace(
+      workspaceId,
+      userId,
+    );
     return boards;
   },
   async updateBoard(
@@ -53,12 +52,12 @@ export const boardService = {
         workspaceId: updatedBoard.workspaceId.toString(),
         boardId: boardId,
         userId,
-        actionType: data.archived === true ? 'board_archived' : 'board_updated',
-        entityType: 'board',
+        actionType: data.archived === true ? "board_archived" : "board_updated",
+        entityType: "board",
         entityId: boardId,
         metadata: {
-          updatedFields: Object.keys(data)
-        }
+          updatedFields: Object.keys(data),
+        },
       });
     }
 
@@ -69,9 +68,9 @@ export const boardService = {
     return boards;
   },
   async reorderColumns(boardId: string, columnOrder: string[], userId: string) {
-      return await boardRepository.reorderColumns(boardId, columnOrder);
-    },
-    async deleteBoard(boardId: string, userId: string) {
-      const deletedBoard = await boardRepository.deleteBoard(boardId);
-    }
+    return await boardRepository.reorderColumns(boardId, columnOrder);
+  },
+  async deleteBoard(boardId: string, userId: string) {
+    const deletedBoard = await boardRepository.deleteBoard(boardId);
+  },
 };

@@ -8,17 +8,22 @@ import { UiAvatarComponent } from './ui-avatar.component';
   template: `
     <div class="flex items-center -space-x-2">
       @for (user of displayUsers(); track user.id) {
-        <ui-avatar 
-          [src]="user.avatar" 
-          [name]="user.name" 
+        <ui-avatar
+          [src]="user.avatar"
+          [name]="user.name"
           [title]="user.name"
-          [size]="size()" 
-          class="ring-2 ring-base-100" 
+          [size]="size()"
+          class="ring-2 ring-base-100"
         />
       }
-      
+
       @if (remainingCount() > 0) {
-        <div [class]="'relative flex items-center justify-center shrink-0 rounded-full bg-base-200 ring-2 ring-base-100 z-10 text-base-content/70 font-medium ' + sizeClasses()">
+        <div
+          [class]="
+            'relative flex items-center justify-center shrink-0 rounded-full bg-base-200 ring-2 ring-base-100 z-10 text-base-content/70 font-medium ' +
+            sizeClasses()
+          "
+        >
           +{{ remainingCount() }}
         </div>
       }
@@ -27,7 +32,7 @@ import { UiAvatarComponent } from './ui-avatar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiAvatarStackComponent {
-  users = input<{id: string, name: string, avatar?: string}[]>([]);
+  users = input<{ id: string; name: string; avatar?: string }[]>([]);
   limit = input(3);
   size = input<'sm' | 'md' | 'lg'>('lg');
 
@@ -35,7 +40,7 @@ export class UiAvatarStackComponent {
   remainingCount = computed(() => Math.max(0, this.users().length - this.limit()));
 
   sizeClasses = computed(() => {
-     const sizes = { sm: 'w-6 h-6 text-[10px]', md: 'w-8 h-8 text-xs', lg: 'w-10 h-10 text-sm' };
-     return sizes[this.size()];
+    const sizes = { sm: 'w-6 h-6 text-[10px]', md: 'w-8 h-8 text-xs', lg: 'w-10 h-10 text-sm' };
+    return sizes[this.size()];
   });
 }

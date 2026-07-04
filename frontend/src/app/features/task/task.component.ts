@@ -27,7 +27,7 @@ import { APP_ICONS } from '../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-task',
- 
+
   imports: [
     CommonModule,
     TaskHeaderComponent,
@@ -38,10 +38,10 @@ import { APP_ICONS } from '../../core/icons/lucide-icons';
     TaskQuickActionsComponent,
     TaskDescriptionComponent,
     TaskCommentsComponent,
-    ...APP_ICONS
+    ...APP_ICONS,
   ],
   templateUrl: './task.component.html',
-  providers: [TaskFacade]
+  providers: [TaskFacade],
 })
 export class TaskComponent {
   private authStore = inject(AuthStoreService);
@@ -70,6 +70,6 @@ export class TaskComponent {
     this.closed.emit();
   }
   openAssigneePicker() {
-  this.isMemberPickerOpen.set(true);
-}
+    this.isMemberPickerOpen.set(true);
+  }
 }

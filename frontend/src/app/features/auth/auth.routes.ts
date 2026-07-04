@@ -5,15 +5,15 @@ import { RegisterPageComponent } from './pages/register-page/register-page.compo
 export const AUTH_ROUTES: Routes = [
   {
     path: 'login',
-    component: LoginPageComponent
+    component: LoginPageComponent,
   },
   {
     path: 'register',
-    component: RegisterPageComponent
+    component: RegisterPageComponent,
   },
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'login'
-  }
+    redirectTo: 'login',
+  },
 ];

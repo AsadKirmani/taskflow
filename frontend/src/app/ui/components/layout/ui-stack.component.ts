@@ -16,18 +16,27 @@ export class UiStackComponent {
   justify = input<'start' | 'center' | 'end' | 'between'>('start');
   gap = input<'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'>('md');
   wrap = input(false);
-  
-  // Accept custom classes for edge cases (like w-full)
-  class = input<string>(''); 
+
+  class = input<string>('');
 
   computedClasses = computed(() => {
     const base = 'flex';
-    
+
     const directions = { row: 'flex-row', col: 'flex-col' };
-    const alignments = { start: 'items-start', center: 'items-center', end: 'items-end', stretch: 'items-stretch' };
-    const justifications = { start: 'justify-start', center: 'justify-center', end: 'justify-end', between: 'justify-between' };
+    const alignments = {
+      start: 'items-start',
+      center: 'items-center',
+      end: 'items-end',
+      stretch: 'items-stretch',
+    };
+    const justifications = {
+      start: 'justify-start',
+      center: 'justify-center',
+      end: 'justify-end',
+      between: 'justify-between',
+    };
     const gaps = { none: 'gap-0', xs: 'gap-1', sm: 'gap-2', md: 'gap-4', lg: 'gap-6', xl: 'gap-8' };
-    
+
     return [
       base,
       directions[this.direction()],
@@ -35,7 +44,9 @@ export class UiStackComponent {
       justifications[this.justify()],
       gaps[this.gap()],
       this.wrap() ? 'flex-wrap' : 'flex-nowrap',
-      this.class()
-    ].filter(Boolean).join(' ');
+      this.class(),
+    ]
+      .filter(Boolean)
+      .join(' ');
   });
 }

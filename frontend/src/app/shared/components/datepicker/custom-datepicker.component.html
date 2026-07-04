@@ -1,34 +1,72 @@
 <div class="relative">
-    <input type="text" readonly [value]="selectedRangeString()" (click)="togglePicker()" class="absolute opacity-0 w-0 h-0 pointer-events-none" />
-      <button (click)="showPicker.set(!showPicker())" [class]="showPicker() ? 'bg-base-content text-base-100 hover:bg-base-content/90' : 'bg-base-100 text-base-content hover:bg-base-300'" class="flex items-center gap-1.5 bg-base-100 group-hover:bg-base-300 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300 w-full">
-        <svg lucideCalendar class="w-4 h-4"></svg> Dates
-      </button>
+  <input
+    type="text"
+    readonly
+    [value]="selectedRangeString()"
+    (click)="togglePicker()"
+    class="absolute opacity-0 w-0 h-0 pointer-events-none"
+  />
+  <button
+    (click)="showPicker.set(!showPicker())"
+    [class]="
+      showPicker()
+        ? 'bg-base-content text-base-100 hover:bg-base-content/90'
+        : 'bg-base-100 text-base-content hover:bg-base-300'
+    "
+    class="flex items-center gap-1.5 bg-base-100 group-hover:bg-base-300 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300 w-full"
+  >
+    <svg lucideCalendar class="w-4 h-4"></svg> Dates
+  </button>
   @if (showPicker()) {
     <div class="inset-0 z-40 fixed" (click)="showPicker.set(false)"></div>
-    <div class="absolute -top-8 z-50 mt-2 p-4 w-[340px] bg-base-100 rounded-field shadow-2xl border border-base-300 overflow-y-auto">
+    <div
+      class="absolute -top-8 z-50 mt-2 p-4 w-[340px] bg-base-100 rounded-field shadow-2xl border border-base-300 overflow-y-auto"
+    >
       <div class="flex items-center justify-between mb-4">
-        <button (click)="prevMonth()" class="p-1 hover:bg-base-200 rounded-full transition-colors text-sm">◀</button>
-        <span class="font-semibold text-sm text-base-content">{{ months[currentMonth()] }} {{ currentYear() }}</span>
-        <button (click)="nextMonth()" class="p-1 hover:bg-base-200 rounded-full transition-colors text-sm">▶</button>
+        <button
+          (click)="prevMonth()"
+          class="p-1 hover:bg-base-200 rounded-full transition-colors text-sm"
+        >
+          ◀
+        </button>
+        <span class="font-semibold text-sm text-base-content"
+          >{{ months[currentMonth()] }} {{ currentYear() }}</span
+        >
+        <button
+          (click)="nextMonth()"
+          class="p-1 hover:bg-base-200 rounded-full transition-colors text-sm"
+        >
+          ▶
+        </button>
       </div>
 
-      <div class="grid grid-cols-7 gap-y-1 text-center text-xs font-medium text-base-content/70 mb-2">
-        @for (dayName of daysOfWeek; track dayName) { <div>{{ dayName }}</div> }
+      <div
+        class="grid grid-cols-7 gap-y-1 text-center text-xs font-medium text-base-content/70 mb-2"
+      >
+        @for (dayName of daysOfWeek; track dayName) {
+          <div>{{ dayName }}</div>
+        }
       </div>
 
       <div class="grid grid-cols-7 gap-y-1 text-center mb-4">
-        @for (blank of blankDays(); track $index) { <div class="h-8"></div> }
+        @for (blank of blankDays(); track $index) {
+          <div class="h-8"></div>
+        }
 
         @for (day of calendarDays(); track day.value) {
-          <div 
+          <div
             class="h-8 w-full flex items-center justify-center relative"
             [class.bg-base-content/10]="day.isInRange"
             [class.bg-primary]="day.isStart || day.isEnd"
             [class.rounded-l-full]="day.isStart && day.hasEnd"
             [class.rounded-r-full]="day.isEnd && day.hasStart"
-            [class.rounded-full]="(day.isStart && !day.hasEnd) || (day.isEnd && !day.hasStart) || (!day.isStart && !day.isEnd && !day.isInRange)">
-            
-            <button 
+            [class.rounded-full]="
+              (day.isStart && !day.hasEnd) ||
+              (day.isEnd && !day.hasStart) ||
+              (!day.isStart && !day.isEnd && !day.isInRange)
+            "
+          >
+            <button
               (click)="selectDay(day.value)"
               class="h-8 w-full text-xs flex items-center justify-center focus:outline-none transition-colors rounded-full"
               [class.text-base-300]="day.isStart || day.isEnd"
@@ -36,7 +74,8 @@
               [class.text-base-content]="day.isInRange"
               [class.font-medium]="day.isInRange"
               [class.text-base-content/70]="!day.isStart && !day.isEnd && !day.isInRange"
-              [class.hover:bg-base-200]="!day.isStart && !day.isEnd && !day.isInRange">
+              [class.hover:bg-base-200]="!day.isStart && !day.isEnd && !day.isInRange"
+            >
               {{ day.value }}
             </button>
           </div>
@@ -44,48 +83,77 @@
       </div>
 
       <div class="flex gap-2 mb-3">
-        <button 
+        <button
           (click)="activePicker.set('start')"
           class="flex-1 p-2 rounded-box text-left relative transition-all group"
           [class]="activePicker() === 'start' ? 'border-none' : 'border'"
           [class.bg-accent]="activePicker() === 'start'"
-          [class.border-accent]="activePicker() !== 'start'">
-          <div class="text-[10px] uppercase font-bold"
-          [class.text-base-300]="activePicker() === 'start'"
-          [class.text-base-content]="activePicker() !== 'start'">Start Date</div>
-          <div class="text-xs  mt-0.5"
-          [class.text-base-200]="activePicker() === 'start'"
-          [class.text-base-content/50]="activePicker() !== 'start'">
-            {{ startDate() ? (startDate() | date:'MMM d, yyyy') : 'None' }}
+          [class.border-accent]="activePicker() !== 'start'"
+        >
+          <div
+            class="text-[10px] uppercase font-bold"
+            [class.text-base-300]="activePicker() === 'start'"
+            [class.text-base-content]="activePicker() !== 'start'"
+          >
+            Start Date
+          </div>
+          <div
+            class="text-xs mt-0.5"
+            [class.text-base-200]="activePicker() === 'start'"
+            [class.text-base-content/50]="activePicker() !== 'start'"
+          >
+            {{ startDate() ? (startDate() | date: 'MMM d, yyyy') : 'None' }}
           </div>
           @if (startDate()) {
-            <span (click)="clearDate('start', $event)" class="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100">✖</span>
+            <span
+              (click)="clearDate('start', $event)"
+              class="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100"
+              >✖</span
+            >
           }
         </button>
 
-        <button 
+        <button
           (click)="activePicker.set('due')"
           class="flex-1 p-2 rounded-box text-left relative transition-all group"
           [class]="activePicker() === 'due' ? 'border-none' : 'border'"
           [class.bg-secondary]="activePicker() === 'due'"
-          [class.border-secondary]="activePicker() !== 'due'">
-          <div class="text-[10px] uppercase font-bold"
-          [class.text-base-300]="activePicker() === 'due'"
-          [class.text-base-content]="activePicker() !== 'due'">Due Date</div>
-          <div class="text-xs mt-0.5"
-          [class.text-base-200]="activePicker() === 'due'"
-          [class.text-base-content/50]="activePicker() !== 'due'">
-            {{ dueDate() ? (dueDate() | date:'MMM d, yyyy') : 'None' }}
+          [class.border-secondary]="activePicker() !== 'due'"
+        >
+          <div
+            class="text-[10px] uppercase font-bold"
+            [class.text-base-300]="activePicker() === 'due'"
+            [class.text-base-content]="activePicker() !== 'due'"
+          >
+            Due Date
+          </div>
+          <div
+            class="text-xs mt-0.5"
+            [class.text-base-200]="activePicker() === 'due'"
+            [class.text-base-content/50]="activePicker() !== 'due'"
+          >
+            {{ dueDate() ? (dueDate() | date: 'MMM d, yyyy') : 'None' }}
           </div>
           @if (dueDate()) {
-            <span (click)="clearDate('due', $event)" class="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100">✖</span>
+            <span
+              (click)="clearDate('due', $event)"
+              class="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100"
+              >✖</span
+            >
           }
         </button>
       </div>
 
       <div class="mb-3 pt-2 border-t border-base-300 flex items-center justify-between">
-        <label class="flex items-center gap-2 text-xs font-medium text-gray-600 cursor-pointer w-max">
-          <input type="checkbox" [ngModel]="hasTime()" (ngModelChange)="hasTime.set($event)" class="rounded text-blue-600 focus:ring-blue-500">
+        <label
+          class="flex items-center gap-2 text-xs font-medium text-gray-600 cursor-pointer w-max"
+        >
+          <input
+            type="checkbox"
+            [ngModel]="hasTime()"
+            (ngModelChange)="hasTime.set($event)"
+            class="rounded text-blue-600 focus:ring-blue-500"
+          />
           Include time
         </label>
       </div>
@@ -94,31 +162,60 @@
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div [class.opacity-50]="!startDate()" [class.pointer-events-none]="!startDate()">
             <div class="flex items-center gap-1">
-              <select [ngModel]="startTime().split(':')[0]" (ngModelChange)="updateTime('start', 'hour', $event)" class="w-full px-2 py-1 text-xs border rounded bg-gray-50 text-center appearance-none"><option *ngFor="let h of hours" [value]="h">{{h}}</option></select>
+              <select
+                [ngModel]="startTime().split(':')[0]"
+                (ngModelChange)="updateTime('start', 'hour', $event)"
+                class="w-full px-2 py-1 text-xs border rounded bg-gray-50 text-center appearance-none"
+              >
+                <option *ngFor="let h of hours" [value]="h">{{ h }}</option>
+              </select>
               <span>:</span>
-              <select [ngModel]="startTime().split(':')[1]" (ngModelChange)="updateTime('start', 'minute', $event)" class="w-full px-2 py-1 text-xs border rounded bg-gray-50 text-center appearance-none"><option *ngFor="let m of minutes" [value]="m">{{m}}</option></select>
+              <select
+                [ngModel]="startTime().split(':')[1]"
+                (ngModelChange)="updateTime('start', 'minute', $event)"
+                class="w-full px-2 py-1 text-xs border rounded bg-gray-50 text-center appearance-none"
+              >
+                <option *ngFor="let m of minutes" [value]="m">{{ m }}</option>
+              </select>
             </div>
           </div>
           <div [class.opacity-50]="!dueDate()" [class.pointer-events-none]="!dueDate()">
             <div class="flex items-center gap-1">
-              <select [ngModel]="endTime().split(':')[0]" (ngModelChange)="updateTime('due', 'hour', $event)" class="w-full px-2 py-1 text-xs border rounded bg-gray-50 text-center appearance-none"><option *ngFor="let h of hours" [value]="h">{{h}}</option></select>
+              <select
+                [ngModel]="endTime().split(':')[0]"
+                (ngModelChange)="updateTime('due', 'hour', $event)"
+                class="w-full px-2 py-1 text-xs border rounded bg-gray-50 text-center appearance-none"
+              >
+                <option *ngFor="let h of hours" [value]="h">{{ h }}</option>
+              </select>
               <span>:</span>
-              <select [ngModel]="endTime().split(':')[1]" (ngModelChange)="updateTime('due', 'minute', $event)" class="w-full px-2 py-1 text-xs border rounded bg-gray-50 text-center appearance-none"><option *ngFor="let m of minutes" [value]="m">{{m}}</option></select>
+              <select
+                [ngModel]="endTime().split(':')[1]"
+                (ngModelChange)="updateTime('due', 'minute', $event)"
+                class="w-full px-2 py-1 text-xs border rounded bg-gray-50 text-center appearance-none"
+              >
+                <option *ngFor="let m of minutes" [value]="m">{{ m }}</option>
+              </select>
             </div>
           </div>
         </div>
       }
 
       <div class="border-t border-base-300 pt-3 mt-2 flex justify-end space-x-2">
-        <button (click)="showPicker.set(false);" class="px-3 py-1.5 text-xs text-base-content bg-base-200 hover:bg-base-300 rounded-box border border-base-300">Cancel</button>
-        <button 
-          (click)="onSave()" 
+        <button
+          (click)="showPicker.set(false)"
+          class="px-3 py-1.5 text-xs text-base-content bg-base-200 hover:bg-base-300 rounded-box border border-base-300"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="onSave()"
           [disabled]="!startDate() && !dueDate()"
-          class="px-3 py-1.5 text-xs disabled:opacity-50 bg-primary text-white font-medium rounded-box hover:bg-primary/90">
+          class="px-3 py-1.5 text-xs disabled:opacity-50 bg-primary text-white font-medium rounded-box hover:bg-primary/90"
+        >
           Save Dates
         </button>
       </div>
-
     </div>
   }
 </div>

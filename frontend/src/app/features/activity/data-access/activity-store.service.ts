@@ -21,7 +21,13 @@ const getRefId = (value: string | ActivityRef | null | undefined): string | null
 };
 
 const toSlug = (value: string): string => {
-  return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'item';
+  return (
+    value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'item'
+  );
 };
 
 const sanitizeColumnText = (value: string | null): string | null => {
@@ -36,30 +42,26 @@ const getActorName = (item: ActivityItem): string => {
 const formatDescription = (item: ActivityItem): string => {
   const actor = getActorName(item);
   const action = formatActivityAction(item.actionType);
-  
+
   const boardName = asRef(item.boardId)?.name;
   const taskTitle = asRef(item.taskId)?.title;
   const columnName = asRef(item.columnId)?.name;
-  
+
   let target = '';
   let location = '';
 
   if (item.entityType === 'task') {
     target = taskTitle ? `task "${taskTitle}"` : 'a task';
     if (boardName) location = `in "${boardName}"`;
-  } 
-  else if (item.entityType === 'comment') {
+  } else if (item.entityType === 'comment') {
     target = taskTitle ? `"${taskTitle}"` : 'a comment';
     if (boardName) location = `in "${boardName}"`;
-  } 
-  else if (item.entityType === 'column') {
+  } else if (item.entityType === 'column') {
     target = columnName ? `column "${columnName}"` : 'a column';
     if (boardName) location = `in "${boardName}"`;
-  } 
-  else if (item.entityType === 'board') {
+  } else if (item.entityType === 'board') {
     target = boardName ? `board "${boardName}"` : 'a board';
-  } 
-  else {
+  } else {
     const wsName = asText(item.metadata?.['workspaceName']);
     target = wsName ? `workspace "${wsName}"` : 'the workspace';
   }
@@ -71,12 +73,13 @@ const formatDescription = (item: ActivityItem): string => {
 const formatContext = (item: ActivityItem): string => {
   const metadata = item.metadata ?? {};
   const sourceRaw = asText(metadata['sourceColumnName']) ?? asText(metadata['sourceColumnId']);
-  const destinationRaw = asText(metadata['destinationColumnName']) ?? asText(metadata['destinationColumnId']);
+  const destinationRaw =
+    asText(metadata['destinationColumnName']) ?? asText(metadata['destinationColumnId']);
   const source = sanitizeColumnText(sourceRaw);
   const destination = sanitizeColumnText(destinationRaw);
 
   const details: string[] = [];
-  
+
   if (source && destination) {
     details.push(`Moved from ${source} to ${destination}`);
   } else if (item.actionType === 'task_moved') {
@@ -84,14 +87,18 @@ const formatContext = (item: ActivityItem): string => {
   }
 
   const updatedFields = Array.isArray(metadata['updatedFields'])
-    ? (metadata['updatedFields'] as unknown[]).map(field => String(field)).filter(Boolean)
+    ? (metadata['updatedFields'] as unknown[]).map((field) => String(field)).filter(Boolean)
     : [];
 
-  if (updatedFields.length && item.actionType !== 'task_completed' && item.actionType !== 'task_reopened') {
+  if (
+    updatedFields.length &&
+    item.actionType !== 'task_completed' &&
+    item.actionType !== 'task_reopened'
+  ) {
     details.push(`Updated: ${updatedFields.join(', ')}`);
   }
 
-  return details.join(' • '); 
+  return details.join(' • ');
 };
 
 const generateDeepLink = (item: ActivityItem, workspaceId?: string) => {
@@ -104,8 +111,10 @@ const generateDeepLink = (item: ActivityItem, workspaceId?: string) => {
 
   if (item.entityType === 'workspace') {
     return {
-      commands: resolvedWorkspaceId ? ['/workspaces', resolvedWorkspaceId, toSlug(workspaceName)] : ['/workspaces'],
-      label: 'Open workspace'
+      commands: resolvedWorkspaceId
+        ? ['/workspaces', resolvedWorkspaceId, toSlug(workspaceName)]
+        : ['/workspaces'],
+      label: 'Open workspace',
     };
   }
 
@@ -118,7 +127,7 @@ const generateDeepLink = (item: ActivityItem, workspaceId?: string) => {
     return {
       commands: ['/boards', boardId, toSlug(boardName || 'board')],
       queryParams: Object.keys(queryParams).length ? queryParams : undefined,
-      label: taskId ? 'Open task' : 'Open board'
+      label: taskId ? 'Open task' : 'Open board',
     };
   }
 
@@ -126,7 +135,7 @@ const generateDeepLink = (item: ActivityItem, workspaceId?: string) => {
     return {
       commands: ['/activity'],
       queryParams: { workspaceId: resolvedWorkspaceId },
-      label: 'Open activity context'
+      label: 'Open activity context',
     };
   }
 
@@ -148,7 +157,7 @@ const initialState: ActivityState = {
   items: [],
   workspaceId: undefined,
   boardId: undefined,
-  isLoaded: false
+  isLoaded: false,
 };
 
 export const ActivityStore = signalStore(
@@ -161,26 +170,27 @@ export const ActivityStore = signalStore(
     currentBoardId: computed(() => boardId()),
     uiItems: computed(() => {
       const wId = workspaceId();
-      return items().map(item => ({
+      return items().map((item) => ({
         id: item._id ?? item.id ?? item.createdAt,
         description: formatDescription(item),
         context: formatContext(item),
         deepLink: generateDeepLink(item, wId),
-        createdAt: item.createdAt
+        createdAt: item.createdAt,
       }));
-    })
+    }),
   })),
   withMethods((store, activityApi = inject(ActivityApiService)) => ({
-    
     async loadActivities(workspaceId?: string, boardId?: string, forceRefresh = false) {
-      
-      // 🚀 THE FIX: Cache Check
-      // Agar data loaded hai aur IDs same hain jo maangi ja rahi hain, toh API call skip kar do!
-      if (!forceRefresh && store.isLoaded() && !store.error() && store.currentWorkspaceId() === workspaceId && store.currentBoardId() === boardId) {
-        return; 
+      if (
+        !forceRefresh &&
+        store.isLoaded() &&
+        !store.error() &&
+        store.currentWorkspaceId() === workspaceId &&
+        store.currentBoardId() === boardId
+      ) {
+        return;
       }
 
-      // Naya data mangwana hai toh isLoaded ko pehle false karo
       patchState(store, { loading: true, error: null, workspaceId, boardId, isLoaded: false });
 
       try {
@@ -196,9 +206,13 @@ export const ActivityStore = signalStore(
         const response = await firstValueFrom(request$);
         patchState(store, { items: response.data?.items ?? [], loading: false, isLoaded: true });
       } catch (err) {
-        patchState(store, { error: 'Failed to load activity feed', items: [], loading: false, isLoaded: false });
+        patchState(store, {
+          error: 'Failed to load activity feed',
+          items: [],
+          loading: false,
+          isLoaded: false,
+        });
       }
-    }
-    
-  }))
+    },
+  })),
 );
