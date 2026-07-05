@@ -3,6 +3,29 @@
     <h1 class="text-2xl font-extrabold text-base-content mb-6">Login</h1>
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      @if (savedUser()) {
+    <div class="flex flex-col items-center mb-6 p-5 border border-base-300 rounded-box bg-base-200/40 text-center">
+      <div class="w-16 h-16 rounded-full overflow-hidden mb-3 border-2 border-primary shadow-sm bg-base-300 flex items-center justify-center">
+        @if (savedUser()?.avatarUrl) {
+          <img [src]="savedUser()?.avatarUrl" alt="Profile" class="w-full h-full object-cover" />
+        } @else {
+          <!-- Agar avatar nahi hai toh Name ka pehla letter dikhao -->
+          <span class="text-xl font-bold uppercase">{{ savedUser()?.name?.charAt(0) }}</span>
+        }
+      </div>
+      <h3 class="font-bold text-base-content">{{ savedUser()?.name }}</h3>
+      <p class="text-xs text-base-content/70 mb-3">{{ savedUser()?.email }}</p>
+      
+      <!-- 'Not You?' Button -->
+      <button 
+        type="button" 
+        (click)="useAnotherAccount()" 
+        class="text-xs font-semibold text-primary hover:underline"
+      >
+        Not you? Use another account
+      </button>
+    </div>
+  } @else {
       <div class="mb-5">
         <label for="email" class="block mb-1.5 text-sm font-semibold text-base-content/90"
           >Your email</label
@@ -15,44 +38,55 @@
           class="w-full p-2 border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
           placeholder="name@email.com"
         />
+        @if (form.get('email')?.invalid && form.get('email')?.touched) {
+          <p class="text-xs text-error mt-1">Please enter a valid email address.</p>
+        }
       </div>
 
-      <div class="mb-5">
+      <div class="mb-5 relative">
         <label for="password" class="block mb-1.5 text-sm font-semibold text-base-content/90"
           >Your password</label
         >
         <input
-          type="password"
+          [type]="hidePassword() ? 'password' : 'text'"
           id="password"
           formControlName="password"
           class="w-full p-2 border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
           placeholder="••••••••"
         />
+        <button
+          type="button"
+          (click)="togglePasswordVisibility()"
+          class="absolute right-2 translate-y-1/4 p-1 text-base-content/70 hover:text-base-content transition-colors"
+        >
+          @if (hidePassword()) {
+            <svg lucideEyeClosed class="w-5 h-5" stroke-width="1.5"></svg>
+          } @else {
+            <svg lucideEye class="w-5 h-5" stroke-width="1.5"></svg>
+          }
+        </button>
+        @if (form.get('password')?.invalid && form.get('password')?.touched) {
+          <p class="text-xs text-error mt-1">Password must be at least 8 characters.</p>
+        }
       </div>
-
-      <label for="remember" class="flex items-center mb-6 cursor-pointer">
-        <input
-          id="remember"
-          type="checkbox"
-          value=""
-          class="w-4 h-4 rounded-sm border border-base-300 bg-base-100 checked:bg-primary"
-        />
-        <p class="ms-2 text-sm font-medium text-base-content select-none">
-          I agree with the
-          <a
-            routerLink="/terms"
-            class="text-primary hover:text-primary/80 hover:underline transition-colors"
-            >terms and conditions</a
-          >.
-        </p>
-      </label>
-
+        <label for="remember" class="flex items-center mb-6 cursor-pointer">
+    <input
+      id="remember"
+      type="checkbox"
+      formControlName="remember"
+      class="w-4 h-4 rounded-sm border border-base-300 bg-base-100 checked:bg-primary"
+    />
+    <p class="ms-2 text-sm font-medium text-base-content select-none">
+      Remember me
+    </p>
+  </label>
       <button
         type="submit"
         class="w-full p-field rounded-field bg-primary text-primary-content font-bold cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 border-none"
       >
         Submit
       </button>
+    }
     </form>
 
     <p class="mt-6 text-sm text-center text-base-content/70">

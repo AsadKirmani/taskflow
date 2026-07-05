@@ -94,6 +94,7 @@ export class TaskFacade {
     }
 
     this.updateTaskProperty('assigneeIds', newMembers);
+    this.updateTaskProperty('assignedAt',new Date().toISOString());
   }
   assignedMembers = computed<User[]>(() => {
     const members = this.boardStore.members() || [];

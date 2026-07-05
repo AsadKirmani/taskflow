@@ -1,7 +1,8 @@
 import { inject, computed } from '@angular/core';
-import { signalStore, withState, withMethods, withComputed, patchState } from '@ngrx/signals';
+import { signalStore, withState, withMethods, withComputed, patchState, withHooks } from '@ngrx/signals';
 import { firstValueFrom } from 'rxjs';
 import { DashboardApiService, DashboardSummary, DashboardTaskRow } from './dashboard-api.service';
+import { EventBusService } from '../../../core/services/event-bus.service';
 
 type DashboardState = {
   workspaceId: string | null;
@@ -32,11 +33,12 @@ const initialState: DashboardState = {
 export const DashboardStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-
+  
+  
   withComputed((state) => ({
     isLoading: computed(() => state.loading()),
     hasError: computed(() => state.error()),
-
+    
     tasksDueToday: computed(() => state.stats().tasksDueToday),
     overdueTasks: computed(() => state.stats().overdueTasks),
     activeBoards: computed(() => state.stats().activeBoards),
@@ -44,7 +46,7 @@ export const DashboardStore = signalStore(
     completedOnTime: computed(() => 0),
     newAssignmentsToday: computed(() => state.stats().newAssignmentsToday),
   })),
-
+  
   withMethods((store, dashboardApi = inject(DashboardApiService)) => ({
     async loadDashboardData(workspaceId: string, userId: string, forceReload = false) {
       if (
@@ -59,15 +61,14 @@ export const DashboardStore = signalStore(
         patchState(store, { error: 'No active workspace found', loading: false });
         return;
       }
-
+      
       patchState(store, { loading: true, error: null });
-
+      
       try {
         const response = await firstValueFrom(
           dashboardApi.getDashboardSummary(workspaceId, userId),
         );
         const data = response.data;
-
         patchState(store, {
           workspaceId,
           stats: data.stats,
@@ -123,4 +124,13 @@ export const DashboardStore = signalStore(
       });
     },
   })),
-);
+  withHooks({
+    onInit(store, eventBus = inject(EventBusService)) {
+      
+      eventBus.taskUpdated$.subscribe(() => {
+        store.loadDashboardData(store.workspaceId() ?? '', '', true);
+      });
+      
+    }
+  })
+)

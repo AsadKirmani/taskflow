@@ -47,6 +47,7 @@ import {
   LucideChevronLeft,
   LucideChevronUp,
   LucideClock,
+  LucideEyeClosed
 } from '@lucide/angular';
 
 export const APP_ICONS = [
@@ -98,4 +99,5 @@ export const APP_ICONS = [
   LucideChevronLeft,
   LucideChevronUp,
   LucideClock,
+  LucideEyeClosed
 ];

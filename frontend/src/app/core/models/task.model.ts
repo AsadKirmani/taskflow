@@ -19,6 +19,7 @@ export interface Task {
   title: string;
   description: string;
   assigneeIds: string[];
+  assignedAt?: string | null;
   reporterId?: string;
   dueDate?: string | null;
   startDate?: string | null;

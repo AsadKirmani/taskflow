@@ -93,6 +93,10 @@ const TaskSchema = new Schema(
       ref: "User",
       default: [],
     },
+    assignedAt: {
+      type: Date,
+      default: null,
+    },
     reporterId: {
       type: Schema.Types.ObjectId,
       ref: "User",

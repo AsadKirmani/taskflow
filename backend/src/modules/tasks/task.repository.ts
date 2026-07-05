@@ -170,6 +170,13 @@ export const taskRepository = {
       isCompleted?: boolean;
       completedAt?: Date | null;
       commentCount?: number;
+      startDate?: Date | null;
+      dueDate?: Date | null;
+      priority?: string;
+      labels?: { name: string; color: string }[];
+      assigneeIds?: string[];
+      archived?: boolean;
+      assignedAt?: Date | null;
     },
   ) {
     const updatedTask = await TaskModel.findByIdAndUpdate(taskId, data, {

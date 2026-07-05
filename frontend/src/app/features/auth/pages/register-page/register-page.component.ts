@@ -1,13 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthStoreService } from '../../data-access/auth-store.service';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
+import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-register-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AutofocusDirective],
+  imports: [ReactiveFormsModule, RouterLink, AutofocusDirective, ...APP_ICONS],
   template: `
     <section class="flex items-center justify-center mx-auto h-screen bg-base-200 px-4">
       <div class="p-8 bg-base-100 rounded-box shadow-xl border border-base-300 w-full max-w-md">
@@ -26,6 +27,9 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
               class="w-full p-2 border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
               placeholder="John Doe"
             />
+            @if (form.get('name')?.invalid && form.get('name')?.touched) {
+              <span class="text-error text-xs mt-1">Name must be at least 2 characters</span>
+            }
           </div>
 
           <div class="mb-5">
@@ -39,20 +43,53 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
               class="w-full p-2 border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
               placeholder="name@email.com"
             />
+            @if (form.get('email')?.invalid && form.get('email')?.touched) {
+              <span class="text-error text-xs mt-1">Please enter a valid email</span>
+            }
           </div>
 
-          <div class="mb-6">
+          <div class="mb-6 relative">
             <label for="password" class="block mb-1.5 text-sm font-semibold text-base-content/90"
               >Password</label
             >
             <input
               id="password"
-              type="password"
+              [type]="hidePassword() ? 'password' : 'text'"
               formControlName="password"
               class="w-full p-2 border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
               placeholder="••••••••"
             />
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute right-2 translate-y-1/4 p-1 text-base-content/70 hover:text-base-content transition-colors"
+            >
+              @if (hidePassword()) {
+                <svg lucideEyeClosed class="w-5 h-5" stroke-width="1.5"></svg>
+              } @else {
+                <svg lucideEye class="w-5 h-5" stroke-width="1.5"></svg>
+              }
+            </button>
+            @if (form.get('password')?.invalid && form.get('password')?.touched) {
+              <span class="text-error text-xs mt-1">Password must be at least 8 characters</span>
+            }
           </div>
+          <label for="remember" class="flex items-center mb-6 cursor-pointer">
+            <input
+              id="remember"
+              type="checkbox"
+              value=""
+              class="w-4 h-4 rounded-sm border border-base-300 bg-base-100 checked:bg-primary"
+            />
+            <p class="ms-2 text-sm font-medium text-base-content select-none">
+              I agree with the
+              <a
+                routerLink="/terms"
+                class="text-primary hover:text-primary/80 hover:underline transition-colors"
+                >terms and conditions</a
+              >.
+            </p>
+          </label>
 
           <button
             type="submit"
@@ -85,6 +122,11 @@ export class RegisterPageComponent {
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
+
+  hidePassword = signal(true);
+  togglePasswordVisibility(): void {
+    this.hidePassword.set(!this.hidePassword());
+  }
 
   submit(): void {
     if (this.form.invalid) {

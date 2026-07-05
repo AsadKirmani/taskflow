@@ -27,7 +27,6 @@ export class DashboardService {
       dashboardRepository.getRecentTasks(workspaceId, userId),
       dashboardRepository.getRecentActivities(workspaceId),
     ]);
-
     const recentTasks = recentTasksRaw.map((task: any) => ({
       id: task._id,
       boardId: task.boardId?._id,

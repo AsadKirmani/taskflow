@@ -20,6 +20,7 @@ import { BoardFilters } from '../../boards/data-access/board-state.model';
 import { TaskState, initialTaskState } from './task-state.model';
 import { TaskComment } from '../../../core/models/comment.model';
 import { ArchiveService } from '../../../core/services/archive.service';
+import { EventBusService } from '../../../core/services/event-bus.service';
 
 const normalizeTasks = (tasks: any[]): Task[] =>
   tasks.map((t) => ({ ...t, id: t.id ?? t._id ?? '' }));
@@ -138,6 +139,7 @@ export const TaskStore = signalStore(
       api = inject(BoardApiService),
       notification = inject(NotificationService),
       archive = inject(ArchiveService),
+      eventBus = inject(EventBusService),
     ) => {
       const triggerFilterFetch = rxMethod<string>(
         pipe(
@@ -289,6 +291,7 @@ export const TaskStore = signalStore(
                 [columnId]: [...(store.taskIdsByColumn()[columnId] ?? []), newTask.id],
               },
             });
+            eventBus.notifyTaskUpdate();
           } catch (err) {
             notification.error('Failed to add task');
           }
@@ -305,6 +308,7 @@ export const TaskStore = signalStore(
 
           try {
             await firstValueFrom(api.updateTask(taskId, updates));
+            eventBus.notifyTaskUpdate();
           } catch (err) {
             patchState(store, { tasksById: { ...store.tasksById(), [taskId]: existingTask } });
             notification.error('Failed to update task');

@@ -24,6 +24,7 @@ export class DashboardRepository {
         assigneeIds: uId,
         isCompleted: false,
         dueDate: { $gte: dates.startOfToday, $lte: dates.endOfToday },
+        archived: false,
       }),
 
       TaskModel.countDocuments({
@@ -31,18 +32,21 @@ export class DashboardRepository {
         assigneeIds: uId,
         isCompleted: false,
         dueDate: { $lt: dates.startOfToday },
+        archived: false,
       }),
 
       TaskModel.countDocuments({
         workspaceId: wsId,
         assigneeIds: uId,
         isCompleted: true,
+        archived: false,
       }),
 
       TaskModel.countDocuments({
         workspaceId: wsId,
         assigneeIds: uId,
-        createdAt: { $gte: dates.startOfToday, $lte: dates.endOfToday },
+        assignedAt: { $gte: dates.startOfToday, $lte: dates.endOfToday },
+        archived: false,
       }),
 
       BoardModel.countDocuments({
@@ -66,6 +70,7 @@ export class DashboardRepository {
       workspaceId: new mongoose.Types.ObjectId(workspaceId),
       assigneeIds: new mongoose.Types.ObjectId(userId),
       isCompleted: false,
+      archived: false
     })
       .select("title dueDate priority isCompleted boardId")
       .populate("boardId", "name")
