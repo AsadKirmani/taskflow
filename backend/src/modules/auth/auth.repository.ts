@@ -41,7 +41,7 @@ export const authRepository = {
     userId: string;
     tokenHash: string;
     expiresAt: Date;
-    createdByIp?: string | null;
+    createdByIp?: string | string[] | null;
     userAgent?: string | null;
   }) {
     return RefreshTokenModel.create(data);

@@ -36,7 +36,10 @@ export const columnRepository = {
     return ColumnModel.findById(columnId);
   },
   async getColumnsByBoardId(boardId: string) {
-    return ColumnModel.find({ boardId, archived: false }).sort({ position: 1 });
+    return ColumnModel.find({ boardId, archived: false })
+      .select("_id name boardId position taskOrder")
+      .sort({ position: 1 })
+      .lean();
   },
   async reorderTasks(columnId: string, newTaskOrder: string[]) {
     const updatedColumn = await ColumnModel.findByIdAndUpdate(

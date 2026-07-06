@@ -5,6 +5,7 @@ import { SettingsStoreService } from '../../data-access/settings-store.service';
 import { ProfileSettingsComponent } from '../../components/profile-settings.component';
 import { SecuritySettingsComponent } from '../../components/security-settings.component';
 import { NotificationsSettingsComponent } from '../../components/notifications-settings.component';
+import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-settings-page',
@@ -15,6 +16,7 @@ import { NotificationsSettingsComponent } from '../../components/notifications-s
     ProfileSettingsComponent,
     SecuritySettingsComponent,
     NotificationsSettingsComponent,
+    UiButtonComponent,
   ],
   template: `
     <section>
@@ -24,17 +26,16 @@ import { NotificationsSettingsComponent } from '../../components/notifications-s
         <div
           class="bg-base-100 rounded-box border border-base-300 overflow-hidden flex flex-col min-h-[500px]"
         >
-          <nav class="flex flex-row overflow-x-auto gap-2 border-b border-base-300 bg-base-300 p-4">
+          <nav class="flex flex-row overflow-x-auto gap-2 border-b border-base-300 bg-base-200 p-4">
             @for (tab of tabs; track tab.id) {
-              <button
+              <ui-button
                 (click)="activeTab.set(tab.id)"
-                [class.bg-base-200]="activeTab() === tab.id"
-                [class.font-semibold]="activeTab() === tab.id"
-                [class.shadow-sm]="activeTab() === tab.id"
-                class="px-4 py-2 rounded-lg text-sm transition-all hover:bg-base-100 whitespace-nowrap"
+                variant="outline"
+                size="md"
+                [active]="activeTab() === tab.id"
               >
                 {{ tab.label }}
-              </button>
+              </ui-button>
             }
           </nav>
 

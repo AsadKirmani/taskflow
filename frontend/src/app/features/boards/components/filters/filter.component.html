@@ -131,86 +131,86 @@
         <li class="flex items-center gap-2">
           <input
             type="checkbox"
-            id="nocolor"
-            name="nocolor"
-            value="nocolor"
+            id="noLabel"
+            name="noLabel"
+            value="noLabel"
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('no_color')"
-            (change)="toggleLabel('no_color', $any($event.target).checked)"
+            [checked]="filter.labels.includes('noLabel')"
+            (change)="toggleLabel('noLabel', $any($event.target).checked)"
           />
-          <label for="nocolor">No Color</label>
+          <label for="noLabel">No Label</label>
         </li>
         <li class="flex items-center gap-2">
           <input
             type="checkbox"
-            id="red"
-            name="red"
-            value="red"
+            id="bug"
+            name="bug"
+            value="bug"
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('red')"
-            (change)="toggleLabel('red', $any($event.target).checked)"
+            [checked]="filter.labels.includes('bug')"
+            (change)="toggleLabel('bug', $any($event.target).checked)"
           />
-          <label for="red">Red</label>
+          <label for="bug">Bug</label>
         </li>
         <li class="flex items-center gap-2">
           <input
             type="checkbox"
-            id="orange"
-            name="orange"
-            value="orange"
+            id="feature"
+            name="feature"
+            value="feature"
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('orange')"
-            (change)="toggleLabel('orange', $any($event.target).checked)"
+            [checked]="filter.labels.includes('feature')"
+            (change)="toggleLabel('feature', $any($event.target).checked)"
           />
-          <label for="orange">Orange</label>
+          <label for="feature">Feature</label>
         </li>
         <li class="flex items-center gap-2">
           <input
             type="checkbox"
-            id="yellow"
-            name="yellow"
-            value="yellow"
+            id="enhancement"
+            name="enhancement"
+            value="enhancement"
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('yellow')"
-            (change)="toggleLabel('yellow', $any($event.target).checked)"
+            [checked]="filter.labels.includes('enhancement')"
+            (change)="toggleLabel('enhancement', $any($event.target).checked)"
           />
-          <label for="yellow">Yellow</label>
+          <label for="enhancement">Enhancement</label>
         </li>
         <li class="flex items-center gap-2">
           <input
             type="checkbox"
-            id="green"
-            name="green"
-            value="green"
+            id="design"
+            name="design"
+            value="design"
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('green')"
-            (change)="toggleLabel('green', $any($event.target).checked)"
+            [checked]="filter.labels.includes('design')"
+            (change)="toggleLabel('design', $any($event.target).checked)"
           />
-          <label for="green">Green</label>
+          <label for="design">Design</label>
         </li>
         <li class="flex items-center gap-2">
           <input
             type="checkbox"
-            id="blue"
-            name="blue"
-            value="blue"
+            id="urgent"
+            name="urgent"
+            value="urgent"
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('blue')"
-            (change)="toggleLabel('blue', $any($event.target).checked)"
+            [checked]="filter.labels.includes('urgent')"
+            (change)="toggleLabel('urgent', $any($event.target).checked)"
           />
-          <label for="blue">Blue</label>
+          <label for="urgent">Urgent</label>
         </li>
         <li class="flex items-center gap-2">
           <input
             type="checkbox"
-            id="purple"
-            name="purple"
-            value="purple"
+            id="documentation"
+            name="documentation"
+            value="documentation"
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('purple')"
-            (change)="toggleLabel('purple', $any($event.target).checked)"
+            [checked]="filter.labels.includes('documentation')"
+            (change)="toggleLabel('documentation', $any($event.target).checked)"
           />
-          <label for="purple">Purple</label>
+          <label for="documentation">Documentation</label>
         </li>
       </ul>
     </section>

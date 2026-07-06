@@ -4,10 +4,10 @@ import {
   HttpHandlerFn,
   HttpErrorResponse,
 } from '@angular/common/http';
-import { inject, Injector } from '@angular/core';
+import { inject } from '@angular/core';
 import { catchError, switchMap, throwError, Subject, Observable, filter, take } from 'rxjs';
 import { TokenService } from '../services/token.service';
-import { AuthStoreService } from '../../features/auth/data-access/auth-store.service';
+import { AuthStoreService } from '../../features/auth/data-access/auth-store.service'; 
 
 let isRefreshing = false;
 const refreshTokenSubject = new Subject<string | null>();
@@ -22,10 +22,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  const injector = inject(Injector);
-
-  const tokenService = injector.get(TokenService);
-  const authStore = injector.get(AuthStoreService);
+  const tokenService = inject(TokenService);
+  const authStore = inject(AuthStoreService);
 
   const token = tokenService.getAccessToken();
   let authReq = req;
@@ -54,7 +52,7 @@ function handle401Error(
   request: HttpRequest<unknown>,
   next: HttpHandlerFn,
   tokenService: TokenService,
-  authStore: AuthStoreService,
+  authStore: InstanceType<typeof AuthStoreService>, 
 ): Observable<any> {
   if (isRefreshing) {
     return refreshTokenSubject.pipe(

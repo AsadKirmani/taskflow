@@ -138,6 +138,7 @@ export const taskController = {
       priority?: "low" | "medium" | "high" | "urgent";
       archived?: boolean;
       assigneeIds?: string[];
+      assignedAt?: string | null;
     };
     const updatePayload: {
       title?: string;
@@ -151,6 +152,7 @@ export const taskController = {
       priority?: "low" | "medium" | "high" | "urgent";
       archived?: boolean;
       assigneeIds?: string[];
+      assignedAt?: Date | null;
     } = {};
 
     if (typeof title === "string") {
@@ -185,6 +187,7 @@ export const taskController = {
     }
     if (Array.isArray(assigneeIds)) {
       updatePayload.assigneeIds = assigneeIds;
+      updatePayload.assignedAt = assigneeIds.length > 0 ? new Date() : null;
     }
     if (typeof isCompleted === "boolean") {
       updatePayload.isCompleted = isCompleted;

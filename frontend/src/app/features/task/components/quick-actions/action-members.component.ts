@@ -3,24 +3,21 @@ import { CommonModule } from '@angular/common';
 import { User } from '../../../../core/models/user.model';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-action-members',
   standalone: true,
-  imports: [CommonModule, AutofocusDirective, ...APP_ICONS],
+  imports: [CommonModule, AutofocusDirective, UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="relative inline-flex w-full">
-      <button
+      <ui-button
         (click)="isOpen.set(!isOpen())"
-        [ngClass]="
-          isOpen()
-            ? 'bg-base-content text-base-100 hover:bg-base-content/90'
-            : 'bg-base-100 text-base-content hover:bg-base-300'
-        "
-        class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300 w-full"
+        variant="outline"
+        [active]="isOpen()"
       >
-        <svg lucideUser class="w-4 h-4"></svg> Members
-      </button>
+        <svg lucideUser class="w-4 h-4 mr-2"></svg> Members
+      </ui-button>
       @if (isOpen()) {
         <div class="fixed inset-0 z-40" (click)="closePicker()"></div>
         <div

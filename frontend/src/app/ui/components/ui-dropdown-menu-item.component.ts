@@ -4,7 +4,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   selector: 'ui-dropdown-menu-item',
   standalone: true,
   template: `
-    <button [class]="computedClass" (click)="onClick.emit()" class="active:bg-base-200">
+    <!-- 🚀 Maine click handler ko onClick.emit() rakha hai -->
+    <button [class]="computedClass" (click)="onClick.emit()">
       @if (type === 'checkbox') {
         <input type="checkbox" [checked]="checked" />
       }
@@ -18,9 +19,17 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export class UiDropdownMenuItemComponent {
   @Input() type: 'button' | 'checkbox' | 'radio' = 'button';
   @Input() checked = false;
+  
+  @Input() active = false; 
+  
   @Output() onClick = new EventEmitter<void>();
 
   get computedClass() {
-    return 'w-full px-4 py-2 text-sm hover:bg-base-200 flex items-center gap-2 text-base-content transition-colors cursor-pointer';
+    const base = 'w-full px-4 py-2 text-sm flex items-center gap-2 text-base-content transition-colors cursor-pointer';
+
+    if (this.active) {
+      return `${base} bg-base-300 border-l-4 border-primary`; 
+    }
+    return `${base} bg-transparent hover:bg-base-200`;
   }
 }

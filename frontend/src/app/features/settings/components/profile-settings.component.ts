@@ -1,11 +1,12 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SettingsStoreService } from '../data-access/settings-store.service';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-profile-settings',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, UiButtonComponent],
   template: `
     <h2 class="text-lg font-semibold mb-4">Edit Profile</h2>
 
@@ -25,12 +26,13 @@ import { SettingsStoreService } from '../data-access/settings-store.service';
       </div>
 
       <div class="flex flex-col gap-2">
-        <button
+        <ui-button
           (click)="fileInput.click()"
-          class="text-sm font-medium px-4 py-2 bg-base-200 hover:bg-base-300 rounded-lg transition-colors border border-base-300"
+          variant="outline"
+          size="md" 
         >
           Change Avatar
-        </button>
+        </ui-button>
         <input
           type="file"
           #fileInput
@@ -68,16 +70,16 @@ import { SettingsStoreService } from '../data-access/settings-store.service';
           <span class="text-error text-xs mt-1">Enter a valid email</span>
         }
       </div>
-      <button
+      <ui-button
         type="submit"
+        variant="primary"
+        size="md"
         [disabled]="profileForm.invalid || store.isSaving()"
-        class="bg-primary text-primary-content px-5 font-medium py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+        [loading]="store.isSaving()"
+        loadingText="Saving..."
       >
-        @if (store.isSaving()) {
-          <span class="loading loading-spinner loading-xs"></span>
-        }
         Save Changes
-      </button>
+      </ui-button>
     </form>
   `,
 })

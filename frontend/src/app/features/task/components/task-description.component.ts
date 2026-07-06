@@ -2,11 +2,12 @@ import { Component, HostListener, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TextEditorComponent } from '../../../shared/components/editor/text-editor.component';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-task-description',
   standalone: true,
-  imports: [CommonModule, TextEditorComponent, ...APP_ICONS],
+  imports: [CommonModule, TextEditorComponent, UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="flex items-start gap-3">
       <svg lucideTextAlignStart class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>
@@ -27,18 +28,22 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
               minHeight="150px"
             ></app-text-editor>
             <div class="flex gap-2 mt-1">
-              <button
+              <ui-button
                 (click)="save()"
-                class="bg-primary hover:bg-primary/90 text-base-100 text-sm font-medium px-4 py-1.5 rounded-box transition-colors"
+                variant="primary"
+                size="sm"
+                [loading]="isSaving()"
+                loadingText="Saving..."
               >
                 Save
-              </button>
-              <button
+              </ui-button>
+              <ui-button
                 (click)="cancelEdit()"
-                class="hover:bg-base-300 text-base-content text-sm font-medium px-4 py-1.5 rounded-box transition-colors"
+                variant="ghost"
+                size="sm"
               >
                 Cancel
-              </button>
+              </ui-button>
             </div>
           </div>
         }
@@ -49,6 +54,7 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
 export class TaskDescriptionComponent {
   description = input<string | undefined>('');
   saved = output<string>();
+  isSaving = signal(false);
 
   isEditing = signal(false);
   descValue = signal('');
@@ -63,8 +69,10 @@ export class TaskDescriptionComponent {
   }
 
   save() {
+    this.isSaving.set(true);
     this.saved.emit(this.descValue());
     this.isEditing.set(false);
+    this.isSaving.set(false);
   }
   @HostListener('keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {

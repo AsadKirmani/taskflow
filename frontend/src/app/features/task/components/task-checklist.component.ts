@@ -2,11 +2,12 @@ import { Component, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChecklistItem } from '../../../core/models/task.model';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-task-checklist',
   standalone: true,
-  imports: [CommonModule, ...APP_ICONS],
+  imports: [CommonModule, UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="flex items-start gap-3">
       <svg lucideSquareCheck class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>
@@ -42,20 +43,20 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
 
               <span
                 [class.line-through]="item.isCompleted"
-                [class.text-base-content]="!item.isCompleted"
+                [class.text-base-content/70]="!item.isCompleted"
                 [class.text-base-content]="item.isCompleted"
-                [style.opacity]="item.isCompleted ? '0.5' : '1'"
                 class="text-sm font-medium flex-1 transition-all"
               >
                 {{ item.title }}
               </span>
 
-              <button
+              <ui-button
                 (click)="onDelete(i)"
-                class="opacity-0 group-hover:opacity-100 text-error hover:bg-error/20 p-1.5 rounded transition-all cursor-pointer"
+                variant="icon"
+                size="icon-sm"
               >
                 <svg lucideTrash class="w-4 h-4"></svg>
-              </button>
+              </ui-button>
             </div>
           }
 
@@ -67,12 +68,13 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
               class="focus:outline-none w-full px-3 py-1.5 text-sm text-base-content rounded-field border border-base-300 focus:border-primary transition-colors"
               (keyup.enter)="onAdd(newItemInput.value); newItemInput.value = ''"
             />
-            <button
+            <ui-button
               (click)="onAdd(newItemInput.value); newItemInput.value = ''"
-              class="bg-base-200 hover:bg-base-300 text-base-content px-4 py-1.5 rounded text-sm font-medium transition-colors border border-base-300 shadow-sm"
+              variant="outline"
+              size="sm"
             >
               Add
-            </button>
+            </ui-button>
           </div>
         </div>
       </div>

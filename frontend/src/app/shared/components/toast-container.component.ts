@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NotificationService, ToastType } from '../../core/services/notification.service';
+import { APP_ICONS } from '../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-toast-container',
   standalone: true,
+  imports: [...APP_ICONS],
   template: `
     <div
       class="fixed bottom-4 right-4 z-[100] flex flex-col gap-3 pointer-events-none sm:bottom-6 sm:right-6"
@@ -13,77 +15,21 @@ import { NotificationService, ToastType } from '../../core/services/notification
           <div class="shrink-0 mt-0.5">
             @switch (toast.type) {
               @case ('success') {
-                <div>
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                    <path d="m9 11 3 3L22 4" />
-                  </svg>
-                </div>
+                
+                  <svg lucideCircleCheck class="w-5 h-5"></svg>
+                
               }
               @case ('error') {
-                <div>
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="15" x2="9" y1="9" y2="15" />
-                    <line x1="9" x2="15" y1="9" y2="15" />
-                  </svg>
-                </div>
+                <svg lucideCircleX class="w-5 h-5"></svg>
+                
               }
               @case ('warning') {
-                <div>
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
-                    />
-                    <path d="M12 9v4" />
-                    <path d="M12 17h.01" />
-                  </svg>
-                </div>
+                <svg lucideTriangleAlert class="w-5 h-5"></svg>
+                
               }
               @default {
-                <div>
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" x2="12" y1="16" y2="12" />
-                    <line x1="12" x2="12.01" y1="8" y2="8" />
-                  </svg>
-                </div>
+                <svg lucideInfo class="w-5 h-5"></svg>
+               
               }
             }
           </div>
@@ -99,19 +45,7 @@ import { NotificationService, ToastType } from '../../core/services/notification
             (click)="toastService.remove(toast.id)"
             class="shrink-0 p-1 rounded-btn hover:bg-base-content transition-colors"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
-            </svg>
+            <svg lucideX class="w-4 h-4"></svg>
           </button>
         </div>
       }

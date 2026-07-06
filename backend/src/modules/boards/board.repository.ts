@@ -37,8 +37,11 @@ export const boardRepository = {
         { visibility: "workspace" },
         { visibility: "private", createdBy: userId },
       ],
-    });
-    return boards;
+     
+    })
+    .select("name")
+    .lean();  
+    return boards.map(board => board.name);
   },
 
   async updateBoard(
@@ -58,9 +61,10 @@ export const boardRepository = {
 
   async getBoardsForUser(userId: string) {
     const boards = await BoardModel.find({
+      
       archived: false,
       $or: [{ createdBy: userId }, { memberIds: userId }],
-    });
+    }).select("name workspaceId visibility createdBy memberIds");
     return boards;
   },
   async reorderColumns(boardId: string, newColumnOrder: string[]) {

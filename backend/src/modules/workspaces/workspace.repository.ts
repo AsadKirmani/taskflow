@@ -24,12 +24,10 @@ export const workspaceRepository = {
     return newWorkspace;
   },
   async getWorkspaceBySlug(slug: string) {
-    const workspace = await WorkspaceModel.findOne({ slug });
-    return workspace;
+    return WorkspaceModel.findOne({ slug }).select("-__v").lean();
   },
   async getWorkspaceById(workspaceId: string) {
-    const workspace = await WorkspaceModel.findById(workspaceId);
-    return workspace;
+    return WorkspaceModel.findById(workspaceId).select("-__v").lean();
   },
   async getMemberRole(
     workspaceId: string,
@@ -40,34 +38,23 @@ export const workspaceRepository = {
       .lean();
     if (!workspace) return null;
 
-    if (workspace.ownerId.toString() === userId.toString()) {
-      return "OWNER";
-    }
+    if (workspace.ownerId.toString() === userId.toString()) return "OWNER";
 
     const member = await WorkspaceMemberModel.findOne({ workspaceId, userId })
       .select("role")
       .lean();
-
-    if (member) {
-      return member.role;
-    }
-
-    return null;
+    return member ? member.role : null;
   },
   async listUserWorkspaces(userId: string) {
     const userObjectId = new Types.ObjectId(userId);
-
-    const memberships = await WorkspaceMemberModel.find({
-      userId: userObjectId,
-    })
-      .select("workspaceId")
-      .lean();
-
+    const memberships = await WorkspaceMemberModel.find({ userId: userObjectId }).select("workspaceId").lean();
     const memberWorkspaceIds = memberships.map((m) => m.workspaceId);
 
     return WorkspaceModel.find({
       $or: [{ ownerId: userObjectId }, { _id: { $in: memberWorkspaceIds } }],
-    }).lean();
+    })
+    .select("_id name slug description ownerId createdAt")
+    .lean();
   },
   async updateWorkspace(
     workspaceId: string,
@@ -159,6 +146,8 @@ export const workspaceRepository = {
     return WorkspaceModel.findByIdAndDelete(workspaceId);
   },
   async listWorkspaceMembers(workspaceId: string) {
-    return WorkspaceMemberModel.find({ workspaceId }).lean();
+    return WorkspaceMemberModel.find({ workspaceId })
+      .select("userId role workspaceName createdAt")
+      .lean();
   },
 };

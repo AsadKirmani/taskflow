@@ -1,25 +1,28 @@
 import { Component, input, output } from '@angular/core';
 import { User } from '../../../core/models/user.model';
 import { CommonModule } from '@angular/common';
-import { AvatarComponent } from '../../../shared/components/avatar.component';
+import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-task-assignees',
   standalone: true,
-  imports: [CommonModule, AvatarComponent, ...APP_ICONS],
+  imports: [CommonModule, UiAvatarComponent, UiButtonComponent, ...APP_ICONS],
   template: `<div class="flex items-center gap-1">
     <div class="flex -space-x-3">
       @for (member of members(); track member.id) {
-        <app-avatar [name]="member.name" [title]="member.name"></app-avatar>
+        <ui-avatar [name]="member.name" [title]="member.name"></ui-avatar>
       }
     </div>
     @if (members().length > 0) {
-      <button
-        class="w-10 h-10 rounded-full border border-base-300 flex items-center justify-center text-base-content hover:bg-base-content/10 transition-colors"
+      <ui-button
+      variant="icon"
+      size="icon"
+      (click)="openPicker.emit()"
       >
         <svg lucidePlus class="w-4 h-4"></svg>
-      </button>
+      </ui-button>
     }
   </div>`,
 })

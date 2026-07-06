@@ -6,7 +6,6 @@ import {
   catchError,
   debounceTime,
   distinctUntilChanged,
-  map,
   switchMap,
   tap,
 } from 'rxjs/operators';
@@ -15,7 +14,7 @@ import { BoardColumn } from '../../../core/models/column.model';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Task } from '../../../core/models/task.model';
 import { TaskDropEventPayload } from '../../boards/models/drag-drop.model';
-import { BoardApiService } from '../../boards/data-access/board-api.service';
+import { TaskApiService } from './task-api.service';
 import { BoardFilters } from '../../boards/data-access/board-state.model';
 import { TaskState, initialTaskState } from './task-state.model';
 import { TaskComment } from '../../../core/models/comment.model';
@@ -24,87 +23,6 @@ import { EventBusService } from '../../../core/services/event-bus.service';
 
 const normalizeTasks = (tasks: any[]): Task[] =>
   tasks.map((t) => ({ ...t, id: t.id ?? t._id ?? '' }));
-
-const matchesDueType = (task: Task, dueType: BoardFilters['dueType']): boolean => {
-  if (dueType === 'all') return true;
-  if (!task.dueDate) return dueType === 'none';
-  if (dueType === 'none') return false;
-
-  const now = new Date();
-  const dueDate = new Date(task.dueDate);
-  if (Number.isNaN(dueDate.getTime())) return false;
-
-  if (dueType === 'overdue') return dueDate.getTime() < now.getTime();
-  if (dueType === 'today') return dueDate.toDateString() === now.toDateString();
-
-  const start = new Date(now);
-  const diffToMonday = start.getDay() === 0 ? -6 : 1 - start.getDay();
-  start.setDate(start.getDate() + diffToMonday);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(start);
-  end.setDate(start.getDate() + 7);
-
-  return dueDate >= start && dueDate < end;
-};
-
-const matchesActivity = (task: Task, activity: BoardFilters['activity']): boolean => {
-  if (activity.length === 0) return true;
-  const now = Date.now();
-  const updatedAt = task.updatedAt ? new Date(task.updatedAt).getTime() : null;
-  const createdAt = task.createdAt ? new Date(task.createdAt).getTime() : null;
-  const within = (val: number | null, days: number) =>
-    val ? val >= now - days * 24 * 60 * 60 * 1000 : false;
-
-  return activity.some((type) => {
-    if (type === 'recentlyupdated') return within(updatedAt, 1);
-    if (type === 'recentlycreated') return within(createdAt, 1);
-    if (type === 'activeinlastweek') return within(updatedAt, 7) || within(createdAt, 7);
-    if (type === 'activeinlastmonth') return within(updatedAt, 30) || within(createdAt, 30);
-    return true;
-  });
-};
-
-const matchesFilters = (task: Task, filters: BoardFilters): boolean => {
-  const matchesSearch =
-    !filters.search ||
-    task.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-    task.description.toLowerCase().includes(filters.search.toLowerCase());
-  const matchesPriority =
-    filters.priorities.length === 0 || filters.priorities.includes(task.priority);
-  const matchesAssignee =
-    filters.assigneeIds.length === 0 ||
-    filters.assigneeIds.some((id) => task.assigneeIds.includes(id));
-  const matchesMemberScope =
-    filters.memberScope === 'all' ||
-    (filters.memberScope === 'no_members' && task.assigneeIds.length === 0) ||
-    (filters.memberScope === 'me' &&
-      !!filters.currentUserId &&
-      task.assigneeIds.includes(filters.currentUserId));
-  const matchesCompletion =
-    filters.completion === 'all' ||
-    (filters.completion === 'completed' && !!task.isCompleted) ||
-    (filters.completion === 'incomplete' && !task.isCompleted);
-  const matchesLabels =
-    filters.labels.length === 0 ||
-    filters.labels.some((label) => {
-      if (label === 'no_color') return task.labels.length === 0;
-      const normalized = label.toLowerCase();
-      return task.labels.some(
-        (tl) => tl.name.toLowerCase() === normalized || tl.color.toLowerCase().includes(normalized),
-      );
-    });
-
-  return (
-    matchesSearch &&
-    matchesPriority &&
-    matchesAssignee &&
-    matchesMemberScope &&
-    matchesCompletion &&
-    matchesDueType(task, filters.dueType) &&
-    matchesLabels &&
-    matchesActivity(task, filters.activity)
-  );
-};
 
 type ExtendedTaskState = TaskState & {
   comments: TaskComment[];
@@ -136,7 +54,7 @@ export const TaskStore = signalStore(
   withMethods(
     (
       store,
-      api = inject(BoardApiService),
+      api = inject(TaskApiService),
       notification = inject(NotificationService),
       archive = inject(ArchiveService),
       eventBus = inject(EventBusService),
@@ -255,15 +173,12 @@ export const TaskStore = signalStore(
         buildTasksByColumn(columns: BoardColumn[]): Record<string, Task[]> {
           const stateTasks = store.tasksById();
           const stateIdsByCol = store.taskIdsByColumn();
-          const currentFilters = store.filters();
-
           return Object.fromEntries(
             columns.map((column) => [
               column.id,
               (stateIdsByCol[column.id] ?? [])
                 .map((id) => stateTasks[id])
                 .filter(Boolean)
-                .filter((task) => matchesFilters(task, currentFilters)),
             ]),
           );
         },
@@ -318,6 +233,7 @@ export const TaskStore = signalStore(
         toggleTaskCompletion(taskId: string, isCompleted: boolean) {
           this.updateTask(taskId, { isCompleted });
         },
+
         async archiveTask(taskId: string, workspaceId: string, taskTitle: string, reason?: string) {
           if (!taskId?.trim()) return;
 

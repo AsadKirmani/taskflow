@@ -4,11 +4,12 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthStoreService } from '../../data-access/auth-store.service';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-register-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AutofocusDirective, ...APP_ICONS],
+  imports: [ReactiveFormsModule, RouterLink, AutofocusDirective,UiButtonComponent, ...APP_ICONS],
   template: `
     <section class="flex items-center justify-center mx-auto h-screen bg-base-200 px-4">
       <div class="p-8 bg-base-100 rounded-box shadow-xl border border-base-300 w-full max-w-md">
@@ -59,17 +60,19 @@ import { APP_ICONS } from '../../../../core/icons/lucide-icons';
               class="w-full p-2 border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
               placeholder="••••••••"
             />
-            <button
+            <ui-button
               type="button"
               (click)="togglePasswordVisibility()"
-              class="absolute right-2 translate-y-1/4 p-1 text-base-content/70 hover:text-base-content transition-colors"
+              variant="ghost"
+              size="icon-sm"
+              class="absolute right-2 top-1/2 transform -translate-y-1/2 py-2 text-base-content/70 hover:text-base-content transition-colors"
             >
               @if (hidePassword()) {
                 <svg lucideEyeClosed class="w-5 h-5" stroke-width="1.5"></svg>
               } @else {
                 <svg lucideEye class="w-5 h-5" stroke-width="1.5"></svg>
               }
-            </button>
+            </ui-button>
             @if (form.get('password')?.invalid && form.get('password')?.touched) {
               <span class="text-error text-xs mt-1">Password must be at least 8 characters</span>
             }
@@ -91,12 +94,13 @@ import { APP_ICONS } from '../../../../core/icons/lucide-icons';
             </p>
           </label>
 
-          <button
+          <ui-button
+            variant="primary"
+            size="lg"
             type="submit"
-            class="w-full p-field rounded-box bg-primary text-primary-content font-bold cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 border-none"
           >
             Register
-          </button>
+          </ui-button>
         </form>
 
         <p class="mt-6 text-sm text-center text-base-content/70">

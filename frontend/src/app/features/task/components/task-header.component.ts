@@ -2,6 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskMenuComponent } from './task-menu.component';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-task-header',
@@ -14,21 +15,23 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
       <svg lucideChevronDown class="w-4 h-4 text-base-content/70"></svg>
     </div>
     <div class="flex items-center gap-1 text-base-content/70">
-      <button
-        class="p-1.5 hover:bg-base-100 rounded-box transition-colors flex items-center justify-center"
+      <ui-button
+      variant="ghost"
+      size="sm"
       >
-        <svg lucideImage class="text-[20px] w-5 h-5"></svg>
-      </button>
+        <svg lucideImage class="w-5 h-5"></svg>
+      </ui-button>
       <app-task-menu></app-task-menu>
-      <button
+      <ui-button
+      variant="ghost"
+      size="icon-sm"
         (click)="menuClicked.emit()"
-        class="p-1.5 hover:bg-base-100 rounded-box transition-colors flex items-center justify-center ml-2"
       >
-        <svg lucideX class="text-[20px] w-5 h-5"></svg>
-      </button>
+        <svg lucideX class="w-5 h-5"></svg>
+      </ui-button>
     </div>
   </header>`,
-  imports: [CommonModule, TaskMenuComponent, ...APP_ICONS],
+  imports: [CommonModule, TaskMenuComponent, UiButtonComponent, ...APP_ICONS],
 })
 export class TaskHeaderComponent {
   columnName = input.required<string>();

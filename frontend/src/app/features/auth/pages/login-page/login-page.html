@@ -54,17 +54,19 @@
           class="w-full p-2 border border-base-300 rounded-field bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50 transition-all"
           placeholder="••••••••"
         />
-        <button
+        <ui-button
           type="button"
+          variant="ghost"
+          size="icon-sm"
           (click)="togglePasswordVisibility()"
-          class="absolute right-2 translate-y-1/4 p-1 text-base-content/70 hover:text-base-content transition-colors"
+          class="absolute right-2 top-1/2 transform -translate-y-1/2 py-2 text-base-content/70 hover:text-base-content transition-colors"
         >
           @if (hidePassword()) {
             <svg lucideEyeClosed class="w-5 h-5" stroke-width="1.5"></svg>
           } @else {
             <svg lucideEye class="w-5 h-5" stroke-width="1.5"></svg>
           }
-        </button>
+        </ui-button>
         @if (form.get('password')?.invalid && form.get('password')?.touched) {
           <p class="text-xs text-error mt-1">Password must be at least 8 characters.</p>
         }
@@ -80,12 +82,14 @@
       Remember me
     </p>
   </label>
-      <button
+      <ui-button
+        variant="primary"
         type="submit"
-        class="w-full p-field rounded-field bg-primary text-primary-content font-bold cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 border-none"
+        size="lg"
+        loadingText="Logging in..."
       >
-        Submit
-      </button>
+        Login
+      </ui-button>
     }
     </form>
 

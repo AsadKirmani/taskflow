@@ -1,11 +1,12 @@
 import { Component, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-task-duedate',
   standalone: true,
-  imports: [DatePipe, ...APP_ICONS],
+  imports: [DatePipe, UiButtonComponent, ...APP_ICONS],
   template: `<div class="mb-6">
     <div class="flex items-center gap-2 group w-fit">
       <div
@@ -25,12 +26,13 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
             {{ startDate() | date: 'MMM d, yyyy' }}</span
           >
         }
-        <button
+        <ui-button
+        variant="icon"
+        size="icon-sm"
           (click)="dueDateRemoved.emit(); startDateRemoved.emit()"
-          class="hover:bg-error/20 text-error rounded-full transition-all flex items-center justify-center p-1"
         >
           <svg lucideX class="w-3 h-3"></svg>
-        </button>
+        </ui-button>
       </div>
     </div>
   </div>`,

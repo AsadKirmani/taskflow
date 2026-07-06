@@ -2,7 +2,7 @@
   @if (loading()) {
     <header
       class="kanban-board__header mb-1 bg-base-100 border border-base-300/20 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-    >
+      >
       <div class="flex items-center gap-2 min-w-0 text-base-content">
         <ui-skeleton variant="text" class="h-7 sm:h-8 w-48 sm:w-64"></ui-skeleton>
       </div>
@@ -13,39 +13,39 @@
         }
       </div>
     </header>
-
+    
     <div
-      class="kanban-board__columns flex-1 min-h-0 overflow-hidden border border-base-300/20 flex items-start bg-base-100 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
+    class="kanban-board__columns flex-1 min-h-0 overflow-hidden border border-base-300/20 flex items-start bg-base-100 p-2 sm:p-4 gap-3 sm:gap-4 rounded-b-xl"
     >
-      @for (col of [1, 2, 3, 4]; track col) {
-        <section
-          class="kanban-column max-h-[calc(100vh-4rem)] self-start bg-base-300 p-2 w-[85vw] sm:w-64 rounded-xl shadow flex-shrink-0 flex flex-col transition-colors"
-        >
-          <div class="flex flex-col p-2 gap-1 mb-2">
-            <div class="flex items-center justify-between">
-              <ui-skeleton variant="text" class="h-5 w-32"></ui-skeleton>
-              <ui-skeleton variant="rect" class="h-5 w-8 rounded-full"></ui-skeleton>
-            </div>
-          </div>
-
-          <div class="kanban-column__task-list flex-1 flex flex-col gap-2 min-h-0 p-1">
-            @for (card of [1, 2, 3]; track card) {
-              <article
-                class="task-card shadow rounded-lg p-2.5 bg-base-100 flex items-center justify-between"
-              >
-                <div class="flex items-center gap-2 w-full">
-                  <ui-skeleton
-                    variant="circle"
-                    width="18px"
-                    height="18px"
-                    class="shrink-0 opacity-40"
-                  ></ui-skeleton>
-                  <ui-skeleton variant="text" class="h-4 w-3/4"></ui-skeleton>
+    @for (col of [1, 2, 3, 4]; track col) {
+      <section
+      class="kanban-column max-h-[calc(100vh-4rem)] self-start bg-base-300 p-2 w-[85vw] sm:w-64 rounded-xl shadow flex-shrink-0 flex flex-col transition-colors"
+      >
+      <div class="flex flex-col p-2 gap-1 mb-2">
+        <div class="flex items-center justify-between">
+          <ui-skeleton variant="text" class="h-5 w-32"></ui-skeleton>
+          <ui-skeleton variant="rect" class="h-5 w-8 rounded-full"></ui-skeleton>
+        </div>
+      </div>
+      
+      <div class="kanban-column__task-list flex-1 flex flex-col gap-2 min-h-0 p-1">
+        @for (card of [1, 2, 3]; track card) {
+          <article
+          class="task-card shadow rounded-lg p-2.5 bg-base-100 flex items-center justify-between"
+          >
+          <div class="flex items-center gap-2 w-full">
+            <ui-skeleton
+            variant="circle"
+            width="18px"
+            height="18px"
+            class="shrink-0 opacity-40"
+            ></ui-skeleton>
+            <ui-skeleton variant="text" class="h-4 w-3/4"></ui-skeleton>
                 </div>
               </article>
             }
           </div>
-
+          
           <div class="add-task p-1 mt-1">
             <ui-skeleton variant="rect" class="h-9 w-full rounded-field opacity-60"></ui-skeleton>
           </div>
@@ -54,10 +54,10 @@
     </div>
   } @else {
     <header
-      class="kanban-board__header mb-1 bg-base-100 border border-base-300/20 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+    class="kanban-board__header mb-1 bg-base-100 border border-base-300/20 p-3 sm:p-4 rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
     >
-      <div class="flex items-center gap-2 min-w-0 text-base-content">
-        <h1 class="text-lg sm:text-2xl font-bold truncate m-0">{{ board()?.name }}</h1>
+    <div class="flex items-center gap-2 min-w-0 text-base-content">
+      <h1 class="text-lg sm:text-2xl font-bold truncate m-0">{{ board()?.name }}</h1>
       </div>
       <div class="flex items-center gap-1 sm:gap-2 flex-wrap justify-between">
         <ui-avatar-stack [users]="boardMembers()" [limit]="5"></ui-avatar-stack>
@@ -70,22 +70,24 @@
         </ui-button>
         <ui-dropdown-menu>
           <ui-dropdown-menu-trigger>
-            <ui-button variant="icon" size="icon">
-              <svg lucideEye></svg>
-            </ui-button>
+            @if (board()?.visibility === 'private') {
+              <ui-button variant="icon" size="icon">
+                <svg lucideLock></svg>
+              </ui-button>
+            } @else {
+              <ui-button variant="icon" size="icon">
+                <svg lucideUsers></svg>
+              </ui-button>
+            }
           </ui-dropdown-menu-trigger>
           <ui-dropdown-menu-content direction="left">
-            <ui-dropdown-menu-item>
+            <ui-dropdown-menu-item (onClick)="visibilityToggled.emit('private')" [active]="board()?.visibility === 'private'">
               <svg lucideLock class="w-4 h-4"></svg>
               <span>Private</span>
             </ui-dropdown-menu-item>
-            <ui-dropdown-menu-item>
-              <svg lucideGlobe class="w-4 h-4"></svg>
+            <ui-dropdown-menu-item (onClick)="visibilityToggled.emit('workspace')" [active]="board()?.visibility === 'workspace'">
+              <svg lucideUsers class="w-4 h-4"></svg>
               <span>Workspace</span>
-            </ui-dropdown-menu-item>
-            <ui-dropdown-menu-item>
-              <svg lucideGlobe class="w-4 h-4"></svg>
-              <span>Public</span>
             </ui-dropdown-menu-item>
           </ui-dropdown-menu-content>
         </ui-dropdown-menu>
@@ -101,7 +103,7 @@
               <span>Copy Link</span>
             </ui-dropdown-menu-item>
             <ui-dropdown-menu-item>
-              <svg lucideMail class="w-4 h-4"></svg>
+              <svg lucideSend class="w-4 h-4"></svg>
               <span>Share via Email</span>
             </ui-dropdown-menu-item>
           </ui-dropdown-menu-content>
@@ -121,9 +123,9 @@
               <svg lucideArchive class="w-4 h-4"></svg>
               <span>Archived Items</span>
             </ui-dropdown-menu-item>
-            <ui-dropdown-menu-item>
-              <svg lucideArchive class="w-4 h-4"></svg>
-              <span>Archive Board</span>
+            <ui-dropdown-menu-item (click)="closeBoard.emit()">
+              <svg lucideMinus class="w-4 h-4"></svg>
+              <span>Close Board</span>
             </ui-dropdown-menu-item>
           </ui-dropdown-menu-content>
         </ui-dropdown-menu>
@@ -165,11 +167,9 @@
         ></app-kanban-column>
       }
 
-      <div
-        class="bg-base-200 w-64 flex items-center justify-center hover:bg-base-300 p-2 rounded-box text-base-content border border-base-300 focus:ring-2 focus:ring-primary shadow transition-colors"
-      >
+      <div class="add-column flex-shrink-0 text-base-content" >
         @if (!isColumnInputOpen()) {
-          <ui-button variant="ghost" size="lg" (clicked)="openColumnInput()">
+          <ui-button variant="outline" size="lg" (clicked)="openColumnInput()">
             <svg lucidePlus class="w-4 h-4 mr-1"></svg>
             Add Column
           </ui-button>

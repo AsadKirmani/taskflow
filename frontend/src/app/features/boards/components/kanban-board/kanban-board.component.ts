@@ -89,6 +89,8 @@ export class KanbanBoardComponent {
   taskUpdated = output<UpdateTaskEventPayload>();
   taskCompletionToggled = output<ToggleTaskCompletionEventPayload>();
   columnArchived = output<{ columnId: string; columnName: string }>();
+  visibilityToggled = output<'private' | 'workspace'>();
+  closeBoard = output<void>();
 
   isColumnInputOpen = signal(false);
   columnInputValue = signal('');

@@ -8,14 +8,9 @@ import {
   ActivityRef,
   formatActivityAction,
 } from '../../../activity/models/activity.model';
-import { UiPageLayoutComponent } from '../../../../ui/components/layout/ui-page-layout.component';
 import { DashboardStore } from '../../data-access/dashboard-store.service';
-import { UiPageContentComponent } from '../../../../ui/components/layout/ui-page-content.component';
 import { UiPageHeaderComponent } from '../../../../ui/components/layout/ui-page-header.component';
-import { UiStackComponent } from '../../../../ui/components/layout/ui-stack.component';
 import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
-import { UiBadgeComponent } from '../../../../ui/components/ui-badge.component';
-import { UiCardComponent } from '../../../../ui/components/ui-card.component';
 import { UiEmptyStateComponent } from '../../../../ui/components/ui-empty-state.component';
 import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.component';
 import { UiPageBodyComponent } from '../../../../ui/components/layout/ui-page-body.component';
@@ -43,13 +38,8 @@ export interface DashboardTaskRow {
     MatCardModule,
     MatButtonModule,
     RouterLink,
-    UiPageLayoutComponent,
     UiPageHeaderComponent,
-    UiPageContentComponent,
     UiButtonComponent,
-    UiStackComponent,
-    UiBadgeComponent,
-    UiCardComponent,
     UiEmptyStateComponent,
     UiSkeletonComponent,
     UiPageBodyComponent,

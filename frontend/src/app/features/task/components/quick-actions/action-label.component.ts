@@ -2,24 +2,21 @@ import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskLabel } from '../../../../core/models/task.model';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-action-label',
   standalone: true,
-  imports: [CommonModule, ...APP_ICONS],
+  imports: [CommonModule, UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="relative inline-flex">
-      <button
+      <ui-button
         (click)="isOpen.set(!isOpen())"
-        [ngClass]="
-          isOpen()
-            ? 'bg-base-content text-base-100 hover:bg-base-content/90'
-            : 'bg-base-100 text-base-content hover:bg-base-300'
-        "
-        class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300"
+        variant="outline"
+        [active]="isOpen()"
       >
-        <svg lucideTag class="w-4 h-4"></svg> Labels
-      </button>
+        <svg lucideTag class="w-4 h-4 mr-2"></svg> Labels
+      </ui-button>
 
       @if (isOpen()) {
         <div class="fixed inset-0 z-40" (click)="isOpen.set(false)"></div>

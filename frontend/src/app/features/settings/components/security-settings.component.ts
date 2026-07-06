@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SettingsStoreService } from '../data-access/settings-store.service';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-security-settings',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, UiButtonComponent],
   template: `
     <h2 class="text-lg font-semibold mb-4">Security Settings</h2>
     <form [formGroup]="securityForm" (ngSubmit)="onSubmit()" class="space-y-4 w-full max-w-md">
@@ -33,16 +34,16 @@ import { SettingsStoreService } from '../data-access/settings-store.service';
           <span class="text-error text-xs mt-1">Password must be at least 8 characters</span>
         }
       </div>
-      <button
+      <ui-button
         type="submit"
         [disabled]="securityForm.invalid || store.isSaving()"
-        class="bg-error text-error-content px-5 font-medium py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+        [loading]="store.isSaving()"
+        loadingText="Changing..."
+        variant="danger"
+        size="md"
       >
-        @if (store.isSaving()) {
-          <span class="loading loading-spinner loading-xs"></span>
-        }
         Change Password
-      </button>
+      </ui-button>
     </form>
   `,
 })

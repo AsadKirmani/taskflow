@@ -7,7 +7,7 @@ import {
   signal,
   effect,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BoardStore } from '../../data-access/board-store.service';
 import { TaskStore } from '../../../task/data-access/task-store.service';
 import { KanbanDndFacade } from '../../data-access/kanban-dnd.facade';
@@ -42,6 +42,8 @@ import { TaskFacade } from '../../../task/facades/task.facade';
       (taskCompletionToggled)="onTaskCompletionToggled($event)"
       (columnArchived)="onColumnArchived($event)"
       [boardMembers]="boardStore.members()"
+      (visibilityToggled)="toggleVisibility()"
+      (closeBoard)="closeBoard()"
     />
   `,
   styles: [
@@ -61,6 +63,7 @@ export class BoardDetailPageComponent implements OnInit {
   protected readonly taskStore = inject(TaskStore);
   protected readonly facade = inject(TaskFacade);
   private readonly dndFacade = inject(KanbanDndFacade);
+  private readonly router = inject(Router);
 
   activeBoardId = signal<string | null>(null);
 
@@ -142,5 +145,17 @@ export class BoardDetailPageComponent implements OnInit {
       event.columnName,
       'Archived from column menu',
     );
+  }
+  toggleVisibility() {
+    const board = this.currentBoard();
+    if (!board()?.id) return;
+    const newVisibility = board()!.visibility === 'private' ? 'workspace' : 'private';
+    this.boardStore.changeBoardVisibility(board()!.id, newVisibility);
+  }
+  closeBoard() {
+    const board = this.currentBoard();
+    if (!board()?.id) return;
+    this.boardStore.archiveBoard(board()!.id, board()!.workspaceId, 'Archived from board menu');
+    this.router.navigate(['/boards']);
   }
 }

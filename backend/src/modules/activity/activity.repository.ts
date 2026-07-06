@@ -2,19 +2,20 @@ import { ActivityLogModel } from "../../models/activity-log.model";
 import { ColumnModel } from "../../models/column.model";
 import { BoardModel } from "../../models/board.model";
 import { WorkspaceMemberModel } from "../../models/workspace-member.model";
+import { Query } from "mongoose";
 
-const applyActivityPopulation = <T>(
-  query: T & {
-    populate: (args: Array<{ path: string; select: string }>) => T;
-  },
-) =>
-  query.populate([
-    { path: "userId", select: "name email avatarUrl" },
-    { path: "taskId", select: "title columnId boardId" },
-    { path: "boardId", select: "name workspaceId" },
-    { path: "columnId", select: "name boardId" },
-  ]);
-
+const applyActivityPopulation = <T extends Query<any, any>>(query: T) => {
+  return query
+    .select(
+      "_id actionType entityType entityId metadata createdAt boardId columnId taskId userId",
+    )
+    .populate([
+      { path: "userId", select: "name email avatarUrl" },
+      { path: "taskId", select: "title columnId boardId" },
+      { path: "boardId", select: "name workspaceId" },
+      { path: "columnId", select: "name boardId" },
+    ]);
+};
 export const activityRepository = {
   async logActivity(data: {
     workspaceId: string;
@@ -206,7 +207,8 @@ async function enrichMoveColumnNames(items: Array<Record<string, unknown>>) {
     const sourceColumnId = metadata.sourceColumnId as string | undefined;
 
     const destinationColumnId = metadata.destinationColumnId as
-      string | undefined;
+      | string
+      | undefined;
 
     if (sourceColumnId) {
       columnIds.add(sourceColumnId);
@@ -243,7 +245,8 @@ async function enrichMoveColumnNames(items: Array<Record<string, unknown>>) {
     const sourceColumnId = metadata.sourceColumnId as string | undefined;
 
     const destinationColumnId = metadata.destinationColumnId as
-      string | undefined;
+      | string
+      | undefined;
 
     if (sourceColumnId && !metadata.sourceColumnName) {
       metadata.sourceColumnName = columnMap.get(sourceColumnId);

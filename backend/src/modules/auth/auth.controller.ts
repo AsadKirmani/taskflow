@@ -57,8 +57,12 @@ export const authController = {
   },
 
   async login(req: Request, res: Response) {
+    let clientIp: string | string[] | undefined = req.headers["x-forwarded-for"] || req.ip;
+    if (typeof clientIp === "string") {
+      clientIp = clientIp.split(",").map(ip => ip.trim());
+    }
     const result = await authService.login(req.body, {
-      ip: req.ip,
+      ip: clientIp,
       userAgent: req.headers["user-agent"],
     });
 
@@ -177,11 +181,17 @@ export const authController = {
     const refreshToken = req.cookies?.[jwtConfig.refreshCookieName];
 
     if (!refreshToken) {
-      throw new AppError("Refresh token missing", 401, "REFRESH_TOKEN_MISSING");
+      return res.status(401).json({
+        success: false,
+        data: null,
+      });
     }
-
+    let clientIp: string | string[] | undefined = req.headers["x-forwarded-for"] || req.ip;
+    if (typeof clientIp === "string") {
+      clientIp = clientIp.split(",").map(ip => ip.trim());
+    }
     const result = await authService.refresh(refreshToken, {
-      ip: req.ip,
+      ip: clientIp,
       userAgent: req.headers["user-agent"],
     });
     res.cookie(jwtConfig.refreshCookieName, result.refreshToken, cookieOptions);

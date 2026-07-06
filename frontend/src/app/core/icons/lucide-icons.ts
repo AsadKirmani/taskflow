@@ -47,7 +47,16 @@ import {
   LucideChevronLeft,
   LucideChevronUp,
   LucideClock,
-  LucideEyeClosed
+  LucideEyeClosed,
+  LucideUsers,
+  LucideMinus,
+  LucideCopy,
+  LucideSend,
+  LucideBellOff,
+  LucideMonitor,
+  LucideTriangleAlert,
+  LucideCircleX,
+  LucideInfo,
 } from '@lucide/angular';
 
 export const APP_ICONS = [
@@ -99,5 +108,14 @@ export const APP_ICONS = [
   LucideChevronLeft,
   LucideChevronUp,
   LucideClock,
-  LucideEyeClosed
+  LucideEyeClosed,
+  LucideUsers,
+  LucideMinus,
+  LucideCopy,
+  LucideSend,
+  LucideBellOff,
+  LucideMonitor,
+  LucideTriangleAlert,
+  LucideCircleX,
+  LucideInfo,
 ];

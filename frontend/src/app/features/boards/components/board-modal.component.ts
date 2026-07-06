@@ -5,11 +5,13 @@ import { BoardStore } from '../data-access/board-store.service';
 import { Workspace } from '../../../core/models/workspace.model';
 import { NotificationService } from '../../../core/services/notification.service';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
+import { UiSelectComponent } from '../../../ui/components/ui-select.component';
 
 @Component({
   selector: 'app-board-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, ...APP_ICONS],
+  imports: [CommonModule, FormsModule, UiButtonComponent, UiSelectComponent, ...APP_ICONS],
   template: `
     <div
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-10 p-2"
@@ -21,13 +23,13 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
       >
         <div class="flex items-start justify-between gap-4 mb-4">
           <h2 class="text-2xl font-semibold text-base-content">Create New Board</h2>
-          <button
-            type="button"
-            class="text-base-content/70 hover:text-primary hover:bg-base-content/10 transition-colors p-2 rounded-full"
+          <ui-button
+            variant="ghost"
+            size="icon-sm"
             (click)="close()"
           >
             <svg lucideX class="w-6 h-6"></svg>
-          </button>
+          </ui-button>
         </div>
 
         <form (submit)="createBoard($event)">
@@ -44,51 +46,41 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
           </div>
 
           <div class="mb-4">
-            <label for="workspace" class="block text-base-content mb-2">Workspace</label>
-            <ng-container *ngIf="hasSelectedWorkspace(); else workspacePicker">
-              <input
-                id="workspace"
-                type="text"
-                class="w-full px-3 py-2 border border-base-300 rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
-                [value]="selectedWorkspaceName()"
-                readonly
-              />
-            </ng-container>
-            <ng-template #workspacePicker>
-              <select
-                [(ngModel)]="boardDraft.workspaceId"
-                name="workspaceId"
-                id="workspace"
-                class="w-full px-3 py-2 border border-base-300 rounded-field focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
-              >
-                <option value="">Select workspace</option>
-                <option *ngFor="let workspace of availableWorkspaces()" [value]="workspace.id">
-                  {{ workspace.name }}
-                </option>
-              </select>
-            </ng-template>
+          <ui-select
+            [(ngModel)]="boardDraft.workspaceId"
+            name="workspaceId"
+            id="workspace"
+            [label]="'Workspace'"
+            [placeholder]="'Select workspace'"
+            class="w-full text-base-content"
+          >
+            @for (workspace of availableWorkspaces(); track workspace.id) {
+              <option [value]="workspace.id">{{ workspace.name }}</option>
+            }
+          </ui-select>
           </div>
 
           <div class="mb-4">
-            <label for="visibility" class="block text-base-content mb-2">Visibility</label>
-            <select
-              [(ngModel)]="boardDraft.visibility"
-              name="visibility"
-              id="visibility"
-              class="w-full px-3 py-2 border border-base-300 rounded-field focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all bg-base-100 text-base-content"
-            >
-              <option value="private">Private</option>
-              <option value="workspace">Workspace</option>
-            </select>
+          <ui-select
+            [(ngModel)]="boardDraft.visibility"
+            name="visibility"
+            id="visibility"
+            [label]="'Visibility'"
+            [placeholder]="'Select visibility'"
+            class="w-full text-base-content"
+          >
+            <option value="private">Private</option>
+            <option value="workspace">Workspace</option>
+          </ui-select>
           </div>
 
           <div class="mb-2">
-            <button
-              type="submit"
-              class="bg-secondary text-white px-4 py-2 rounded-box hover:bg-secondary/80 w-full disabled:opacity-50"
+            <ui-button
+              variant="secondary"
+              size="lg"
             >
               Create
-            </button>
+            </ui-button>
           </div>
         </form>
       </div>

@@ -5,11 +5,12 @@ import { AuthStoreService } from '../../data-access/auth-store.service';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { User } from '../../../../core/models/user.model';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AutofocusDirective, ...APP_ICONS],
+  imports: [ReactiveFormsModule, RouterLink, AutofocusDirective, UiButtonComponent, ...APP_ICONS],
   templateUrl: './login-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

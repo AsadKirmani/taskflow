@@ -6,7 +6,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   template: `
     <div [class]="containerClasses()">
       <div [class]="iconClasses()">
-        <ng-content select="[icon]"></ng-content>
+        <ng-content></ng-content>
       </div>
 
       <h3 [class]="titleClasses()">

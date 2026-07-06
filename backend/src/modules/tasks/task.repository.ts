@@ -29,11 +29,10 @@ export const taskRepository = {
   async getTasksInBoard(boardId: string, filters?: TaskFilters) {
     const query = this.buildTaskQuery(boardId, filters);
 
-    const tasks = await TaskModel.find({ ...query, archived: false }).sort({
-      position: 1,
-      createdAt: 1,
-    });
-    return tasks;
+    return TaskModel.find({ ...query, archived: false })
+      .select("_id title columnId boardId assigneeIds priority labels isCompleted dueDate startDate position commentCount attachmentCount checklist")
+      .sort({ position: 1, createdAt: 1 })
+      .lean();
   },
   buildTaskQuery(
     boardId: string,
@@ -109,7 +108,7 @@ export const taskRepository = {
 
     if (filters.labels?.length) {
       const labelConditions = filters.labels.map((label) => {
-        if (label === "no_color") {
+        if (label === "noLabel") {
           return { labels: { $size: 0 } };
         }
         return {
@@ -159,8 +158,7 @@ export const taskRepository = {
       : { boardId };
   },
   async getTaskById(taskId: string) {
-    const task = await TaskModel.findById(taskId);
-    return task;
+    return TaskModel.findById(taskId).select("-__v -archived").lean();
   },
   async updateTask(
     taskId: string,

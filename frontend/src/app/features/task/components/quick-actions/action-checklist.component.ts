@@ -2,24 +2,21 @@ import { Component, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-action-checklist',
   standalone: true,
-  imports: [CommonModule, AutofocusDirective, ...APP_ICONS],
+  imports: [CommonModule, AutofocusDirective, UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="relative inline-flex">
-      <button
+      <ui-button
+        variant="outline"
         (click)="isOpen.set(!isOpen())"
-        [ngClass]="
-          isOpen()
-            ? 'bg-base-content text-base-100 hover:bg-base-content/90'
-            : 'bg-base-100 text-base-content hover:bg-base-300'
-        "
-        class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300"
+        [active]="isOpen()"
       >
-        <svg lucideSquareCheck class="w-4 h-4"></svg> Checklist
-      </button>
+        <svg lucideSquareCheck class="w-4 h-4 mr-2"></svg> Checklist
+      </ui-button>
 
       @if (isOpen()) {
         <div class="fixed inset-0 z-40" (click)="isOpen.set(false)"></div>
@@ -40,12 +37,13 @@ import { APP_ICONS } from '../../../../core/icons/lucide-icons';
               (keyup.enter)="add(itemInput.value)"
               appAutofocus
             />
-            <button
+            <ui-button
               (click)="add(itemInput.value)"
-              class="bg-primary hover:bg-primary/90 text-primary-content w-full py-1.5 rounded text-sm font-medium transition-colors"
+              variant="primary"
+              size="sm"
             >
               Add Item
-            </button>
+            </ui-button>
           </div>
         </div>
       }

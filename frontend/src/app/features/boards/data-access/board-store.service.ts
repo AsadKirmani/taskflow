@@ -1,5 +1,5 @@
 import { inject, computed } from '@angular/core';
-import { signalStore, withState, withMethods, withComputed, patchState } from '@ngrx/signals';
+import { signalStore, withState, withMethods, withComputed, patchState, withHooks } from '@ngrx/signals';
 import { firstValueFrom } from 'rxjs';
 import { BoardApiService } from './board-api.service';
 import { BoardState, initialBoardState } from './board-state.model';
@@ -9,6 +9,7 @@ import { BoardColumn } from '../../../core/models/column.model';
 import { ColumnDropEventPayload } from '../models/drag-drop.model';
 import { User } from '../../../core/models/user.model';
 import { ArchiveService } from '../../../core/services/archive.service';
+import { EventBusService } from '../../../core/services/event-bus.service';
 
 type ExtendedBoardState = BoardState & {
   isAllBoardsLoaded: boolean;
@@ -162,6 +163,29 @@ export const BoardStore = signalStore(
           notification.error('Failed to load board details');
         }
       },
+      async changeBoardVisibility(boardId: string, visibility: 'private' | 'workspace') {
+        if (!boardId?.trim()) {
+          notification.error('Board ID is missing');
+          return;
+        }
+
+        try {
+          const updatedBoard = await firstValueFrom(
+            boardApi.updateBoard(boardId, { visibility }),
+          );
+
+          const normalizedBoard = normalizeBoard(updatedBoard.data);
+
+          patchState(store, {
+            boards: store.boards().map((b) => (b.id === boardId ? normalizedBoard : b)),
+            board: store.board()?.id === boardId ? normalizedBoard : store.board(),
+          });
+
+          notification.success('Board visibility updated', 'The visibility of the board has been changed successfully.');
+        } catch (err) {
+          notification.error('Failed to update board visibility', 'An error occurred while trying to change the visibility of the board.');
+        }
+      },
       async handleColumnDrop(event: ColumnDropEventPayload) {
         if (event.fromIndex === event.toIndex) return;
 
@@ -202,10 +226,10 @@ export const BoardStore = signalStore(
               reason,
             }),
           );
-          notification.success('Board archived successfully');
+          notification.success('Board archived successfully', 'The board has been archived successfully.');
         } catch (err) {
           patchState(store, { boards: originalBoards });
-          notification.error('Failed to archive board');
+          notification.error('Failed to archive board', 'An error occurred while trying to archive the board.');
         }
       },
 
@@ -219,10 +243,10 @@ export const BoardStore = signalStore(
               entityName: boardName,
             }),
           );
-          notification.success('Board restored');
+          notification.success('Board restored', 'The board has been restored successfully.');
           await this.loadAllBoards(true);
         } catch (err) {
-          notification.error('Failed to restore board');
+          notification.error('Failed to restore board', 'An error occurred while trying to restore the board.');
         }
       },
 
@@ -246,10 +270,10 @@ export const BoardStore = signalStore(
               reason,
             }),
           );
-          notification.success('Column archived successfully');
+          notification.success('Column archived successfully', 'The column has been archived successfully.');
         } catch (err) {
           patchState(store, { columns: originalColumns });
-          notification.error('Failed to archive column');
+          notification.error('Failed to archive column', 'An error occurred while trying to archive the column.');
         }
       },
 
@@ -263,13 +287,13 @@ export const BoardStore = signalStore(
               entityName: columnName,
             }),
           );
-          notification.success('Column restored');
+          notification.success('Column restored', 'The column has been restored successfully.');
           const currentBoardId = store.currentBoardId();
           if (currentBoardId) {
             await this.loadBoard(currentBoardId, true);
           }
         } catch (err) {
-          notification.error('Failed to restore column');
+          notification.error('Failed to restore column', 'An error occurred while trying to restore the column.');
         }
       },
       resetBoardState() {
@@ -283,4 +307,13 @@ export const BoardStore = signalStore(
       },
     }),
   ),
-);
+  withHooks({
+      onInit(store, eventBus = inject(EventBusService)) {
+        
+        eventBus.taskUpdated$.subscribe(() => {
+          store.loadBoard(store.currentBoardId() ?? '', true);
+        });
+        
+      }
+    })
+  )

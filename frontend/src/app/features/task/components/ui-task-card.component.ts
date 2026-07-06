@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { UiCardComponent } from './ui-card.component';
+import { UiCardComponent } from '../../../ui/components/ui-card.component';
 import { CommonModule } from '@angular/common';
 
 @Component({

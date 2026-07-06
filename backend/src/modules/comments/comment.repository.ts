@@ -13,10 +13,10 @@ export const commentRepository = {
     return newComment;
   },
   async getCommentsByTaskId(taskId: string) {
-    const comments = await CommentModel.find({ taskId }).sort({
-      createdAt: -1,
-    });
-    return comments;
+    return CommentModel.find({ taskId })
+      .select("_id content author authorId createdAt updatedAt")
+      .sort({ createdAt: -1 })
+      .lean();
   },
   async updateComment(
     commentId: string,

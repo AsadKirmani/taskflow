@@ -1,12 +1,12 @@
 <section class="dashboard-page flex flex-col rounded-box">
   <ui-page-header title="Dashboard" subtitle="Plan, Prioritize, and Track Your Tasks">
-    <a
+    <ui-button
+      variant="primary"
       routerLink="/boards"
-      class="bg-primary text-primary-content px-4 py-2 text-xs rounded-field hover:opacity-90 flex items-center gap-2 md:text-sm font-semibold transition-all"
     >
-      <svg lucidePlus class="w-4 h-4"></svg>
+      <svg lucidePlus class="w-4 h-4 mr-2"></svg>
       Create
-    </a>
+    </ui-button>
   </ui-page-header>
 
   @if (store.hasError()) {
@@ -127,7 +127,7 @@
                   title="All Caught Up!"
                   description="You don't have any pending tasks assigned to you right now."
                 >
-                  <svg lucideCheckCircle class="w-6 h-6"></svg>
+                  <svg lucideCircleCheck class="w-6 h-6"></svg>
 
                   <button
                     actions
@@ -155,7 +155,7 @@
                   </thead>
                   <tbody class="divide-y divide-base-300">
                     @for (task of store.recentTaskRows(); track task.id) {
-                      <tr class="hover:bg-base-300 transition-colors group">
+                      <tr class="hover:bg-base-200 transition-colors group">
                         <td
                           class="p-4 flex items-center gap-3 text-sm font-semibold text-base-content"
                         >
@@ -212,7 +212,7 @@
                   title="No Recent Activity"
                   description="Things are quiet right now. Your recent workspace events will appear here."
                 >
-                  <svg lucideNotificationsPaused class="w-8 h-8 text-base-content/50"></svg>
+                  <svg lucideBellOff class="w-8 h-8 text-base-content/50"></svg>
                 </ui-empty-state>
               </div>
             } @else {
@@ -223,7 +223,7 @@
                   track item._id ?? item.id ?? item.createdAt
                 ) {
                   <li
-                    class="flex items-start justify-between gap-4 p-4 hover:bg-base-300 transition-colors"
+                    class="flex items-start justify-between gap-4 p-4 hover:bg-base-200 transition-colors"
                   >
                     <div class="flex items-start gap-3 min-w-0">
                       <span

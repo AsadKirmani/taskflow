@@ -27,7 +27,6 @@ import { APP_ICONS } from '../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-task',
-
   imports: [
     CommonModule,
     TaskHeaderComponent,
@@ -52,7 +51,7 @@ export class TaskComponent {
       const t = this.task();
       const currentT = untracked(() => this.facade.currentTask());
       if (t && (!currentT || currentT.id !== t.id)) {
-        this.facade.currentTask.set(structuredClone(t));
+        this.facade.selectedTaskId.set(t.id);
         this.taskStore.getCommentsForTask(t.id);
       }
     });

@@ -28,7 +28,7 @@ const RefreshTokenSchema = new Schema(
       default: null,
     },
     createdByIp: {
-      type: String,
+      type: Schema.Types.Mixed,
       default: null,
     },
     userAgent: {

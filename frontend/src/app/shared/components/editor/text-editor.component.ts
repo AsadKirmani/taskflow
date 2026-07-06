@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
-import { AutofocusDirective } from '../../directives/autofocus.directive';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
@@ -15,7 +14,6 @@ import { UiButtonComponent } from '../../../ui/components/ui-button.component';
     CommonModule,
     FormsModule,
     TiptapEditorDirective,
-    AutofocusDirective,
     UiButtonComponent,
     ...APP_ICONS,
   ],

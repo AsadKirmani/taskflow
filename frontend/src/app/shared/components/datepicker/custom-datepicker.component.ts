@@ -11,6 +11,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CalendarService } from '../../../core/services/calendar.service';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
 export interface TaskDates {
   startDate: Date | null;
@@ -31,7 +32,7 @@ interface CalendarDay {
 @Component({
   selector: 'app-custom-datepicker',
   standalone: true,
-  imports: [CommonModule, FormsModule, ...APP_ICONS],
+  imports: [CommonModule, FormsModule, UiButtonComponent, ...APP_ICONS],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [DatePipe],
   templateUrl: './custom-datepicker.component.html',

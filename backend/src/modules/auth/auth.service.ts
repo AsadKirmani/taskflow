@@ -85,7 +85,7 @@ export const authService = {
 
   async login(
     input: { email: string; password: string },
-    meta?: { ip?: string; userAgent?: string },
+    meta?: { ip?: string | string[]; userAgent?: string },
   ) {
     const user = await authRepository.findUserByEmail(input.email);
 
@@ -189,7 +189,7 @@ export const authService = {
   },
   async refresh(
     refreshToken: string,
-    meta?: { ip?: string; userAgent?: string },
+    meta?: { ip?: string | string[]; userAgent?: string },
   ) {
     const totalStart = Date.now();
 

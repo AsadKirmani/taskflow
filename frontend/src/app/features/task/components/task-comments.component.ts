@@ -3,22 +3,24 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { TextEditorComponent } from '../../../shared/components/editor/text-editor.component';
 import { TaskComment } from '../../../core/models/comment.model';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-task-comments',
   standalone: true,
-  imports: [CommonModule, TextEditorComponent, DatePipe, ...APP_ICONS],
+  imports: [CommonModule, TextEditorComponent, DatePipe, UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <svg lucideMessageSquare class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>
         <h3 class="font-semibold text-base text-base-content m-0">Comments and activity</h3>
       </div>
-      <button
-        class="bg-base-200 hover:bg-base-300 text-base-content text-xs px-3 py-1.5 rounded-md font-medium transition-colors"
+      <ui-button
+       variant="outline"
+       size="sm"
       >
         Show details
-      </button>
+      </ui-button>
     </div>
 
     <div class="flex flex-col gap-2 mt-4 relative">
@@ -37,19 +39,23 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
             minHeight="80px"
           ></app-text-editor>
           <div class="flex items-center gap-2 mt-2">
-            <button
+            <ui-button
               [disabled]="newComment().trim() === '' || newComment().trim() === '<p></p>'"
+              [loading]="posting()"
+              loadingText="Saving..."
               (click)="post()"
-              class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-base-300 text-xs font-medium px-4 py-1.5 rounded-box transition-colors"
+              variant="primary"
+              size="sm"
             >
               Save
-            </button>
-            <button
+            </ui-button>
+            <ui-button
               (click)="cancel()"
-              class="text-base-content/70 hover:text-base-content text-xs font-medium px-3 py-1.5 rounded-box hover:bg-base-200 transition-colors"
+              variant="ghost"
+              size="sm"
             >
               Cancel
-            </button>
+            </ui-button>
           </div>
         </div>
       }
@@ -85,7 +91,7 @@ export class TaskCommentsComponent {
   comments = input.required<TaskComment[]>();
   commentPosted = output<string>();
   commentDeleted = output<string>();
-
+  posting = signal(false);
   isWriting = signal(false);
   newComment = signal('');
 
@@ -100,8 +106,10 @@ export class TaskCommentsComponent {
   post() {
     const text = this.newComment().trim();
     if (!text || text === '<p></p>') return;
+    this.posting.set(true);
     this.commentPosted.emit(text);
     this.cancel();
+    this.posting.set(false);
   }
   @HostListener('keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {

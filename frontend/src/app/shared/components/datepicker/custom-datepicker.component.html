@@ -6,17 +6,13 @@
     (click)="togglePicker()"
     class="absolute opacity-0 w-0 h-0 pointer-events-none"
   />
-  <button
+  <ui-button
     (click)="showPicker.set(!showPicker())"
-    [class]="
-      showPicker()
-        ? 'bg-base-content text-base-100 hover:bg-base-content/90'
-        : 'bg-base-100 text-base-content hover:bg-base-300'
-    "
-    class="flex items-center gap-1.5 bg-base-100 group-hover:bg-base-300 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-base-300 w-full"
+    [active]="showPicker()"
+    variant="outline"
   >
-    <svg lucideCalendar class="w-4 h-4"></svg> Dates
-  </button>
+    <svg lucideCalendar class="w-4 h-4 mr-2"></svg> Dates
+  </ui-button>
   @if (showPicker()) {
     <div class="inset-0 z-40 fixed" (click)="showPicker.set(false)"></div>
     <div

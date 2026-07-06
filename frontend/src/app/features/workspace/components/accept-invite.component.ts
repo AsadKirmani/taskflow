@@ -2,10 +2,12 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WorkspaceApiService } from '../data-access/workspace-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 
 @Component({
   selector: 'app-accept-invite',
   standalone: true,
+  imports: [UiButtonComponent],
   template: `
     <div class="min-h-screen bg-stone-50 flex items-center justify-center p-4">
       <div
@@ -50,12 +52,13 @@ import { NotificationService } from '../../../core/services/notification.service
           </div>
           <h2 class="text-xl font-bold text-stone-900 mb-2">Invalid or Expired Link</h2>
           <p class="text-stone-500 text-sm mb-6">{{ errorMessage() }}</p>
-          <button
+          <ui-button
+            variant="primary"
             (click)="goToHome()"
             class="w-full bg-stone-900 text-white font-semibold py-2.5 rounded-xl hover:bg-black transition-colors"
           >
             Go to Dashboard
-          </button>
+          </ui-button>
         }
       </div>
     </div>

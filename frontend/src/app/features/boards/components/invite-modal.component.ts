@@ -1,11 +1,14 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { WorkspaceApiService } from '../../workspace/data-access/workspace-api.service';
+import { UiButtonComponent } from '../../../ui/components/ui-button.component';
+import { APP_ICONS } from '../../../core/icons/lucide-icons';
+import { UiSelectComponent } from '../../../ui/components/ui-select.component';
 
 @Component({
   selector: 'app-invite-member-modal',
   standalone: true,
-  imports: [],
+  imports: [UiButtonComponent, UiSelectComponent, ...APP_ICONS],
   template: `
     <div
       class="fixed inset-0 bg-slate-950/50 flex items-center justify-center z-50 p-4"
@@ -20,20 +23,13 @@ import { WorkspaceApiService } from '../../workspace/data-access/workspace-api.s
             <h2 class="text-xl font-bold text-base-content">Invite to Workspace</h2>
             <p class="text-sm text-base-content/70">Collaborate with your team members.</p>
           </div>
-          <button
+          <ui-button
             (click)="closeModal()"
-            class="text-base-content/70 hover:text-base-content transition-colors p-2 rounded-full hover:bg-base-content/10"
+            variant="ghost"
+            size="icon-sm"
           >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+            <svg lucideX class="w-5 h-5"></svg>
+          </ui-button>
         </div>
 
         <form (submit)="sendInvite($event)">
@@ -49,50 +45,35 @@ import { WorkspaceApiService } from '../../workspace/data-access/workspace-api.s
           </div>
 
           <div class="mb-6">
-            <label class="block text-sm font-semibold text-base-content mb-2">Role</label>
-            <select
+          <ui-select
+              label="Role"
               name="role"
-              class="w-full px-4 py-2.5 border border-base-300 text-base-content rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all bg-base-100"
+              placeholder="Select a role"
+              class="text-base-content w-full"
             >
               <option value="MEMBER">Member (Can edit boards)</option>
               <option value="GUEST">Guest (Read-only)</option>
-            </select>
+            </ui-select>
           </div>
+            
 
           <div class="flex gap-3 pt-2">
-            <button
-              type="button"
+            <ui-button
               (click)="closeModal()"
-              class="flex-1 border border-base-300 text-base-content font-semibold rounded-box hover:bg-base-content/10 transition-colors"
+              variant="ghost"
+              size="lg"
             >
               Cancel
-            </button>
-            <button
+            </ui-button>
+            <ui-button
               type="submit"
+              variant="primary"
               [disabled]="isSubmitting()"
-              class="flex-1 p-2 bg-primary text-white font-semibold rounded-box hover:bg-primary/80 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              [loading]="isSubmitting()"
+              [loadingText]="'Sending...'"
             >
-              @if (isSubmitting()) {
-                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Sending...
-              } @else {
-                Send Invite
-              }
-            </button>
+              Send Invite
+            </ui-button>
           </div>
         </form>
       </div>

@@ -15,9 +15,14 @@ export class TaskFacade {
   private taskStore = inject(TaskStore);
   private boardStore = inject(BoardStore);
   private uploadService = inject(UploadService);
-  private notificationService = inject(NotificationService);
-  currentTask = signal<Task | null>(null);
+  selectedTaskId = signal<string | null>(null);
   boardMembers = computed(() => this.boardStore.members() ?? []);
+
+  currentTask = (() => {
+    const taskId = this.selectedTaskId();
+    if (!taskId) return null;
+    return this.taskStore.tasksById()[taskId] || null;
+  });
 
   columnName = computed(
     () =>
@@ -26,17 +31,16 @@ export class TaskFacade {
   );
   comments: Signal<TaskComment[]> = this.taskStore.comments;
 
-  updateTaskProperty(key: keyof Task, value: any) {
+  updateTaskProperty(updates: Partial<Task>) {
     const task = this.currentTask();
     if (!task) return;
-    this.currentTask.set({ ...task, [key]: value });
-    this.taskStore.updateTask(task.id, { [key]: value });
+    this.taskStore.updateTask(task.id, updates);
   }
   removeDueDate() {
-    this.updateTaskProperty('dueDate', null);
+    this.updateTaskProperty({ dueDate: null });
   }
   removeStartDate() {
-    this.updateTaskProperty('startDate', null);
+    this.updateTaskProperty({ startDate: null });
   }
 
   toggleLabel(label: TaskLabel) {
@@ -47,15 +51,15 @@ export class TaskFacade {
     const newLabels = exists
       ? currentLabels.filter((l) => l.name !== label.name)
       : [...currentLabels, label];
-    this.updateTaskProperty('labels', newLabels);
+    this.updateTaskProperty({ labels: newLabels });
   }
   addChecklistItem(text: string) {
     const task = this.currentTask();
     if (!task) return;
-    this.updateTaskProperty('checklist', [
+    this.updateTaskProperty({ checklist: [
       ...(task.checklist || []),
       { title: text, isCompleted: false },
-    ]);
+    ] });
   }
 
   toggleChecklistItem(index: number, isCompleted: boolean) {
@@ -64,15 +68,12 @@ export class TaskFacade {
     const newChecklist = task.checklist.map((item, i) =>
       i === index ? { ...item, isCompleted } : item,
     );
-    this.updateTaskProperty('checklist', newChecklist);
+    this.updateTaskProperty({ checklist: newChecklist });
   }
   deleteChecklistItem(index: number) {
     const task = this.currentTask();
     if (!task || !task.checklist) return;
-    this.updateTaskProperty(
-      'checklist',
-      task.checklist.filter((_, i) => i !== index),
-    );
+    this.updateTaskProperty({ checklist: task.checklist.filter((_, i) => i !== index) });
   }
   postComment(text: string) {
     const tId = this.currentTask()?.id;
@@ -85,6 +86,7 @@ export class TaskFacade {
 
     const currentMembers = task.assigneeIds || [];
     const exists = currentMembers.includes(userId);
+    const assignedAt = exists ? null : new Date().toISOString();
 
     let newMembers;
     if (exists) {
@@ -93,8 +95,7 @@ export class TaskFacade {
       newMembers = [...currentMembers, userId];
     }
 
-    this.updateTaskProperty('assigneeIds', newMembers);
-    this.updateTaskProperty('assignedAt',new Date().toISOString());
+    this.updateTaskProperty({ assigneeIds: newMembers, assignedAt });
   }
   assignedMembers = computed<User[]>(() => {
     const members = this.boardStore.members() || [];
@@ -140,8 +141,7 @@ export class TaskFacade {
       dueDateTime = dueObj.toISOString();
     }
 
-    this.updateTaskProperty('startDate', startDateTime);
-    this.updateTaskProperty('dueDate', dueDateTime);
+    this.updateTaskProperty({  startDate: startDateTime, dueDate: dueDateTime });
   }
   archiveTask(taskId: string, workspaceId: string, taskTitle: string, reason?: string) {
     this.taskStore.archiveTask(taskId, workspaceId, taskTitle, reason);
@@ -155,7 +155,7 @@ export class TaskFacade {
         if (currentTask) {
           const updatedAttachments = [...(currentTask.attachments || []), newAttachment];
 
-          this.updateTaskProperty('attachments', updatedAttachments);
+          this.updateTaskProperty({ attachments: updatedAttachments });
         }
       },
       error: (err) => {

@@ -88,18 +88,15 @@ export const archiveRepository = {
       includeRestored?: boolean;
     },
   ) {
-    const query: Record<string, unknown> = {
-      workspaceId,
-    };
+    const query: Record<string, unknown> = { workspaceId };
+    if (options?.entityType) query["entityType"] = options.entityType;
+    if (!options?.includeRestored) query["restoredAt"] = null;
 
-    if (options?.entityType) {
-      query["entityType"] = options.entityType;
-    }
-
-    if (!options?.includeRestored) {
-      query["restoredAt"] = null;
-    }
-
-    return ArchiveModel.find(query).sort({ createdAt: -1 });
+    return ArchiveModel.find(query)
+      .select(
+        "_id entityType entityId entityName archivedBy reason createdAt restoredAt restoredBy",
+      )
+      .sort({ createdAt: -1 })
+      .lean();
   },
 };
