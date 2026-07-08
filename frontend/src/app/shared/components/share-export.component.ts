@@ -1,12 +1,11 @@
 import { Component, input, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ExportService } from '../../core/services/export.service';
 import { APP_ICONS } from '../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-share-export',
   standalone: true,
-  imports: [CommonModule, ...APP_ICONS],
+  imports: [...APP_ICONS],
   template: `
     <div
       class="w-full rounded-lg transition-all duration-200 overflow-hidden mt-2 border"

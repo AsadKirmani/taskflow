@@ -38,7 +38,11 @@ export class App implements OnInit {
       event.preventDefault();
       this.shortcuts.triggerCreate();
     }
-
+    if ((event.shiftKey || event.metaKey) && event.key.toLowerCase() === 't') {
+      event.preventDefault();
+      const activeColumnId = this.shortcuts.activeColumnId;
+      this.shortcuts.triggerAddTask(activeColumnId || undefined);
+    }
     if (event.key === 'Escape') {
       event.preventDefault();
       this.shortcuts.triggerEscape();

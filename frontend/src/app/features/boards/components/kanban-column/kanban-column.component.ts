@@ -1,5 +1,4 @@
 import { Component, inject, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { BoardColumn } from '../../../../core/models/column.model';
 import { Task } from '../../../../core/models/task.model';
 import { KanbanTaskComponent } from '../kanban-task/kanban-task.component';
@@ -16,6 +15,8 @@ import {
   UiDropdownMenuTrigger,
 } from '../../../../ui/components/ui-dropdown-menu.component';
 import { UiDropdownMenuItemComponent } from '../../../../ui/components/ui-dropdown-menu-item.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { KeyboardShortcutsService } from '../../../../core/services/keyboard-shortcuts.service';
 
 @Component({
   selector: 'app-kanban-column',
@@ -23,7 +24,6 @@ import { UiDropdownMenuItemComponent } from '../../../../ui/components/ui-dropdo
 
   imports: [
     KanbanTaskComponent,
-    CommonModule,
     AutofocusDirective,
     DragDropModule,
     UiButtonComponent,
@@ -38,6 +38,26 @@ import { UiDropdownMenuItemComponent } from '../../../../ui/components/ui-dropdo
 })
 export class KanbanColumnComponent {
   private cdr = inject(ChangeDetectorRef);
+  private shortcuts = inject(KeyboardShortcutsService);
+  onMouseEnter() {
+    this.shortcuts.setActiveColumnId(this.column().id);
+  }
+
+  onMouseLeave() {
+    this.shortcuts.setActiveColumnId(null);
+  }
+
+  constructor() {
+    this.shortcuts.addTaskTriggered
+      .pipe(takeUntilDestroyed())
+      .subscribe((data) => {
+      const targetColumnId = data?.columnId;
+        if ((targetColumnId && targetColumnId === this.column().id) || (!targetColumnId && this.columnIndex() === 0)) {
+          this.isInputOpen.set(true);
+        }
+      });
+  }
+
   column = input.required<BoardColumn>();
   tasks = input<Task[]>([]);
   columnIndex = input.required<number>();

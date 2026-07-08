@@ -9,14 +9,11 @@
         @if (savedUser()?.avatarUrl) {
           <img [src]="savedUser()?.avatarUrl" alt="Profile" class="w-full h-full object-cover" />
         } @else {
-          <!-- Agar avatar nahi hai toh Name ka pehla letter dikhao -->
           <span class="text-xl font-bold uppercase">{{ savedUser()?.name?.charAt(0) }}</span>
         }
       </div>
       <h3 class="font-bold text-base-content">{{ savedUser()?.name }}</h3>
       <p class="text-xs text-base-content/70 mb-3">{{ savedUser()?.email }}</p>
-      
-      <!-- 'Not You?' Button -->
       <button 
         type="button" 
         (click)="useAnotherAccount()" 

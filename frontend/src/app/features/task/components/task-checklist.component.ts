@@ -1,5 +1,4 @@
 import { Component, input, output, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ChecklistItem } from '../../../core/models/task.model';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../ui/components/ui-button.component';
@@ -7,7 +6,7 @@ import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 @Component({
   selector: 'app-task-checklist',
   standalone: true,
-  imports: [CommonModule, UiButtonComponent, ...APP_ICONS],
+  imports: [UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="flex items-start gap-3">
       <svg lucideSquareCheck class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>
@@ -21,7 +20,7 @@ import { UiButtonComponent } from '../../../ui/components/ui-button.component';
           <div class="flex-1 h-2 bg-base-200 rounded-full overflow-hidden border border-base-300">
             <div
               class="h-full transition-all duration-500 ease-out"
-              [ngClass]="progressPercentage() === 100 ? 'bg-success' : 'bg-primary'"
+              [class]="progressPercentage() === 100 ? 'bg-success' : 'bg-primary'"
               [style.width.%]="progressPercentage()"
             ></div>
           </div>

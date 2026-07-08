@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, effect, inject, untracked } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { RouterLink } from '@angular/router';
@@ -19,6 +18,7 @@ import { UiStatCardComponent } from '../../../../ui/components/layout/ui-stat-ca
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 import { WorkspaceStoreService } from '../../../workspace/data-access/workspace-store.service';
 import { AuthStoreService } from '../../../auth/data-access/auth-store.service';
+import { DatePipe, TitleCasePipe } from '@angular/common';
 
 export interface DashboardTaskRow {
   id: string;
@@ -34,7 +34,6 @@ export interface DashboardTaskRow {
   selector: 'app-dashboard-page',
   standalone: true,
   imports: [
-    CommonModule,
     MatCardModule,
     MatButtonModule,
     RouterLink,
@@ -45,8 +44,11 @@ export interface DashboardTaskRow {
     UiPageBodyComponent,
     UiPanelComponent,
     UiStatCardComponent,
+    DatePipe,
+    TitleCasePipe,
     ...APP_ICONS,
   ],
+  
   templateUrl: './dashboard-page.component.html',
   styles: [
     `

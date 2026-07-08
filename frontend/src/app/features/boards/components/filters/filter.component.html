@@ -1,33 +1,34 @@
 <div class="fixed inset-0 z-40" (click)="close()"></div>
-<div
+@if(isOpen()) {
+
+  <div
   class="filter-menu absolute right-5 z-50 w-64 rounded-box bg-base-100 border border-base-300"
-  *ngIf="isOpen"
->
+  >
   <header class="border-b border-base-300 p-2 relative h-12">
     <h2 class="text-center font-semibold text-base-content">Filter</h2>
     <ui-button (click)="close()" variant="icon" size="icon-sm" class="absolute right-2 top-2">
       <svg lucideX class="w-4 h-4"></svg>
     </ui-button>
   </header>
-
+  
   <div class="filter-options max-h-[70vh] overflow-y-auto p-2 space-y-4">
     <section>
       <p class="text-sm font-semibold text-base-content/70 mb-2">Members</p>
       <ul class="space-y-2 text-base-content">
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="nomembers"
+          type="checkbox"
+          id="nomembers"
             name="nomembers"
             value="nomembers"
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
             [checked]="filter.noMembers"
             (change)="toggleFlag('noMembers', $any($event.target).checked)"
-          />
-          <label for="nomembers">No Members</label>
-        </li>
-        <li class="flex items-center gap-2">
-          <input
+            />
+            <label for="nomembers">No Members</label>
+          </li>
+          <li class="flex items-center gap-2">
+            <input
             type="checkbox"
             id="me"
             name="me"
@@ -35,17 +36,17 @@
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
             [checked]="filter.me"
             (change)="toggleFlag('me', $any($event.target).checked)"
-          />
-          <label for="me">Me</label>
-        </li>
-      </ul>
-    </section>
-
-    <section>
-      <p class="text-sm font-semibold text-base-content/70 mb-2">Task Status</p>
-      <ul class="space-y-2 text-base-content">
-        <li class="flex items-center gap-2">
-          <input
+            />
+            <label for="me">Me</label>
+          </li>
+        </ul>
+      </section>
+      
+      <section>
+        <p class="text-sm font-semibold text-base-content/70 mb-2">Task Status</p>
+        <ul class="space-y-2 text-base-content">
+          <li class="flex items-center gap-2">
+            <input
             type="checkbox"
             id="completed"
             name="completed"
@@ -53,10 +54,10 @@
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
             [checked]="filter.completed"
             (change)="toggleFlag('completed', $any($event.target).checked)"
-          />
-          <label for="completed">Completed</label>
-        </li>
-        <li class="flex items-center gap-2">
+            />
+            <label for="completed">Completed</label>
+          </li>
+          <li class="flex items-center gap-2">
           <input
             type="checkbox"
             id="incomplete"
@@ -65,159 +66,159 @@
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
             [checked]="filter.incomplete"
             (change)="toggleFlag('incomplete', $any($event.target).checked)"
-          />
-          <label for="incomplete">Incomplete</label>
-        </li>
-      </ul>
-    </section>
-
-    <section>
+            />
+            <label for="incomplete">Incomplete</label>
+          </li>
+        </ul>
+      </section>
+      
+      <section>
       <p class="text-sm font-semibold text-base-content/70 mb-2">Due Date</p>
       <ul class="space-y-2 text-base-content">
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="noduedate"
-            name="noduedate"
-            value="noduedate"
-            class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.dueDate === 'none'"
-            (change)="selectDueDate('none', $any($event.target).checked)"
+          type="checkbox"
+          id="noduedate"
+          name="noduedate"
+          value="noduedate"
+          class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
+          [checked]="filter.dueDate === 'none'"
+          (change)="selectDueDate('none', $any($event.target).checked)"
           />
           <label for="noduedate">No Due Date</label>
         </li>
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="overdue"
-            name="overdue"
-            value="overdue"
-            class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.dueDate === 'overdue'"
-            (change)="selectDueDate('overdue', $any($event.target).checked)"
+          type="checkbox"
+          id="overdue"
+          name="overdue"
+          value="overdue"
+          class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
+          [checked]="filter.dueDate === 'overdue'"
+          (change)="selectDueDate('overdue', $any($event.target).checked)"
           />
           <label for="overdue">Overdue</label>
         </li>
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="today"
-            name="today"
-            value="today"
-            class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.dueDate === 'today'"
-            (change)="selectDueDate('today', $any($event.target).checked)"
+          type="checkbox"
+          id="today"
+          name="today"
+          value="today"
+          class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
+          [checked]="filter.dueDate === 'today'"
+          (change)="selectDueDate('today', $any($event.target).checked)"
           />
           <label for="today">Due Today</label>
         </li>
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="week"
-            name="week"
-            value="week"
-            class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.dueDate === 'this_week'"
-            (change)="selectDueDate('this_week', $any($event.target).checked)"
+          type="checkbox"
+          id="week"
+          name="week"
+          value="week"
+          class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
+          [checked]="filter.dueDate === 'this_week'"
+          (change)="selectDueDate('this_week', $any($event.target).checked)"
           />
           <label for="week">Due This Week</label>
         </li>
       </ul>
     </section>
-
+    
     <section>
       <p class="text-sm font-semibold text-base-content/70 mb-2">Labels</p>
       <ul class="space-y-2 text-base-content">
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="noLabel"
-            name="noLabel"
-            value="noLabel"
-            class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('noLabel')"
-            (change)="toggleLabel('noLabel', $any($event.target).checked)"
+          type="checkbox"
+          id="noLabel"
+          name="noLabel"
+          value="noLabel"
+          class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
+          [checked]="filter.labels.includes('noLabel')"
+          (change)="toggleLabel('noLabel', $any($event.target).checked)"
           />
           <label for="noLabel">No Label</label>
         </li>
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="bug"
-            name="bug"
-            value="bug"
-            class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('bug')"
-            (change)="toggleLabel('bug', $any($event.target).checked)"
+          type="checkbox"
+          id="bug"
+          name="bug"
+          value="bug"
+          class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
+          [checked]="filter.labels.includes('bug')"
+          (change)="toggleLabel('bug', $any($event.target).checked)"
           />
           <label for="bug">Bug</label>
         </li>
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="feature"
-            name="feature"
-            value="feature"
-            class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('feature')"
-            (change)="toggleLabel('feature', $any($event.target).checked)"
+          type="checkbox"
+          id="feature"
+          name="feature"
+          value="feature"
+          class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
+          [checked]="filter.labels.includes('feature')"
+          (change)="toggleLabel('feature', $any($event.target).checked)"
           />
           <label for="feature">Feature</label>
         </li>
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="enhancement"
-            name="enhancement"
-            value="enhancement"
-            class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('enhancement')"
-            (change)="toggleLabel('enhancement', $any($event.target).checked)"
+          type="checkbox"
+          id="enhancement"
+          name="enhancement"
+          value="enhancement"
+          class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
+          [checked]="filter.labels.includes('enhancement')"
+          (change)="toggleLabel('enhancement', $any($event.target).checked)"
           />
           <label for="enhancement">Enhancement</label>
         </li>
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="design"
-            name="design"
-            value="design"
-            class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('design')"
-            (change)="toggleLabel('design', $any($event.target).checked)"
+          type="checkbox"
+          id="design"
+          name="design"
+          value="design"
+          class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
+          [checked]="filter.labels.includes('design')"
+          (change)="toggleLabel('design', $any($event.target).checked)"
           />
           <label for="design">Design</label>
         </li>
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="urgent"
-            name="urgent"
-            value="urgent"
-            class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('urgent')"
+          type="checkbox"
+          id="urgent"
+          name="urgent"
+          value="urgent"
+          class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
+          [checked]="filter.labels.includes('urgent')"
             (change)="toggleLabel('urgent', $any($event.target).checked)"
           />
           <label for="urgent">Urgent</label>
         </li>
         <li class="flex items-center gap-2">
           <input
-            type="checkbox"
-            id="documentation"
-            name="documentation"
-            value="documentation"
-            class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
-            [checked]="filter.labels.includes('documentation')"
+          type="checkbox"
+          id="documentation"
+          name="documentation"
+          value="documentation"
+          class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
+          [checked]="filter.labels.includes('documentation')"
             (change)="toggleLabel('documentation', $any($event.target).checked)"
-          />
-          <label for="documentation">Documentation</label>
-        </li>
-      </ul>
-    </section>
+            />
+            <label for="documentation">Documentation</label>
+          </li>
+        </ul>
+      </section>
 
-    <section>
-      <p class="text-sm font-semibold text-base-content/70 mb-2">Activity</p>
-      <ul class="space-y-2 text-base-content">
+      <section>
+        <p class="text-sm font-semibold text-base-content/70 mb-2">Activity</p>
+        <ul class="space-y-2 text-base-content">
         <li class="flex items-center gap-2">
           <input
             type="checkbox"
@@ -227,11 +228,11 @@
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
             [checked]="filter.activity.includes('recentlyupdated')"
             (change)="toggleActivity('recentlyupdated', $any($event.target).checked)"
-          />
-          <label for="recentlyupdated">Recently Updated</label>
-        </li>
-        <li class="flex items-center gap-2">
-          <input
+            />
+            <label for="recentlyupdated">Recently Updated</label>
+          </li>
+          <li class="flex items-center gap-2">
+            <input
             type="checkbox"
             id="recentlycreated"
             name="recentlycreated"
@@ -239,11 +240,11 @@
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
             [checked]="filter.activity.includes('recentlycreated')"
             (change)="toggleActivity('recentlycreated', $any($event.target).checked)"
-          />
-          <label for="recentlycreated">Recently Created</label>
-        </li>
-        <li class="flex items-center gap-2">
-          <input
+            />
+            <label for="recentlycreated">Recently Created</label>
+          </li>
+          <li class="flex items-center gap-2">
+            <input
             type="checkbox"
             id="activeinlastweek"
             name="activeinlastweek"
@@ -251,11 +252,11 @@
             class="w-4 h-4 rounded-sm bg-base-100 focus:outline-none"
             [checked]="filter.activity.includes('activeinlastweek')"
             (change)="toggleActivity('activeinlastweek', $any($event.target).checked)"
-          />
-          <label for="activeinlastweek">Active in Last Week</label>
-        </li>
-        <li class="flex items-center gap-2">
-          <input
+            />
+            <label for="activeinlastweek">Active in Last Week</label>
+          </li>
+          <li class="flex items-center gap-2">
+            <input
             type="checkbox"
             id="activeinlastmonth"
             name="activeinlastmonth"
@@ -270,3 +271,4 @@
     </section>
   </div>
 </div>
+}

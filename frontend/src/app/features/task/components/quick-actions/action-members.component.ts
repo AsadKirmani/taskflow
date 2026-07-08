@@ -1,5 +1,4 @@
 import { Component, input, output, signal, computed, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { User } from '../../../../core/models/user.model';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
@@ -8,7 +7,7 @@ import { UiButtonComponent } from '../../../../ui/components/ui-button.component
 @Component({
   selector: 'app-action-members',
   standalone: true,
-  imports: [CommonModule, AutofocusDirective, UiButtonComponent, ...APP_ICONS],
+  imports: [AutofocusDirective, UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="relative inline-flex w-full">
       <ui-button

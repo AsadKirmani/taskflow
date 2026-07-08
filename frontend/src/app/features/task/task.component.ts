@@ -9,7 +9,6 @@ import {
   untracked,
   computed,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Task } from '../../core/models/task.model';
 import { AuthStoreService } from '../auth/data-access/auth-store.service';
 import { TaskStore } from './data-access/task-store.service';
@@ -28,7 +27,6 @@ import { APP_ICONS } from '../../core/icons/lucide-icons';
 @Component({
   selector: 'app-task',
   imports: [
-    CommonModule,
     TaskHeaderComponent,
     TaskChecklistComponent,
     TaskAssigneesComponent,

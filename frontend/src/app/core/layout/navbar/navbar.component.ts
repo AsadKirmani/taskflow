@@ -3,9 +3,8 @@ import {
   Component,
   HostListener,
   inject,
-  EventEmitter,
-  Output,
   ViewChild,
+  output,
 } from '@angular/core';
 import { AuthStoreService } from '../../../features/auth/data-access/auth-store.service';
 import { ThemeService } from '../../services/theme.service';
@@ -85,17 +84,15 @@ import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
             <ui-dropdown-menu>
               <ui-dropdown-menu-trigger>
                 <ui-button
-                  variant="icon"
+                  variant="ghost"
                   size="icon"
                   aria-label="User menu"
-                  class="border border-base-300 cursor-pointer rounded-full"
                 >
                   <ui-avatar
                     [name]="authStore.currentUser()?.name || 'User'"
                     [title]="authStore.currentUser()?.name || 'User'"
                     size="lg"
                     [src]="authStore.currentUser()?.avatarUrl || ''"
-                    class="w-8 h-8 sm:w-10 sm:h-10 block"
                   ></ui-avatar>
                 </ui-button>
               </ui-dropdown-menu-trigger>
@@ -118,7 +115,7 @@ import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
 export class NavbarComponent {
   public themeService = inject(ThemeService);
   authStore = inject(AuthStoreService);
-  @Output() menuToggle = new EventEmitter<void>();
+  menuToggle = output<void>();
   logout() {
     this.authStore.logout();
   }

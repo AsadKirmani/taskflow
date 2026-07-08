@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, booleanAttribute } from '@angular/core';
 
 @Component({
   selector: 'ui-button',
@@ -52,6 +52,7 @@ export class UiButtonComponent {
   type = input<'button' | 'submit' | 'reset'>('button');
   variant = input<'primary' | 'outline' | 'secondary' | 'ghost' | 'danger' | 'icon'>('primary');
   size = input<'sm' | 'md' | 'lg' | 'icon' | 'icon-sm'>('md');
+  fullWidth = input(false, {transform: booleanAttribute});
   active = input(false);
   disabled = input(false);
   loading = input(false);
@@ -63,8 +64,11 @@ export class UiButtonComponent {
   isSmallIcon = computed(() => this.size() === 'icon-sm');
 
   computedClasses = computed(() => {
-    const base =
+    let base =
       'inline-flex items-center justify-center cursor-pointer font-medium transition-all duration-300 rounded-btn focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] whitespace-nowrap';
+      if (this.fullWidth()) {
+        base += ' w-full';
+      }
       let activeClasses = '';
     if (this.active()) {
       const v = this.variant();
@@ -80,10 +84,10 @@ export class UiButtonComponent {
         'bg-primary text-primary-content hover:bg-primary/90 focus:ring-primary/50 shadow-sm',
       secondary:
         'bg-secondary text-secondary-content hover:bg-secondary/90 border border-secondary-content/10 focus:ring-secondary/20',
-      ghost: 'bg-transparent text-base-content hover:bg-base-300 focus:ring-base-content/20',
+      ghost: 'bg-transparent text-base-content/70 hover:text-base-content hover:bg-base-300 focus:ring-base-content/20',
       danger: 'bg-error text-error-content hover:bg-error/90 focus:ring-error/50 shadow-sm',
-      icon: 'bg-transparent text-base-content hover:bg-base-300 border border-base-300 focus:ring-base-content/20',
-      outline: 'bg-transparent text-base-content border border-base-300 hover:bg-base-100 focus:ring-base-content/20',
+      icon: 'bg-transparent text-base-content/70 hover:text-base-content hover:bg-base-300 border border-base-300 focus:ring-base-content/20',
+      outline: 'bg-transparent border border-base-300 hover:bg-base-100 focus:ring-base-content/20',
     };
 
     const sizes = {

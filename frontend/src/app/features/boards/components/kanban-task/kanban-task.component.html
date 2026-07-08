@@ -1,6 +1,8 @@
 <article
-  class="task-card flex flex-col gap-2 w-56 shadow-sm rounded-xl text-start text-base-content p-2 bg-base-100 group cursor-grab active:cursor-grabbing transition-all hover:ring-2 hover:ring-primary hover:shadow-md overflow-hidden border border-base-300/10"
+  class="task-card flex flex-col gap-2 shadow-sm rounded-xl text-start text-base-content p-2 bg-base-100 focus:outline-none focus:ring-2 focus:ring-primary group cursor-grab active:cursor-grabbing transition-all hover:shadow-md overflow-hidden border border-base-300/10"
   (click)="openOverlay.emit()"
+  tabindex="0"
+  (keydown)="onKeydown($event)"
 >
   @if (!isEditing()) {
     @if (task().labels && task().labels.length > 0) {
@@ -21,7 +23,7 @@
       <div class="flex items-start justify-start gap-2 min-w-0">
         <button
           type="button"
-          class="task-card__mark-complete-button mt-0.5 opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer p-0 m-0 flex items-center flex-shrink-0"
+          class="task-card__mark-complete-button mt-0.5 opacity-70 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 focus:opacity-100 transition-opacity bg-transparent border-none cursor-pointer p-0 m-0 flex items-center flex-shrink-0"
           (click)="$event.stopPropagation(); toggleCompletion.emit()"
         >
           @if (task().isCompleted) {
@@ -35,7 +37,7 @@
         </button>
 
         <h4
-          class="task-card__title leading-tight m-0 font-medium text-sm transition-transform duration-300 transform translate-x-0 md:translate-x-[-26px] md:group-hover:translate-x-0"
+          class="task-card__title leading-tight m-0 font-medium text-sm transition-transform duration-300 transform translate-x-0 md:translate-x-[-26px] md:group-hover:translate-x-0 md:group-focus-within:translate-x-0"
           [class.line-through]="task().isCompleted"
           [class.text-base-content/60]="task().isCompleted"
         >
@@ -45,7 +47,7 @@
 
       <button
         type="button"
-        class="task-card__button opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer p-0 m-0 flex items-center flex-shrink-0 text-base-content/40 hover:text-primary"
+        class="task-card__button opacity-70 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity bg-transparent border-none cursor-pointer p-0 m-0 flex items-center flex-shrink-0 text-base-content/40 hover:text-primary"
         (click)="startEdit($event)"
       >
         <svg lucidePencil class="w-4 h-4 text-[16px]">edit</svg>
@@ -60,11 +62,9 @@
       task().checklist?.length ||
       task().assigneeIds.length
     ) {
-      <!-- Main Footer Container: Added flex-wrap and items-center -->
       <div
         class="flex items-center justify-start border-t border-base-300/5 flex-wrap gap-x-3 gap-y-2 text-base-content/50 text-[12px]"
       >
-        <!-- Left side icons container (Due date, Description, Comments, etc.) -->
         <div class="flex items-center gap-3 flex-wrap">
           @if (task().dueDate && task().startDate) {
             <div
@@ -112,7 +112,6 @@
           }
         </div>
 
-        <!-- Avatar Stack: Hamesha right side rahega due to justify-between -->
         @if (task().assigneeIds && task().assigneeIds!.length > 0) {
           <div class="flex items-center flex-shrink-0 ml-auto">
             <ui-avatar-stack [users]="avatarUsers()" [limit]="3" size="sm" />
@@ -122,15 +121,14 @@
     }
   } @else {
     <div class="flex flex-col gap-2" (click)="$event.stopPropagation()">
-      <input
-        type="text"
-        class="p-2 shadow-sm rounded-lg w-full h-10 outline-none ring-1 ring-base-content/20 focus:ring-2 focus:ring-primary bg-base-100 text-base-content"
+      <textarea
+        class="p-2.5 shadow-md rounded-xl w-full min-h-[80px] outline-none ring-2 ring-primary bg-base-100 text-base-content text-sm resize-none mb-2 leading-snug"
         [value]="editValue()"
         (input)="onInput($event)"
-        (keydown.enter)="save()"
+        (keydown.enter)="save(); $event.preventDefault()"
         (keydown.escape)="cancel()"
         appAutofocus
-      />
+      ></textarea>
       <div class="flex items-center justify-end gap-2">
         <button
           type="button"

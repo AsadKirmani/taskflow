@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, output, ViewChild, ElementRef } from '@angular/core';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
@@ -6,7 +5,7 @@ import { UiButtonComponent } from '../../../../ui/components/ui-button.component
 @Component({
   selector: 'app-action-attachments',
   standalone: true,
-  imports: [CommonModule, UiButtonComponent, ...APP_ICONS],
+  imports: [UiButtonComponent, ...APP_ICONS],
   template: `
     <ui-button
       variant="outline"

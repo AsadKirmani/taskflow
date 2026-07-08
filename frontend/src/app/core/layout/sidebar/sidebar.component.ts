@@ -1,10 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Output,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 
@@ -21,8 +20,7 @@ import { APP_ICONS } from '../../icons/lucide-icons';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent {
-  @Output()
-  navigate = new EventEmitter<void>();
+  navigate = output<void>();
 
   readonly isCollapsed = input<boolean>(false);
 

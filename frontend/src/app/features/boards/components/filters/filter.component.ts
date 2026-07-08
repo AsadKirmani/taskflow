@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output, model } from '@angular/core';
+import { Component, model, output } from '@angular/core';
 import { BoardFilterSelection } from './filter-selection.model';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
@@ -7,7 +6,7 @@ import { UiButtonComponent } from '../../../../ui/components/ui-button.component
 @Component({
   selector: 'app-apply-filter',
   standalone: true,
-  imports: [CommonModule, ...APP_ICONS, UiButtonComponent],
+  imports: [...APP_ICONS, UiButtonComponent],
   templateUrl: './filter.component.html',
   host: {
     'document:click': 'close()',
@@ -23,8 +22,8 @@ export class ApplyFilterComponent {
     labels: [],
     activity: [],
   };
-  @Output() filtersChanged = new EventEmitter<BoardFilterSelection>();
-  @Output() filterClose = new EventEmitter<void>();
+  filtersChanged = output<BoardFilterSelection>();
+  filterClose = output<void>();
 
   isOpen = model<boolean>(false);
   close(): void {

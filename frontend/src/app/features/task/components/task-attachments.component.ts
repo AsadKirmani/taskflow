@@ -1,10 +1,9 @@
-import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-task-attachments',
-  imports: [CommonModule, ...APP_ICONS],
+  imports: [...APP_ICONS],
   standalone: true,
   template: `<div class="flex items-start gap-3">
     <svg lucidePaperclip class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>

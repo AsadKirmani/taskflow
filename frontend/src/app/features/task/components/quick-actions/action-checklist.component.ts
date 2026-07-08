@@ -1,5 +1,4 @@
 import { Component, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
@@ -7,7 +6,7 @@ import { UiButtonComponent } from '../../../../ui/components/ui-button.component
 @Component({
   selector: 'app-action-checklist',
   standalone: true,
-  imports: [CommonModule, AutofocusDirective, UiButtonComponent, ...APP_ICONS],
+  imports: [AutofocusDirective, UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="relative inline-flex">
       <ui-button

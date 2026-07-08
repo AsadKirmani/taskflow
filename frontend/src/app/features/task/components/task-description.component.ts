@@ -1,5 +1,4 @@
 import { Component, HostListener, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TextEditorComponent } from '../../../shared/components/editor/text-editor.component';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../ui/components/ui-button.component';
@@ -7,7 +6,7 @@ import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 @Component({
   selector: 'app-task-description',
   standalone: true,
-  imports: [CommonModule, TextEditorComponent, UiButtonComponent, ...APP_ICONS],
+  imports: [TextEditorComponent, UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="flex items-start gap-3">
       <svg lucideTextAlignStart class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>

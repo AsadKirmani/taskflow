@@ -1,5 +1,4 @@
 import { Component, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TaskMenuComponent } from './task-menu.component';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../ui/components/ui-button.component';
@@ -31,7 +30,7 @@ import { UiButtonComponent } from '../../../ui/components/ui-button.component';
       </ui-button>
     </div>
   </header>`,
-  imports: [CommonModule, TaskMenuComponent, UiButtonComponent, ...APP_ICONS],
+  imports: [TaskMenuComponent, UiButtonComponent, ...APP_ICONS],
 })
 export class TaskHeaderComponent {
   columnName = input.required<string>();

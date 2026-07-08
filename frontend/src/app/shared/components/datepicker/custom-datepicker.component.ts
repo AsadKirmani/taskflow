@@ -7,7 +7,7 @@ import {
   inject,
   output,
 } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CalendarService } from '../../../core/services/calendar.service';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
@@ -32,14 +32,12 @@ interface CalendarDay {
 @Component({
   selector: 'app-custom-datepicker',
   standalone: true,
-  imports: [CommonModule, FormsModule, UiButtonComponent, ...APP_ICONS],
+  imports: [DatePipe, FormsModule, UiButtonComponent, ...APP_ICONS],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DatePipe],
   templateUrl: './custom-datepicker.component.html',
 })
 export class CustomDatepickerComponent implements OnInit {
   private calendarService = inject(CalendarService);
-  private datePipe = inject(DatePipe);
 
   dateApplied = output<TaskDates>();
 
@@ -98,8 +96,8 @@ export class CustomDatepickerComponent implements OnInit {
     const start = this.startDate();
     const due = this.dueDate();
     if (start && due) return 'Start & Due Date set';
-    if (start) return `Starts: ${this.datePipe.transform(start, 'MMM d')}`;
-    if (due) return `Due: ${this.datePipe.transform(due, 'MMM d')}`;
+    if (start) return `Starts: ${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    if (due) return `Due: ${due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
     return '';
   });
 

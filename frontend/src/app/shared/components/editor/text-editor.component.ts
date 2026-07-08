@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation, model, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Editor } from '@tiptap/core';
@@ -11,7 +10,6 @@ import { UiButtonComponent } from '../../../ui/components/ui-button.component';
   selector: 'app-text-editor',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     TiptapEditorDirective,
     UiButtonComponent,

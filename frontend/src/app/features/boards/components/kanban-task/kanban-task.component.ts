@@ -33,7 +33,7 @@ export class KanbanTaskComponent {
   isEditing = signal(false);
   editValue = signal('');
 
-  startEdit(event?: MouseEvent) {
+  startEdit(event?: MouseEvent | KeyboardEvent) {
     event?.stopPropagation();
     this.editValue.set(this.task().title);
     this.isEditing.set(true);
@@ -73,4 +73,33 @@ export class KanbanTaskComponent {
       };
     });
   });
+  onKeydown(event: KeyboardEvent) {
+    if (this.isEditing()) {
+      return;
+    }
+
+    switch (event.key) {
+      case 'Enter':
+        event.preventDefault();
+        this.openOverlay.emit();
+        break;
+
+      case ' ': 
+        event.preventDefault();
+        this.toggleCompletion.emit();
+        break;
+
+      case 'e':
+      case 'E':
+        event.preventDefault();
+        this.startEdit(event);
+        break;
+        case 'Escape':
+          if (this.isEditing()) {
+            event.preventDefault();
+            this.cancel();
+          }
+          break;
+        }
+  }
 }

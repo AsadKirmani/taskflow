@@ -1,5 +1,5 @@
 import { Component, HostListener, input, output, signal } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { TextEditorComponent } from '../../../shared/components/editor/text-editor.component';
 import { TaskComment } from '../../../core/models/comment.model';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
@@ -8,7 +8,7 @@ import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 @Component({
   selector: 'app-task-comments',
   standalone: true,
-  imports: [CommonModule, TextEditorComponent, DatePipe, UiButtonComponent, ...APP_ICONS],
+  imports: [TextEditorComponent, DatePipe, UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">

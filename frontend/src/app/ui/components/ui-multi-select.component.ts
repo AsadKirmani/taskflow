@@ -7,12 +7,11 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'ui-multi-select',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="relative w-full text-left" (click)="$event.stopPropagation()">
       @if (label()) {

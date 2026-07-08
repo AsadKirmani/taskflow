@@ -3,21 +3,19 @@ import { NotificationService } from '../../../core/services/notification.service
 import { WorkspaceApiService } from '../../workspace/data-access/workspace-api.service';
 import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
-import { UiSelectComponent } from '../../../ui/components/ui-select.component';
+import { UiSelectComponent, SelectOption } from '../../../ui/components/ui-select.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-invite-member-modal',
   standalone: true,
-  imports: [UiButtonComponent, UiSelectComponent, ...APP_ICONS],
+  imports: [UiButtonComponent, UiSelectComponent, FormsModule, ...APP_ICONS],
   template: `
     <div
-      class="fixed inset-0 bg-slate-950/50 flex items-center justify-center z-50 p-4"
-      (click)="closeModal()"
+      class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4"
+      (mousedown)="onBackdropClick($event)"
     >
-      <div
-        class="bg-base-100 rounded-2xl shadow-xl p-6 w-full max-w-md border border-base-300"
-        (click)="$event.stopPropagation()"
-      >
+      <div class="bg-base-100 rounded-2xl shadow-xl p-6 w-full max-w-md border border-base-300">
         <div class="flex items-center justify-between mb-6">
           <div>
             <h2 class="text-xl font-bold text-base-content">Invite to Workspace</h2>
@@ -26,9 +24,9 @@ import { UiSelectComponent } from '../../../ui/components/ui-select.component';
           <ui-button
             (click)="closeModal()"
             variant="ghost"
-            size="icon-sm"
+            size="icon"
           >
-            <svg lucideX class="w-5 h-5"></svg>
+            <svg lucideX></svg>
           </ui-button>
         </div>
 
@@ -38,37 +36,40 @@ import { UiSelectComponent } from '../../../ui/components/ui-select.component';
             <input
               type="email"
               name="email"
+              [(ngModel)]="email"
               required
               placeholder="colleague@company.com"
-              class="w-full px-4 py-2.5 border border-base-300 text-base-content focus:border-accent rounded-field focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
+              class="w-full px-4 py-2.5 bg-base-100 border border-base-300 text-base-content focus:border-primary rounded-field focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
             />
           </div>
 
           <div class="mb-6">
-          <ui-select
-              label="Role"
+            <ui-select
               name="role"
-              placeholder="Select a role"
-              class="text-base-content w-full"
-            >
-              <option value="MEMBER">Member (Can edit boards)</option>
-              <option value="GUEST">Guest (Read-only)</option>
-            </ui-select>
+              [label]="'Role'"
+              [placeholder]="'Select a role'"
+              [options]="roleOptions"
+              [(ngModel)]="selectedRole"
+              class="w-full text-base-content"
+            ></ui-select>
           </div>
-            
 
           <div class="flex gap-3 pt-2">
             <ui-button
               (click)="closeModal()"
               variant="ghost"
               size="lg"
+              [fullWidth]="true"
             >
               Cancel
             </ui-button>
+            
             <ui-button
               type="submit"
               variant="primary"
-              [disabled]="isSubmitting()"
+              size="lg"
+              [fullWidth]="true"
+              [disabled]="isSubmitting() || !email || !selectedRole"
               [loading]="isSubmitting()"
               [loadingText]="'Sending...'"
             >
@@ -85,31 +86,44 @@ export class InviteMemberModalComponent {
   private readonly workspaceApi = inject(WorkspaceApiService);
 
   readonly workspaceId = input.required<string>();
-
   readonly close = output<void>();
 
   isSubmitting = signal(false);
+  email = '';
+  selectedRole = 'MEMBER';
+
+  readonly roleOptions: SelectOption[] = [
+    { label: 'Member (Can edit boards)', value: 'MEMBER' },
+    { label: 'Guest (Read-only)', value: 'GUEST' }
+  ];
+
+  onBackdropClick(event: MouseEvent) {
+    if (event.target === event.currentTarget) {
+      this.closeModal();
+    }
+  }
 
   sendInvite(event: Event): void {
     event.preventDefault();
 
-    const form = event.target as HTMLFormElement;
-    const formData = new FormData(form);
+    const trimmedEmail = this.email.trim();
 
-    const email = ((formData.get('email') as string) || '').trim();
-    const role = formData.get('role') as string;
-
-    if (!email) {
+    if (!trimmedEmail) {
       this.notificationService.error('Please enter a valid email address');
+      return;
+    }
+
+    if (!this.selectedRole) {
+      this.notificationService.error('Please select a role');
       return;
     }
 
     this.isSubmitting.set(true);
 
-    this.workspaceApi.inviteWorkspaceMember(this.workspaceId(), email, role).subscribe({
+    this.workspaceApi.inviteWorkspaceMember(this.workspaceId(), trimmedEmail, this.selectedRole).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        this.notificationService.success(`Invite sent to ${email} as ${role}`);
+        this.notificationService.success(`Invite sent to ${trimmedEmail} as ${this.selectedRole}`);
         this.closeModal();
       },
       error: (err) => {

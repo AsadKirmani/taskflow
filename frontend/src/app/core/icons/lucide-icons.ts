@@ -57,6 +57,7 @@ import {
   LucideTriangleAlert,
   LucideCircleX,
   LucideInfo,
+  LucideCircleCheckBig,
 } from '@lucide/angular';
 
 export const APP_ICONS = [
@@ -118,4 +119,5 @@ export const APP_ICONS = [
   LucideTriangleAlert,
   LucideCircleX,
   LucideInfo,
+  LucideCircleCheckBig,
 ];

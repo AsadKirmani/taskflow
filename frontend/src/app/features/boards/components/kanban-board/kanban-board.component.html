@@ -167,28 +167,27 @@
         ></app-kanban-column>
       }
 
-      <div class="add-column flex-shrink-0 text-base-content" >
+      <div class="add-column flex-shrink-0 text-base-content/70 bg-base-200 rounded-xl w-64" >
         @if (!isColumnInputOpen()) {
-          <ui-button variant="outline" size="lg" (clicked)="openColumnInput()">
+          <ui-button variant="outline" size="lg" (clicked)="openColumnInput()" [fullWidth]="true">
             <svg lucidePlus class="w-4 h-4 mr-1"></svg>
             Add Column
           </ui-button>
         } @else {
-          <div class="flex flex-col gap-2">
-            <input
+          <div class="flex flex-col gap-2 mt-1 w-full text-base-content/70 transition-colors p-2">
+            <textarea
               type="text"
               appAutofocus
-              class="add-column__input p-2 rounded-field w-full h-12 border border-base-300 focus:ring-2 focus:ring-accent focus:ring-offset-2 outline-none bg-base-100"
+              class="add-column__input p-1 resize-none rounded-field w-full h-12 border border-base-300 focus:ring-2 focus:ring-primary outline-none bg-base-100"
               placeholder="Column title..."
               [value]="columnInputValue()"
               (input)="onColumnInputChange($event)"
               (keydown.enter)="submitColumnInput()"
               (keydown.escape)="closeColumnInput()"
-              autofocus
-            />
+              ></textarea>
             <div class="flex items-center justify-end gap-2 mt-1">
-              <ui-button variant="secondary" size="sm" (clicked)="closeColumnInput()">
-                Cancel
+              <ui-button variant="ghost" size="icon" (clicked)="closeColumnInput()">
+                <svg lucideX class="w-5 h-5"></svg>
               </ui-button>
 
               <ui-button variant="primary" size="sm" (clicked)="submitColumnInput()">

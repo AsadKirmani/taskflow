@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { UiCardComponent } from '../../../ui/components/ui-card.component';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'ui-task-card',
   standalone: true,
-  imports: [UiCardComponent, CommonModule],
+  imports: [UiCardComponent, ],
   template: `
     <ui-card [interactive]="true" class="block cursor-grab active:cursor-grabbing">
       <div class="flex flex-col gap-3">

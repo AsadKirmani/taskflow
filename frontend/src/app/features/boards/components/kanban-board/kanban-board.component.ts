@@ -8,9 +8,8 @@ import {
   signal,
   HostListener,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
@@ -51,7 +50,6 @@ import { User } from '../../../../core/models/user.model';
 
   imports: [
     ApplyFilterComponent,
-    CommonModule,
     TaskComponent,
     KanbanColumnComponent,
     AutofocusDirective,
@@ -74,6 +72,23 @@ export class KanbanBoardComponent {
   protected readonly shortcuts = inject(KeyboardShortcutsService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+
+  constructor() {
+    this.shortcuts.createTriggered
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        if (!this.activeTaskOverlay() && !this.isFilterOpen()) {
+          this.openColumnInput();
+        }
+      });
+    this.shortcuts.escapeTriggered
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        if (this.isColumnInputOpen()) {
+          this.closeColumnInput();
+        }
+      });
+  }
 
   board = input<Board | null>(null);
   columns = input<BoardColumn[]>([]);
@@ -155,11 +170,12 @@ export class KanbanBoardComponent {
   }
 
   onColumnInputChange(event: Event): void {
-    this.columnInputValue.set((event.target as HTMLInputElement).value);
+    this.columnInputValue.set((event.target as HTMLTextAreaElement).value);
   }
 
   submitColumnInput(): void {
     const title = this.columnInputValue().trim();
+    this.columnInputValue.set('');
     if (!title) {
       this.closeColumnInput();
       return;
@@ -196,6 +212,9 @@ export class KanbanBoardComponent {
 
     if (this.isFilterOpen()) {
       this.isFilterOpen.set(false);
+    }
+    if (this.isColumnInputOpen()) {
+      this.closeColumnInput();
     }
   }
   onFiltersChanged(selection: BoardFilterSelection): void {
@@ -251,15 +270,5 @@ export class KanbanBoardComponent {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '') || 'task'
     );
-  }
-  ngOnInit(): void {
-    this.shortcuts.createTriggered.subscribe(() => {
-      this.isColumnInputOpen.set(true);
-    });
-    this.shortcuts.escapeTriggered.subscribe(() => {
-      if (this.isColumnInputOpen()) {
-        this.isColumnInputOpen.set(false);
-      }
-    });
   }
 }

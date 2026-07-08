@@ -1,5 +1,7 @@
 <section
-  class="kanban-column self-start max-h-[65vh] bg-base-300 px-1 py-2 rounded-box flex-shrink-0 flex flex-col transition-colors"
+  class="kanban-column self-start max-h-[65vh] w-64 bg-base-300 px-1 py-2 rounded-box flex-shrink-0 flex flex-col transition-colors"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
 >
   <div class="flex flex-col px-1">
     <header
@@ -65,34 +67,47 @@
         description="Drag tasks here or add a new one."
         size="compact"
       >
-        <svg lucideAssignment class="w-5 h-5"></svg>
+        <svg lucideCircleCheckBig class="w-5 h-5"></svg>
       </ui-empty-state>
     }
   </div>
-
-  <div
-    class="add-task p-1 flex items-center justify-start gap-1 text-base-content/70 transition-colors"
-  >
+  <div class="add-task flex flex-col w-full text-base-content/70 transition-colors p-2">
     @if (!isInputOpen()) {
-      <button
-        class="add-task__button cursor-pointer hover:bg-base-content/10 border border-base-300 w-full flex items-center justify-start p-1 rounded-btn transition-colors"
+      <ui-button
+        variant="outline"
         (click)="isInputOpen.set(true)"
+        [fullWidth]="true"
       >
-        <svg lucidePlus class="w-4 h-4 mr-1"></svg>
-        Add a task
-      </button>
+        <svg lucidePlus class="w-4 h-4 mr-1.5"></svg>
+        Add a card
+      </ui-button>
     } @else {
-      <input
-        type="text"
-        class="add-task__input p-1 text-base-content rounded-field w-full h-10 outline-none ring-1 ring-accent focus:ring-2 focus:ring-accent focus:outline-none"
-        placeholder="Task title..."
-        [value]="inputValue()"
-        (input)="onInput($event)"
-        (blur)="cancelInput()"
-        (keydown.enter)="submitTask()"
-        (keydown.escape)="cancelInput()"
-        appAutofocus
-      />
+      <div class="flex flex-col gap-2 w-full p-1">
+        <textarea
+          class="p-2.5 shadow-sm rounded-box w-full outline-none ring-2 ring-primary bg-base-100 text-base-content text-sm placeholder:text-base-content/50 resize-none"
+          placeholder="Enter a title for this card..."
+          [value]="inputValue()"
+          (input)="onInput($event)"
+          (keydown.enter)="submitTask(); $event.preventDefault()"
+          (keydown.escape)="cancelInput()"
+          appAutofocus
+        ></textarea>
+        
+        <div class="flex items-center justify-start gap-2">
+          <button
+            class="px-3 py-1.5 rounded-btn bg-primary text-primary-content hover:bg-primary/90 border-none cursor-pointer text-sm font-medium transition-colors"
+            (click)="submitTask()"
+          >
+            Add card
+          </button>
+          <button
+            class="p-1.5 text-base-content/50 hover:text-base-content hover:bg-base-content/10 rounded-btn cursor-pointer border-none bg-transparent transition-colors flex items-center justify-center"
+            (click)="cancelInput()"
+          >
+            <svg lucideX class="w-5 h-5"></svg>
+          </button>
+        </div>
+      </div>
     }
   </div>
 </section>

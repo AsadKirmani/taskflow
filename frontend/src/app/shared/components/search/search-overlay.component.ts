@@ -1,12 +1,11 @@
 import { Component, ElementRef, HostListener, ViewChild, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { SearchService } from '../../../core/services/search.service';
 import { Task } from '../../../core/models/task.model';
 
 @Component({
   selector: 'app-search-overlay',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './search-overlay.component.html',
 })
 export class SearchOverlayComponent {

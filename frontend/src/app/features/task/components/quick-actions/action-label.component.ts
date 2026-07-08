@@ -1,5 +1,4 @@
 import { Component, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TaskLabel } from '../../../../core/models/task.model';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
@@ -7,7 +6,7 @@ import { UiButtonComponent } from '../../../../ui/components/ui-button.component
 @Component({
   selector: 'app-action-label',
   standalone: true,
-  imports: [CommonModule, UiButtonComponent, ...APP_ICONS],
+  imports: [UiButtonComponent, ...APP_ICONS],
   template: `
     <div class="relative inline-flex">
       <ui-button

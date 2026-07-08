@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { WorkspaceStoreService } from '../../data-access/workspace-store.service';
 
 @Component({
   selector: 'app-workspace-list-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   template: `
     <section class="p-6 max-w-4xl mx-auto">
       <h1 class="text-2xl font-bold mb-4">Workspaces</h1>

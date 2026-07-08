@@ -8,13 +8,11 @@ import { User } from '../../../core/models/user.model';
 import { CustomDatepickerComponent } from '../../../shared/components/datepicker/custom-datepicker.component';
 import { TaskDates } from '../../../shared/components/datepicker/custom-datepicker.component';
 import { Task } from '../../../core/models/task.model';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-task-quick-actions',
   standalone: true,
   imports: [
-    CommonModule,
     ActionLabelComponent,
     ActionChecklistComponent,
     ActionAttachmentsComponent,

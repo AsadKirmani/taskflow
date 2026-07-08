@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, output, } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -28,7 +28,7 @@ import { RouterLink } from '@angular/router';
   `,
 })
 export class UserMenuComponent {
-  @Output() logout = new EventEmitter<void>();
+  logout = output<void>();
 
   onLogout(event: MouseEvent): void {
     event.preventDefault();
