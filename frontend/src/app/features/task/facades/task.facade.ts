@@ -3,9 +3,10 @@ import { TaskStore } from '../data-access/task-store.service';
 import { Task, TaskLabel } from '../../../core/models/task.model';
 import { BoardStore } from '../../boards/data-access/board-store.service';
 import { User } from '../../../core/models/user.model';
-import { TaskComment } from '../../../core/models/comment.model';
 import { UploadService } from '../../../core/services/upload.service';
+import { TaskComment } from '../../../core/models/comment.model';
 import { NotificationService } from '../../../core/services/notification.service';
+import { ActivityStore } from '../../activity/data-access/activity-store.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,10 +16,11 @@ export class TaskFacade {
   private taskStore = inject(TaskStore);
   private boardStore = inject(BoardStore);
   private uploadService = inject(UploadService);
+  private taskActivityStore = inject(ActivityStore);
   selectedTaskId = signal<string | null>(null);
   boardMembers = computed(() => this.boardStore.members() ?? []);
 
-  currentTask = (() => {
+  currentTask = computed<Task | null>(() => {
     const taskId = this.selectedTaskId();
     if (!taskId) return null;
     return this.taskStore.tasksById()[taskId] || null;
@@ -29,8 +31,24 @@ export class TaskFacade {
       this.boardStore.currentColumns().find((col) => col.id === this.currentTask()?.columnId)
         ?.name || '',
   );
-  comments: Signal<TaskComment[]> = this.taskStore.comments;
 
+comments = computed(() => {
+  const rawComments = this.taskStore.comments();
+  const members = this.boardMembers();
+  if (!rawComments || !members) return [];
+  return rawComments.map(comment => {
+    const authorDetails = members.find(m => m.id === comment.authorId); 
+    return {
+      ...comment,
+      authorAvatarUrl: authorDetails?.avatarUrl || undefined,
+    };
+  });
+});
+
+taskActivities = computed(() => this.taskActivityStore.items());
+loadTaskActivity(taskId: string) {
+  this.taskActivityStore.loadTaskActivity(taskId);
+}
   updateTaskProperty(updates: Partial<Task>) {
     const task = this.currentTask();
     if (!task) return;

@@ -3,11 +3,12 @@ import { User } from '../../../../core/models/user.model';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../../ui/components/ui-button.component';
+import { UiAvatarComponent } from '../../../../ui/components/ui-avatar.component';
 
 @Component({
   selector: 'app-action-members',
   standalone: true,
-  imports: [AutofocusDirective, UiButtonComponent, ...APP_ICONS],
+  imports: [AutofocusDirective, UiButtonComponent, UiAvatarComponent, ...APP_ICONS],
   template: `
     <div class="relative inline-flex w-full">
       <ui-button
@@ -38,11 +39,11 @@ import { UiButtonComponent } from '../../../../ui/components/ui-button.component
                 class="flex items-center justify-between p-2 hover:bg-base-200 rounded cursor-pointer transition-colors group"
               >
                 <div class="flex items-center gap-3">
-                  <div
-                    class="w-7 h-7 rounded-full bg-primary text-primary-content flex items-center justify-center text-xs font-bold"
-                  >
-                    {{ member.name.charAt(0).toUpperCase() || 'U' }}
-                  </div>
+                  <ui-avatar
+                    [name]="member.name"
+                    [src]="member.avatarUrl"
+                    size="sm"
+                  ></ui-avatar>
                   <span
                     class="text-sm font-medium text-base-content group-hover:text-primary transition-colors"
                   >

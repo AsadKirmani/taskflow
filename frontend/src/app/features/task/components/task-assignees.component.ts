@@ -11,7 +11,7 @@ import { UiButtonComponent } from '../../../ui/components/ui-button.component';
   template: `<div class="flex items-center gap-1">
     <div class="flex -space-x-3">
       @for (member of members(); track member.id) {
-        <ui-avatar [name]="member.name" [title]="member.name"></ui-avatar>
+        <ui-avatar [name]="member.name" [title]="member.name" [src]="member.avatarUrl" size="md"></ui-avatar>
       }
     </div>
     @if (members().length > 0) {

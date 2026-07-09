@@ -15,7 +15,7 @@ export const activityService = {
   }) {
     return activityRepository.logActivity(data);
   },
-  async getGlobalActivity(userId: string, page: number, limit: number) {
+  async getUserActivity(userId: string, page: number, limit: number) {
     const userWorkspaces = await workspaceRepository.listUserWorkspaces(userId);
     const workspaceIds = userWorkspaces.map((ws) => ws._id.toString());
 
@@ -23,7 +23,7 @@ export const activityService = {
       return { items: [], total: 0 };
     }
 
-    return activityRepository.getGlobalActivity(
+    return activityRepository.getUserActivity(
       userId,
       workspaceIds,
       page,

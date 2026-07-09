@@ -69,7 +69,7 @@ export class KanbanTaskComponent {
       return {
         id: id,
         name: member?.name ?? 'Unknown',
-        avatar: member?.avatarUrl ?? undefined,
+        avatarUrl: member?.avatarUrl ?? undefined,
       };
     });
   });

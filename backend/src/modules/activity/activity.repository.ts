@@ -7,7 +7,7 @@ import { Query } from "mongoose";
 const applyActivityPopulation = <T extends Query<any, any>>(query: T) => {
   return query
     .select(
-      "_id actionType entityType entityId metadata createdAt boardId columnId taskId userId",
+      "_id actionType entityType entityId metadata createdAt boardId columnId taskId userId"
     )
     .populate([
       { path: "userId", select: "name email avatarUrl" },
@@ -16,6 +16,7 @@ const applyActivityPopulation = <T extends Query<any, any>>(query: T) => {
       { path: "columnId", select: "name boardId" },
     ]);
 };
+
 export const activityRepository = {
   async logActivity(data: {
     workspaceId: string;
@@ -41,17 +42,21 @@ export const activityRepository = {
     });
   },
 
-  async getGlobalActivity(
+  async getUserActivity(
     userId: string,
-    workspaceIds: string[],
+    workspaceIds: string[] | undefined,
     page: number,
-    limit: number,
+    limit: number
   ) {
     const skip = (page - 1) * limit;
-    const query = {
-      workspaceId: { $in: workspaceIds },
-      userId: userId,
+    
+    const query: any = {
+      userId: userId, 
     };
+
+    if (workspaceIds && workspaceIds.length > 0) {
+      query.workspaceId = { $in: workspaceIds };
+    }
 
     const [items, total] = await Promise.all([
       applyActivityPopulation(
@@ -59,7 +64,7 @@ export const activityRepository = {
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
-          .lean(),
+          .lean()
       ),
       ActivityLogModel.countDocuments(query),
     ]);
@@ -74,7 +79,7 @@ export const activityRepository = {
     userId: string,
     workspaceId: string,
     page: number,
-    limit: number,
+    limit: number
   ) {
     const skip = (page - 1) * limit;
 
@@ -126,7 +131,7 @@ export const activityRepository = {
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
-          .lean(),
+          .lean()
       ),
       ActivityLogModel.countDocuments(query),
     ]);
@@ -141,7 +146,7 @@ export const activityRepository = {
     workspaceId: string,
     boardId: string,
     page: number,
-    limit: number,
+    limit: number
   ) {
     const skip = (page - 1) * limit;
 
@@ -156,9 +161,8 @@ export const activityRepository = {
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
-          .lean(),
+          .lean()
       ),
-
       ActivityLogModel.countDocuments(query),
     ]);
 
@@ -181,9 +185,8 @@ export const activityRepository = {
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
-          .lean(),
+          .lean()
       ),
-
       ActivityLogModel.countDocuments(query),
     ]);
 
@@ -194,7 +197,7 @@ export const activityRepository = {
   },
 };
 
-async function enrichMoveColumnNames(items: Array<Record<string, unknown>>) {
+async function enrichMoveColumnNames(items: any[]) {
   const columnIds = new Set<string>();
 
   for (const item of items) {
@@ -202,37 +205,33 @@ async function enrichMoveColumnNames(items: Array<Record<string, unknown>>) {
       continue;
     }
 
-    const metadata = (item.metadata ?? {}) as Record<string, unknown>;
-
-    const sourceColumnId = metadata.sourceColumnId as string | undefined;
-
-    const destinationColumnId = metadata.destinationColumnId as
-      | string
-      | undefined;
+    const metadata = item.metadata ?? {};
+    const sourceColumnId = metadata.sourceColumnId;
+    const destinationColumnId = metadata.destinationColumnId;
 
     if (sourceColumnId) {
-      columnIds.add(sourceColumnId);
+      columnIds.add(sourceColumnId.toString());
     }
 
     if (destinationColumnId) {
-      columnIds.add(destinationColumnId);
+      columnIds.add(destinationColumnId.toString());
     }
   }
 
-  if (!columnIds.size) {
+  if (columnIds.size === 0) {
     return items;
   }
 
   const columns = await ColumnModel.find({
     _id: {
-      $in: [...columnIds],
+      $in: Array.from(columnIds),
     },
   })
     .select("_id name")
     .lean();
 
   const columnMap = new Map(
-    columns.map((column) => [column._id.toString(), column.name]),
+    columns.map((column) => [column._id.toString(), column.name])
   );
 
   for (const item of items) {
@@ -240,20 +239,18 @@ async function enrichMoveColumnNames(items: Array<Record<string, unknown>>) {
       continue;
     }
 
-    const metadata = (item.metadata ?? {}) as Record<string, unknown>;
-
-    const sourceColumnId = metadata.sourceColumnId as string | undefined;
-
-    const destinationColumnId = metadata.destinationColumnId as
-      | string
-      | undefined;
+    const metadata = item.metadata ?? {};
+    const sourceColumnId = metadata.sourceColumnId;
+    const destinationColumnId = metadata.destinationColumnId;
 
     if (sourceColumnId && !metadata.sourceColumnName) {
-      metadata.sourceColumnName = columnMap.get(sourceColumnId);
+      metadata.sourceColumnName = columnMap.get(sourceColumnId.toString());
     }
 
     if (destinationColumnId && !metadata.destinationColumnName) {
-      metadata.destinationColumnName = columnMap.get(destinationColumnId);
+      metadata.destinationColumnName = columnMap.get(
+        destinationColumnId.toString()
+      );
     }
 
     item.metadata = metadata;

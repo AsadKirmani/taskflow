@@ -20,10 +20,10 @@ const parsePagination = (req: Request) => {
 };
 
 export const activityController = {
-  async getGlobalActivity(req: Request, res: Response) {
+  async getUserActivity(req: Request, res: Response) {
     const { page, limit } = parsePagination(req);
     const userId = req.auth!.userId;
-    const result = await activityService.getGlobalActivity(userId, page, limit);
+    const result = await activityService.getUserActivity(userId, page, limit);
     res.json({ success: true, data: { ...result, page, limit } });
   },
   async getWorkspaceActivity(req: Request, res: Response) {

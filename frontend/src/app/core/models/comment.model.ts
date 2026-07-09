@@ -4,6 +4,7 @@ export interface TaskComment {
   boardId: string;
   taskId: string;
   author: string;
+  authorAvatarUrl?: string | null;
   authorId: string;
   content: string;
   createdAt: string;

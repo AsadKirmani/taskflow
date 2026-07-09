@@ -87,7 +87,7 @@ export class UiButtonComponent {
       ghost: 'bg-transparent text-base-content/70 hover:text-base-content hover:bg-base-300 focus:ring-base-content/20',
       danger: 'bg-error text-error-content hover:bg-error/90 focus:ring-error/50 shadow-sm',
       icon: 'bg-transparent text-base-content/70 hover:text-base-content hover:bg-base-300 border border-base-300 focus:ring-base-content/20',
-      outline: 'bg-transparent border border-base-300 hover:bg-base-100 focus:ring-base-content/20',
+      outline: 'bg-transparent border border-base-300 hover:bg-base-100 focus:ring-base-content/20 text-base-content/70',
     };
 
     const sizes = {

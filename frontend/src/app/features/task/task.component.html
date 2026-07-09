@@ -72,13 +72,14 @@
       </div>
 
       <div
-        class="w-full md:w-[380px] lg:w-[420px] bg-base-300 border-l border-base-300 p-5 sm:p-8 flex flex-col gap-6 overflow-y-auto"
+        class="w-full md:w-[380px] lg:w-[420px] border-l border-base-300 p-5 sm:p-8 flex flex-col gap-6 overflow-y-auto"
       >
         <app-task-comments
           [comments]="facade.comments()"
           (commentPosted)="facade.postComment($event)"
         >
         </app-task-comments>
+        <app-task-activity [activities]="facade.taskActivities()"> </app-task-activity>
       </div>
     </div>
   </article>

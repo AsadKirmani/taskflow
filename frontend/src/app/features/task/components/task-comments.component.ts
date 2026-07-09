@@ -4,30 +4,25 @@ import { TextEditorComponent } from '../../../shared/components/editor/text-edit
 import { TaskComment } from '../../../core/models/comment.model';
 import { APP_ICONS } from '../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../ui/components/ui-button.component';
+import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
 
 @Component({
   selector: 'app-task-comments',
   standalone: true,
-  imports: [TextEditorComponent, DatePipe, UiButtonComponent, ...APP_ICONS],
+  imports: [TextEditorComponent, DatePipe, UiButtonComponent, UiAvatarComponent, ...APP_ICONS],
   template: `
-    <div class="flex items-center justify-between">
+    <div>
       <div class="flex items-center gap-2">
         <svg lucideMessageSquare class="w-5 h-5 text-base-content/70 flex-shrink-0"></svg>
         <h3 class="font-semibold text-base text-base-content m-0">Comments and activity</h3>
       </div>
-      <ui-button
-       variant="outline"
-       size="sm"
-      >
-        Show details
-      </ui-button>
     </div>
 
     <div class="flex flex-col gap-2 mt-4 relative">
       @if (!isWriting()) {
         <div
           (click)="startWriting()"
-          class="w-full bg-base-100 border border-base-300 rounded-md p-3 shadow-sm text-sm text-base-content/70 cursor-text hover:bg-base-200 transition-colors"
+          class="w-full bg-base-300 border border-base-300 rounded-field p-3 text-sm text-base-content/70 cursor-text hover:bg-base-100 transition-colors"
         >
           Write a comment...
         </div>
@@ -64,23 +59,27 @@ import { UiButtonComponent } from '../../../ui/components/ui-button.component';
     <div class="flex flex-col gap-5 mt-4">
       @for (comment of comments(); track comment.id) {
         <div class="flex items-start gap-3">
-          <div
-            class="w-8 h-8 rounded-full bg-base-100 border border-base-300 text-accent flex items-center justify-center text-xs font-bold"
-          >
-            {{ comment.author.charAt(0).toUpperCase() }}
-          </div>
+          <ui-avatar
+            [name]="comment.author"
+            [src]="comment.authorAvatarUrl"
+            size="md"
+          ></ui-avatar>
           <div class="flex flex-col flex-1">
-            <div class="text-sm text-base-content leading-tight">
+            <div class="text-sm text-base-content leading-tight mb-1.5">
               <span class="font-bold text-accent">{{ comment.author }}</span>
-              <span class="text-base-content/70 mx-1">added a comment</span>
-            </div>
-            <div class="text-xs text-base-content/70 mb-1.5 mt-0.5">
-              {{ comment.createdAt | date: 'short' }}
+              <span class="text-xs text-base-content/70">
+                {{ comment.createdAt | date: 'short' }}
+              </span>
             </div>
             <div
-              class="bg-base-200 border border-base-300 rounded-md p-3 text-sm text-base-content prose prose-sm max-w-none"
+              class="bg-base-100 border border-base-300 rounded-md p-3 text-sm text-base-content prose prose-sm max-w-none"
               [innerHTML]="comment.content"
             ></div>
+            <div class="flex items-center gap-1 mt-1">
+            <a class="text-xs text-base-content/70 hover:text-base-content hover:underline cursor-pointer">Edit</a>
+              <span class="text-xs text-base-content/70">&bull;</span>
+              <a class="text-xs text-base-content/70 hover:text-base-content hover:underline cursor-pointer">Delete</a>
+            </div>
           </div>
         </div>
       }

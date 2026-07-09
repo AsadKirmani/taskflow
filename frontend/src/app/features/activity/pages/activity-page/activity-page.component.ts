@@ -4,6 +4,9 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ActivityStore } from '../../data-access/activity-store.service';
 import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.component';
 import { UiPageHeaderComponent } from '../../../../ui/components/layout/ui-page-header.component';
+import { AuthStoreService } from '../../../auth/data-access/auth-store.service';
+import { BoardStore } from '../../../boards/data-access/board-store.service';
+import { WorkspaceStoreService } from '../../../workspace/data-access/workspace-store.service';
 
 @Component({
   selector: 'app-activity-page',
@@ -14,19 +17,14 @@ import { UiPageHeaderComponent } from '../../../../ui/components/layout/ui-page-
       <div class="min-w-0">
         @if (store.currentBoardId()) {
           <ui-page-header
-            title="Board activity feed"
+            [title]="(boardStore.currentBoard()?.name || 'Board') + ' Activity'"
             subtitle="Activities related to the current board"
           ></ui-page-header>
         } @else if (store.currentWorkspaceId()) {
           <ui-page-header
-            title="Workspace activity feed"
+            [title]="(workspaceStore.activeWorkspace()?.slug || 'Workspace') + ' Activity'"
             subtitle="Activities related to the current workspace"
           >
-            <span
-              class="text-xs text-base-content/70 bg-base-100 px-2 py-1 rounded break-all self-start sm:self-auto"
-            >
-              Workspace: {{ store.currentWorkspaceId() }}
-            </span>
           </ui-page-header>
         } @else {
           <ui-page-header
@@ -63,35 +61,42 @@ import { UiPageHeaderComponent } from '../../../../ui/components/layout/ui-page-
         } @else if (store.uiItems().length === 0) {
           <p class="text-sm text-base-content/70">No activity yet.</p>
         } @else {
-          <ul class="space-y-2">
-            @for (item of store.uiItems(); track item.id) {
-              <li
-                class="rounded-box border border-base-300 p-3 hover:bg-base-200 transition-colors"
-              >
-                <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                  <div class="min-w-0">
-                    <p class="text-sm font-medium text-base-content">{{ item.description }}</p>
-                    <p class="text-xs text-base-content/70">{{ item.context }}</p>
+<ul class="space-y-2">
+  @for (item of store.uiItems(); track item.id) {
+    <li class="border-b border-base-300 last:border-0 hover:bg-base-200 transition-colors p-2 rounded-box">
+      <div class="flex items-start gap-1">
+        <div class="flex flex-col flex-1">
+          <p class="text-[14px] text-base-content m-0">
+            <span class="font-bold">{{ item.actor }}</span>
+            <span class="ml-1">{{ item.actionText }}</span>
+          </p>
 
-                    @if (item.deepLink; as link) {
-                      @if (link.commands) {
-                        <a
-                          class="mt-1 inline-flex text-xs font-medium text-primary hover:text-primary-focus hover:underline"
-                          [routerLink]="link.commands"
-                          [queryParams]="link.queryParams"
-                        >
-                          {{ link.label }}
-                        </a>
-                      }
-                    }
-                  </div>
-                  <span class="text-xs text-base-content/70 shrink-0">{{
-                    item.createdAt | date: 'medium'
-                  }}</span>
-                </div>
-              </li>
+          @if (item.isComment && item.commentContent) {
+            <div class="mt-1 mb-1 w-64 bg-base-100 border border-base-300 rounded-box p-3 text-sm text-base-content/70" [innerHTML]="item.commentContent"></div>
+          }
+
+          <div class="text-[12px] text-base-content/60 mt-1 flex gap-0.5">
+            <span>{{ item.createdAt | date: 'd MMM yyyy, h:mm a' }}</span>
+            
+            @for (tag of item.locationTags; track tag) {
+              <span>&bull; {{ tag }}</span>
             }
-          </ul>
+            </div>
+
+            @if (item.deepLink; as link) {
+              @if (link.commands) {
+                <a class="my-1 text-xs font-medium text-primary hover:underline w-fit"
+                   [routerLink]="link.commands"
+                   [queryParams]="link.queryParams">
+                  {{ link.label }}
+                </a>
+              }
+            }
+        </div>
+      </div>
+    </li>
+  }
+</ul>
         }
       </div>
     </section>
@@ -101,13 +106,28 @@ import { UiPageHeaderComponent } from '../../../../ui/components/layout/ui-page-
 export class ActivityPageComponent implements OnInit {
   protected readonly store = inject(ActivityStore);
   private readonly route = inject(ActivatedRoute);
+  private authStore = inject(AuthStoreService);
+  boardStore = inject(BoardStore);
+  workspaceStore = inject(WorkspaceStoreService);
 
   ngOnInit(): void {
+    const userId = this.authStore.currentUser()?.id;
+    if (!userId) return;
+
     this.route.paramMap.subscribe((params) => {
       const wId = params.get('workspaceId') ?? undefined;
       const bId = params.get('boardId') ?? undefined;
+      if(wId) {
+        this.workspaceStore.setActiveWorkspace(wId);
+      }
 
-      this.store.loadActivities(wId, bId);
+      if (wId && bId) {
+        this.store.loadBoardActivity(wId, bId);
+      } else if (wId) {
+        this.store.loadWorkspaceActivity(wId);
+      } else {
+        this.store.loadUserActivity(userId);
+      }
     });
   }
 }

@@ -22,6 +22,7 @@ import { TaskHeaderComponent } from './components/task-header.component';
 import { TaskAssigneesComponent } from './components/task-assignees.component';
 import { TaskDueDateComponent } from './components/task-duedate.component';
 import { TaskAttachmentsComponent } from './components/task-attachments.component';
+import { TaskActivityComponent } from './components/task.activity.component';
 import { APP_ICONS } from '../../core/icons/lucide-icons';
 
 @Component({
@@ -35,6 +36,7 @@ import { APP_ICONS } from '../../core/icons/lucide-icons';
     TaskQuickActionsComponent,
     TaskDescriptionComponent,
     TaskCommentsComponent,
+    TaskActivityComponent,
     ...APP_ICONS,
   ],
   templateUrl: './task.component.html',
@@ -51,6 +53,7 @@ export class TaskComponent {
       if (t && (!currentT || currentT.id !== t.id)) {
         this.facade.selectedTaskId.set(t.id);
         this.taskStore.getCommentsForTask(t.id);
+        this.facade.loadTaskActivity(t.id);
       }
     });
   }

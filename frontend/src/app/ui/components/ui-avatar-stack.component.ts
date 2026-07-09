@@ -9,7 +9,7 @@ import { UiAvatarComponent } from './ui-avatar.component';
     <div class="flex items-center -space-x-2">
       @for (user of displayUsers(); track user.id) {
         <ui-avatar
-          [src]="user.avatar"
+          [src]="user.avatarUrl"
           [name]="user.name"
           [title]="user.name"
           [size]="size()"
@@ -32,7 +32,7 @@ import { UiAvatarComponent } from './ui-avatar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiAvatarStackComponent {
-  users = input<{ id: string; name: string; avatar?: string }[]>([]);
+  users = input<{ id: string; name: string; avatarUrl?: string | null }[]>([]);
   limit = input(3);
   size = input<'sm' | 'md' | 'lg'>('lg');
 

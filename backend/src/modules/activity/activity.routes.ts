@@ -8,7 +8,7 @@ const router = Router();
 router.get(
   "/",
   authMiddleware,
-  asyncHandler(activityController.getGlobalActivity),
+  asyncHandler(activityController.getUserActivity),
 );
 
 router.get(
