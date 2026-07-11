@@ -1,13 +1,10 @@
 import { CreateWorkspaceDto, UpdateWorkspaceDto } from "./workspace.dto";
 import { workspaceRepository } from "./workspace.repository";
-import { sendInvitationEmail } from "../../config/mailer";
 import { authService } from "../auth/auth.service";
 import { AppError } from "../../shared/errors/app-error";
 import { activityService } from "../activity/activity.service";
 import crypto from "crypto";
-import { PermissionService } from "../../services/permission.service";
 import { WorkspaceMemberModel } from "../../models/workspace-member.model";
-import { PERMISSION } from "../../config/roles";
 import { addInvitationEmailJob } from "../../queues/queue.service";
 import { WorkspaceRole } from "../../shared/constants/enums";
 
@@ -49,7 +46,7 @@ export const workspaceService = {
       entityType: "workspace",
       entityId: workspace._id.toString(),
       metadata: {
-        name: workspace.name,
+        workspaceName: workspace.name,
         slug: workspace.slug,
       },
     });

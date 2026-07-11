@@ -58,6 +58,13 @@ import {
   LucideCircleX,
   LucideInfo,
   LucideCircleCheckBig,
+  LucidePanelLeftClose,
+  LucideExternalLink,
+  LucideMenu,
+  LucideShare,
+  LucideSquarePen,
+  LucideKanban,
+  LucideBriefcase,
 } from '@lucide/angular';
 
 export const APP_ICONS = [
@@ -120,4 +127,11 @@ export const APP_ICONS = [
   LucideCircleX,
   LucideInfo,
   LucideCircleCheckBig,
+  LucidePanelLeftClose,
+  LucideExternalLink,
+  LucideMenu,
+  LucideShare,
+  LucideSquarePen,
+  LucideKanban,
+  LucideBriefcase,
 ];

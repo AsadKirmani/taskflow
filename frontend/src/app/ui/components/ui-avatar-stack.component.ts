@@ -40,7 +40,7 @@ export class UiAvatarStackComponent {
   remainingCount = computed(() => Math.max(0, this.users().length - this.limit()));
 
   sizeClasses = computed(() => {
-    const sizes = { sm: 'w-6 h-6 text-[10px]', md: 'w-8 h-8 text-xs', lg: 'w-10 h-10 text-sm' };
+    const sizes = { sm: 'w-7 h-7 text-[10px]', md: 'w-8 h-8 text-xs', lg: 'w-10 h-10 text-sm' };
     return sizes[this.size()];
   });
 }

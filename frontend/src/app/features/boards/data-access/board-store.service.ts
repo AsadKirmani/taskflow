@@ -297,23 +297,8 @@ export const BoardStore = signalStore(
         }
       },
       resetBoardState() {
-        patchState(store, {
-          board: null,
-          columns: [],
-          members: [],
-          loadedBoardIds: [],
-          loadedColumnBoardIds: [],
-        });
+        patchState(store, initialState);
       },
     }),
   ),
-  withHooks({
-      onInit(store, eventBus = inject(EventBusService)) {
-        
-        eventBus.taskUpdated$.subscribe(() => {
-          store.loadBoard(store.currentBoardId() ?? '', true);
-        });
-        
-      }
-    })
   )

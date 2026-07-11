@@ -9,9 +9,9 @@ export const workspaceController = {
   async listWorkspaces(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const cacheKey = `user:${userId}:workspaces`;
-    const cachedWorkspaces = await redisClient.get(cacheKey);
+    const cachedWorkspaces = await redisClient.get(cacheKey) as string | null;
     if (cachedWorkspaces) {
-      return res.json({ success: true, data: { items: cachedWorkspaces } });
+      return res.json({ success: true, data: JSON.parse(cachedWorkspaces) });
     }
     const workspaces = await workspaceService.listUserWorkspaces(userId);
     await redisClient.set(cacheKey, JSON.stringify(workspaces), { ex: 3600 });
@@ -24,7 +24,7 @@ export const workspaceController = {
   async createWorkspace(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const workspace = await workspaceService.createWorkspace(req.body, userId);
-    await redisClient.del(`user:${userId}:workspaces`);
+    await redisClient.del(`user:${userId}:profile`);
     res.status(201).json({ success: true, data: workspace });
   },
 

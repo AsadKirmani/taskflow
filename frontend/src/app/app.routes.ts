@@ -55,9 +55,24 @@ export const appRoutes: Routes = [
           import('./features/activity/activity.routes').then((m) => m.ACTIVITY_ROUTES),
       },
       {
+        path: 'w/:workspaceId/settings',
+        loadChildren: () =>
+          import('./features/workspace/workspace.routes').then((m) => m.WORKSPACE_ROUTES),
+      },
+      {
+        path: 't/:taskId/:title',
+        loadChildren: () =>
+          import('./features/task/task.routes').then((m) => m.TASK_ROUTES),
+      },
+      {
         path: 'settings',
         loadChildren: () =>
           import('./features/settings/settings.routes').then((m) => m.SETTINGS_ROUTES),
+      },
+      {
+        path: 'profile',
+        loadChildren: () =>
+          import('./features/user/user.routes').then((m) => m.USER_ROUTES),
       },
       {
         path: 'invite/accept',

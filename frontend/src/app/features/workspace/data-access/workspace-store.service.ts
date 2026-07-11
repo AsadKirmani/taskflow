@@ -38,7 +38,36 @@ export const WorkspaceStoreService = signalStore(
       workspaceApi = inject(WorkspaceApiService),
       permissionService = inject(PermissionService)
     ) => ({
-      
+      createWorkspace(name: string, slug: string, description: string): void {
+        patchState(store, { isLoading: true, error: null });
+
+        workspaceApi.createWorkspace(name, slug, description).subscribe({
+          next: (response: any) => {
+            const newWorkspace = response?.data;
+            if (newWorkspace) {
+              const mappedWorkspace: Workspace = {
+                id: newWorkspace.id,
+                name: newWorkspace.name,
+                slug: newWorkspace.name.toLowerCase().replace(/\s+/g, '-'),
+                description: '',
+                currentUserRole: newWorkspace.role,
+              };
+
+              patchState(store, {
+                workspaces: [...store.workspaces(), mappedWorkspace],
+                isLoading: false,
+                error: null,
+              });
+            }
+          },
+          error: (error: any) => {
+            patchState(store, {
+              isLoading: false,
+              error: error?.message || 'Failed to create workspace',
+            });
+          },
+        });
+      },
       loadWorkspaces(force = false): void {
         if (store.isLoading()) return;
         if (store.isLoaded() && !force) return;

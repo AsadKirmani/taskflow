@@ -19,7 +19,12 @@ export const taskRepository = {
       );
       data.position = column?.taskOrder?.length || 0;
     }
-    const newTask = await TaskModel.create(data);
+    const newTask = await TaskModel.create({
+      ...data, 
+      archived: false,
+      isCompleted: false,
+      assignedAt: new Date(),
+    });
     await ColumnModel.findByIdAndUpdate(data.columnId, {
       $push: { taskOrder: newTask._id },
     });

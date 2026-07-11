@@ -55,7 +55,6 @@ import { UiButtonComponent } from '../../../ui/components/ui-button.component';
           <ui-button
             variant="primary"
             (click)="goToHome()"
-            class="w-full bg-stone-900 text-white font-semibold py-2.5 rounded-xl hover:bg-black transition-colors"
           >
             Go to Dashboard
           </ui-button>

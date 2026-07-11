@@ -20,7 +20,6 @@ import { filter } from 'rxjs';
           class="fixed inset-0 z-40 bg-neutral-900/50 backdrop-blur-sm transition-all duration-300 ease-in-out md:hidden"
         ></div>
       }
-
       <aside
         [class.w-[260px]]="isSidebarOpen() && !isMobile()"
         [class.w-[84px]]="!isSidebarOpen() && !isMobile()"
@@ -36,19 +35,18 @@ import { filter } from 'rxjs';
           [isCollapsed]="!isSidebarOpen() && !isMobile()"
           (navigate)="handleSidebarNavigate()"
           class="block h-full w-full"
+          (toggleSidebar)="toggleSidebar()"
         >
         </app-sidebar>
       </aside>
-
       <div class="flex-1 flex flex-col h-full min-w-0 relative">
-        <app-navbar (menuToggle)="toggleMobileSidebar()"> </app-navbar>
-
+      <app-navbar (menuToggle)="toggleSidebar()"
+      [isMobile]="isMobile()"
+      > </app-navbar>
         <main
-          class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8 scroll-smooth scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-base-200"
+          class="flex-1 overflow-y-auto overflow-x-hidden p-4 scroll-smooth scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-base-200"
         >
-          <div class="max-w-7xl mx-auto h-full w-full">
-            <router-outlet />
-          </div>
+          <div class="max-w-7xl mx-auto h-full w-full"><router-outlet /></div>
         </main>
       </div>
     </div>
@@ -91,7 +89,7 @@ export class AppShellComponent implements OnDestroy {
     this.routerEventsSubscription.unsubscribe();
   }
 
-  toggleMobileSidebar(): void {
+  toggleSidebar(): void {
     this.isSidebarOpen.update((open) => !open);
   }
 

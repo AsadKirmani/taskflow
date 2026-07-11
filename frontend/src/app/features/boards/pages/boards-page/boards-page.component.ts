@@ -52,7 +52,7 @@ export class BoardsPageComponent implements OnInit {
   readonly currentWorkspaceId = computed(() => this.workspaceStore.activeWorkspace()?.id ?? null);
 
   readonly availableWorkspaces = computed(() => {
-    return this.workspaceStore.workspaces().map((ws) => ({ id: ws.id, name: ws.name }));
+    return this.workspaceStore.workspaces().map((ws) => ({ id: ws.id, name: ws.name, slug: ws.slug }));
   });
 
   readonly isWorkspaceMode = computed(() => !!this.currentWorkspaceId());

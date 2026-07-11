@@ -1,4 +1,9 @@
 import { Routes } from '@angular/router';
-import { WorkspaceListPageComponent } from './pages/workspace-list-page/workspace-list-page.component';
+import { WorkspaceSettingsComponent } from './components/workspace-settings.component';
 
-export const WORKSPACE_ROUTES: Routes = [];
+export const WORKSPACE_ROUTES: Routes = [
+    {
+        path: '',
+        component: WorkspaceSettingsComponent
+    }
+];

@@ -10,7 +10,7 @@ export class ActivityApiService {
   private readonly baseUrl = `${environment.apiUrl}`;
   private readonly http = inject(HttpClient);
 
-  getUserActivity(userId: string, page = 1, limit = 30): Observable<ApiResponse<ActivityListData>> {
+  getUserActivity(page = 1, limit = 30): Observable<ApiResponse<ActivityListData>> {
     return this.http.get<ApiResponse<ActivityListData>>(`${this.baseUrl}`, {
       params: { page, limit },
       withCredentials: true,

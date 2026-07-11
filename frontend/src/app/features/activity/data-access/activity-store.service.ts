@@ -46,14 +46,13 @@ const FIELD_MAP: Record<string, string> = {
   labels: 'labels',
   checklist: 'checklist items',
   status: 'status',
-  visibility: 'visibility'
+  visibility: 'visibility',
 };
 
 const humanizeField = (field: string): string => {
   if (FIELD_MAP[field]) return FIELD_MAP[field];
   return field.replace(/([A-Z])/g, ' $1').toLowerCase();
 };
-
 
 export const getActorName = (item: ActivityItem | any): string => {
   return asRef(item.userId)?.name || 'Someone';
@@ -64,14 +63,15 @@ export const getActionText = (item: ActivityItem): string => {
   const boardName = asRef(item.boardId)?.name;
   const taskTitle = asRef(item.taskId)?.title;
   const columnName = asRef(item.columnId)?.name;
-  const wsName = asText(metadata['workspaceName']);
+  const wsName = asText(item.metadata?.['workspaceName']);
 
   switch (item.actionType) {
     case 'task_created':
       return `added ${taskTitle} to ${columnName || 'list'}`;
     case 'task_moved':
       const source = sanitizeColumnText(asText(metadata['sourceColumnName'])) || 'another list';
-      const dest = sanitizeColumnText(asText(metadata['destinationColumnName'])) || (columnName || 'a list');
+      const dest =
+        sanitizeColumnText(asText(metadata['destinationColumnName'])) || columnName || 'a list';
       return `moved ${taskTitle} from ${source} to ${dest}`;
     case 'task_completed':
       return `marked ${taskTitle} complete`;
@@ -107,7 +107,7 @@ export const getActionText = (item: ActivityItem): string => {
 export const getLocationTags = (item: ActivityItem): string[] => {
   const tags: string[] = [];
   const boardName = asRef(item.boardId)?.name;
-  const wsName = asText(item.metadata?.['workspaceName']);
+  const wsName = asText(item.metadata?.['name']);
 
   if (boardName) {
     tags.push(`on board ${boardName}`);
@@ -115,7 +115,7 @@ export const getLocationTags = (item: ActivityItem): string[] => {
   if (wsName && (item.entityType === 'board' || item.entityType === 'workspace')) {
     tags.push(`on Workspace ${wsName}`);
   }
-  
+
   return tags;
 };
 
@@ -125,7 +125,7 @@ const generateDeepLink = (item: ActivityItem, workspaceId?: string) => {
   const resolvedWorkspaceId = workspaceId || asText(item.workspaceId) || undefined;
   const boardName = asRef(item.boardId)?.name;
   const taskTitle = asRef(item.taskId)?.title;
-  const workspaceName = asText(item.metadata?.['workspaceName']) || 'workspace';
+  const workspaceName = asText(item.metadata?.['name']) || 'workspace';
 
   if (item.entityType === 'workspace') {
     return {
@@ -162,30 +162,44 @@ const generateDeepLink = (item: ActivityItem, workspaceId?: string) => {
 
 type ActivityState = {
   loading: boolean;
+  loadingMore: boolean;
   error: string | null;
   items: ActivityItem[];
   workspaceId: string | undefined;
   boardId: string | undefined;
   taskId: string | undefined;
+  userId: string | undefined;
   isLoaded: boolean;
+  page: number;
+  limit: number;
+  total: number;
+  hasMore: boolean;
 };
 
 const initialState: ActivityState = {
   loading: true,
+  loadingMore: false,
   error: null,
   items: [],
   workspaceId: undefined,
   boardId: undefined,
   taskId: undefined,
+  userId: undefined,
   isLoaded: false,
+  page: 1,
+  limit: 30,
+  total: 0,
+  hasMore: false,
 };
 
 export const ActivityStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withComputed(({ items, workspaceId, boardId, taskId, loading, error }) => ({
+  withComputed(({ items, workspaceId, boardId, taskId, loading, loadingMore, hasMore, error }) => ({
     isLoading: computed(() => loading()),
+    isLoadingMore: computed(() => loadingMore()),
     hasError: computed(() => error()),
+    hasMoreItems: computed(() => hasMore()),
     currentWorkspaceId: computed(() => workspaceId()),
     currentBoardId: computed(() => boardId()),
     currentTaskId: computed(() => taskId()),
@@ -205,18 +219,39 @@ export const ActivityStore = signalStore(
   })),
   withMethods((store, activityApi = inject(ActivityApiService)) => {
     const fetchActivities = async (
-      request$: any, 
-      statePatches: Partial<ActivityState>
+      request$: any,
+      statePatches: Partial<ActivityState>,
+      isLoadMore = false,
     ) => {
-      patchState(store, { loading: true, error: null, isLoaded: false, ...statePatches });
+      if (isLoadMore) {
+        patchState(store, { loadingMore: true, error: null, ...statePatches });
+      } else {
+        patchState(store, { loading: true, error: null, isLoaded: false, ...statePatches });
+      }
       try {
-        const response = await firstValueFrom(request$) as { data?: { items?: any[] } };
-        patchState(store, { items: response.data?.items ?? [], loading: false, isLoaded: true });
+        const response = (await firstValueFrom(request$)) as {
+          data?: { items?: any[]; total?: number };
+        };
+        const newItems = response.data?.items ?? [];
+        const total = response.data?.total ?? 0;
+        const currentPage = store.page();
+        const limit = store.limit();
+
+        patchState(store, {
+          items: isLoadMore ? [...store.items(), ...newItems] : newItems,
+          loading: false,
+          loadingMore: false,
+          isLoaded: true,
+          total,
+          hasMore: currentPage * limit < total,
+        });
       } catch (err) {
+        console.log('Error fetching activities:', err);
         patchState(store, {
           error: 'Failed to load activity feed',
           items: [],
           loading: false,
+          loadingMore: false,
           isLoaded: false,
         });
       }
@@ -224,47 +259,151 @@ export const ActivityStore = signalStore(
 
     return {
       async loadUserActivity(userId: string, forceRefresh = false) {
-        if (!forceRefresh && store.isLoaded() && !store.workspaceId() && !store.boardId() && !store.taskId()) {
+        if (
+          !forceRefresh &&
+          store.isLoaded() &&
+          !store.workspaceId() &&
+          !store.boardId() &&
+          !store.taskId()
+        ) {
           return;
         }
-        await fetchActivities(activityApi.getUserActivity(userId), { 
-          workspaceId: undefined, 
-          boardId: undefined, 
-          taskId: undefined 
+        patchState(store, {
+          userId,
+          workspaceId: undefined,
+          boardId: undefined,
+          taskId: undefined,
+          page: 1,
+          items: [],
+          loading: true,
+          isLoaded: false,
+          hasMore: false,
+          error: null,
+        });
+        await fetchActivities(activityApi.getUserActivity(1, store.limit()), {
+          userId,
+          workspaceId: undefined,
+          boardId: undefined,
+          taskId: undefined,
         });
       },
 
       async loadWorkspaceActivity(workspaceId?: string, forceRefresh = false) {
-        if (!forceRefresh && store.isLoaded() && store.workspaceId() === workspaceId && !store.boardId() && !store.taskId()) {
+        if (
+          !forceRefresh &&
+          store.isLoaded() &&
+          store.workspaceId() === workspaceId &&
+          !store.boardId() &&
+          !store.taskId()
+        ) {
           return;
         }
-        await fetchActivities(activityApi.getWorkspaceActivity(workspaceId), { 
-          workspaceId, 
-          boardId: undefined, 
-          taskId: undefined 
+        patchState(store, {
+          workspaceId,
+          userId: undefined,
+          boardId: undefined,
+          taskId: undefined,
+          page: 1,
+          items: [],
+          loading: true,
+          isLoaded: false,
+          hasMore: false,
+          error: null,
+        });
+        await fetchActivities(activityApi.getWorkspaceActivity(workspaceId, 1, store.limit()), {
+          workspaceId,
+          boardId: undefined,
+          taskId: undefined,
+          userId: undefined,
         });
       },
 
       async loadBoardActivity(workspaceId: string, boardId: string, forceRefresh = false) {
-        if (!forceRefresh && store.isLoaded() && store.workspaceId() === workspaceId && store.boardId() === boardId && !store.taskId()) {
+        if (
+          !forceRefresh &&
+          store.isLoaded() &&
+          store.workspaceId() === workspaceId &&
+          store.boardId() === boardId &&
+          !store.taskId()
+        ) {
           return;
         }
-        await fetchActivities(activityApi.getBoardActivity(workspaceId, boardId), { 
-          workspaceId, 
-          boardId, 
-          taskId: undefined 
+        patchState(store, {
+          workspaceId,
+          boardId,
+          userId: undefined,
+          taskId: undefined,
+          page: 1,
+          items: [],
+          loading: true,
+          isLoaded: false,
+          hasMore: false,
+          error: null,
         });
+        await fetchActivities(
+          activityApi.getBoardActivity(workspaceId, boardId, 1, store.limit()),
+          {
+            workspaceId,
+            boardId,
+            taskId: undefined,
+          },
+        );
       },
 
       async loadTaskActivity(taskId: string, forceRefresh = false) {
         if (!forceRefresh && store.isLoaded() && store.taskId() === taskId) {
           return;
         }
-        await fetchActivities(activityApi.getTaskActivity(taskId), { 
-          workspaceId: undefined, 
-          boardId: undefined, 
-          taskId 
+        patchState(store, {
+          taskId,
+          userId: undefined,
+          workspaceId: undefined,
+          boardId: undefined,
+          page: 1,
+          items: [],
+          loading: true,
+          isLoaded: false,
+          hasMore: false,
+          error: null,
         });
+        await fetchActivities(activityApi.getTaskActivity(taskId, 1, store.limit()), {
+          workspaceId: undefined,
+          boardId: undefined,
+          taskId,
+        });
+      },
+      async loadMore() {
+        if (!store.hasMore() || store.loadingMore()) return;
+
+        const nextPage = store.page() + 1;
+        patchState(store, { page: nextPage });
+
+        if (store.taskId()) {
+          await fetchActivities(
+            activityApi.getTaskActivity(store.taskId()!, nextPage, store.limit()),
+            {},
+            true,
+          );
+        } else if (store.boardId() && store.workspaceId()) {
+          await fetchActivities(
+            activityApi.getBoardActivity(
+              store.workspaceId()!,
+              store.boardId()!,
+              nextPage,
+              store.limit(),
+            ),
+            {},
+            true,
+          );
+        } else if (store.workspaceId()) {
+          await fetchActivities(
+            activityApi.getWorkspaceActivity(store.workspaceId()!, nextPage, store.limit()),
+            {},
+            true,
+          );
+        } else if (store.userId()) {
+          await fetchActivities(activityApi.getUserActivity(nextPage, store.limit()), {}, true);
+        }
       },
     };
   }),

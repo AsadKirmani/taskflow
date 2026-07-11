@@ -22,8 +22,9 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
           [ngModel]="value"
           (ngModelChange)="onValueChange($event)"
           (blur)="onTouched()"
+          autofocus
           [class]="
-            'w-full h-10 px-3 py-2 text-sm bg-base-100 border rounded-btn transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:bg-base-200 ' +
+            'w-full h-10 px-3 py-2 text-base-content/80 text-sm bg-base-100 border rounded-btn transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:bg-base-200 ' +
             (error()
               ? 'border-error focus:ring-error/30'
               : 'border-base-300 focus:border-primary focus:ring-primary/20')

@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-
+import { Location } from '@angular/common';
 import { Board } from '../../../../core/models/board.model';
 import { BoardColumn } from '../../../../core/models/column.model';
 import { Task } from '../../../../core/models/task.model';
@@ -72,6 +72,7 @@ export class KanbanBoardComponent {
   protected readonly shortcuts = inject(KeyboardShortcutsService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly location = inject(Location);
 
   constructor() {
     this.shortcuts.createTriggered
@@ -112,10 +113,7 @@ export class KanbanBoardComponent {
   isFilterOpen = signal(false);
   hasActiveFilters = signal(false);
 
-  activeTaskOverlayId = toSignal(
-    this.route.queryParamMap.pipe(map((params) => params.get('taskId'))),
-    { initialValue: null },
-  );
+  activeTaskOverlayId = signal<string | null>(null);
 
   activeTaskOverlay = computed(() => {
     const taskId = this.activeTaskOverlayId();
@@ -185,21 +183,19 @@ export class KanbanBoardComponent {
   }
 
   openTaskOverlay(task: Task): void {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { taskId: task.id, taskTitle: this.toSlug(task.title) },
-      queryParamsHandling: 'merge',
-      replaceUrl: true,
-    });
-  }
+    this.activeTaskOverlayId.set(task.id);
 
+    const currentUrlTree = this.router.parseUrl(this.router.url);
+    const queryString = new URLSearchParams(currentUrlTree.queryParams as Record<string, string>).toString();
+    const url = `/t/${task.id}/${this.toSlug(task.title)}${queryString ? '?' + queryString : ''}`;
+    this.location.go(url);
+  }
   closeTaskOverlay(): void {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { taskId: null, taskTitle: null },
-      queryParamsHandling: 'merge',
-      replaceUrl: true,
-    });
+    this.activeTaskOverlayId.set(null);
+    const boardId = this.route.snapshot.paramMap.get('boardId');
+    const currentUrlTree = this.router.parseUrl(this.router.url);
+    const queryString = new URLSearchParams(currentUrlTree.queryParams as Record<string, string>).toString();
+    this.location.go(`/boards/${boardId}/${this.toSlug(this.board()?.name || '')}${queryString ? '?' + queryString : ''}`);
   }
 
   @HostListener('document:keydown.escape', ['$event'])

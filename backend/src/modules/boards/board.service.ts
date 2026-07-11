@@ -17,6 +17,7 @@ export const boardService = {
       entityType: "board",
       entityId: board._id.toString(),
       metadata: {
+        workspaceName: input.workSpaceName,
         name: board.name,
         visibility: board.visibility,
       },

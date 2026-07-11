@@ -1,13 +1,33 @@
 <nav
   aria-label="Main Navigation"
-  class="h-full overflow-y-auto bg-base-200 py-5 text-stone-600 transition-all duration-300"
+  class="h-full overflow-y-auto relative bg-base-200 py-4 text-stone-600 transition-all duration-300"
   [class.px-4]="!isCollapsed()"
   [class.px-2]="isCollapsed()"
 >
-  <div class="mb-5 truncate" [class.text-center]="isCollapsed()">
+      <button
+        class="absolute top-4 hidden md:flex items-center justify-center w-8 h-8 rounded-lg hover:bg-base-300 text-base-content/50 hover:text-base-content transition-all duration-200 z-20"
+        [class.right-3]="!isCollapsed()"
+        [class.left-1/2]="isCollapsed()"
+        [class.-translate-x-1/2]="isCollapsed()"
+        [class.opacity-0]="isCollapsed()"
+        [class.group-hover:opacity-100]="isCollapsed()"
+        (click)="toggleSidebar.emit()"
+        title="Toggle sidebar"
+      >
+        @if (!isCollapsed()) {
+          <ui-button variant="icon" size="icon">
+            <svg lucidePanelLeftClose></svg>
+          </ui-button>
+        } @else {
+          <ui-button variant="icon" size="icon">
+            <svg lucidePanelLeftClose></svg>
+          </ui-button>
+        }
+          
+      </button>
+  <div class="mb-4 truncate" [class.text-center]="isCollapsed()">
     @if (!isCollapsed()) {
       <h1 class="text-xl font-bold tracking-tight text-base-content">TaskFlow</h1>
-      <p class="text-xs uppercase tracking-[0.24em] text-base-content">Organize Your Work</p>
     } @else {
       <span class="text-xl font-extrabold text-base-content tracking-tighter" aria-label="TaskFlow"
         >TF</span
@@ -62,54 +82,6 @@
         <svg lucideSquareKanban class="w-4 h-4"></svg>
         @if (!isCollapsed()) {
           <span>Boards</span>
-        }
-      </a>
-    </li>
-
-    <li>
-      <a
-        #activityRla="routerLinkActive"
-        [class]="
-          activityRla.isActive
-            ? 'bg-base-content text-base-100'
-            : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
-        "
-        class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
-        [class.px-3]="!isCollapsed()"
-        [class.justify-center]="isCollapsed()"
-        routerLink="/activity"
-        routerLinkActive="active"
-        (click)="navigate.emit()"
-        [title]="isCollapsed() ? 'Activity' : ''"
-        aria-label="Activity"
-      >
-        <svg lucideActivity class="w-4 h-4"></svg>
-        @if (!isCollapsed()) {
-          <span>Activity</span>
-        }
-      </a>
-    </li>
-
-    <li>
-      <a
-        #settingsRla="routerLinkActive"
-        [class]="
-          settingsRla.isActive
-            ? 'bg-base-content text-base-100'
-            : 'hover:bg-base-300 hover:text-base-content/90 text-base-content/70'
-        "
-        class="flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-colors"
-        [class.px-3]="!isCollapsed()"
-        [class.justify-center]="isCollapsed()"
-        routerLink="/settings"
-        routerLinkActive="active"
-        (click)="navigate.emit()"
-        [title]="isCollapsed() ? 'Settings' : ''"
-        aria-label="Settings"
-      >
-        <svg lucideSettings class="w-4 h-4"></svg>
-        @if (!isCollapsed()) {
-          <span>Settings</span>
         }
       </a>
     </li>
