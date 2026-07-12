@@ -5,7 +5,7 @@ import {
   OnInit,
   computed,
   signal,
-  effect,
+  OnDestroy
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BoardStore } from '../../data-access/board-store.service';
@@ -32,7 +32,7 @@ import { TaskFacade } from '../../../task/facades/task.facade';
       class="block h-full min-h-0"
       [board]="boardStore.currentBoard()"
       [columns]="boardStore.currentColumns()"
-      [tasksByColumn]="taskStore.buildTasksByColumn(boardStore.currentColumns())"
+      [tasksByColumn]="tasksByColumn()" 
       [loading]="isLoading()"
       (taskMoved)="onTaskMoved($event)"
       (columnMoved)="onColumnMoved($event)"
@@ -57,7 +57,7 @@ import { TaskFacade } from '../../../task/facades/task.facade';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BoardDetailPageComponent implements OnInit {
+export class BoardDetailPageComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   protected readonly boardStore = inject(BoardStore);
   protected readonly taskStore = inject(TaskStore);
@@ -67,21 +67,14 @@ export class BoardDetailPageComponent implements OnInit {
 
   activeBoardId = signal<string | null>(null);
 
-  currentBoard = computed(() => this.boardStore.currentBoard);
-  currentColumns = computed(() => {
-    return this.boardStore.currentColumns;
-  });
-
   isLoading = computed(() => {
-    const currentStoreState = (this.boardStore as any).stateSubject?.getValue();
-    const currentTaskState = (this.taskStore as any).stateSubject?.getValue();
-    return (currentStoreState?.loading || currentTaskState?.loading) ?? false;
+    return this.boardStore.loading() || this.taskStore.loading();
   });
 
   tasksByColumn = computed(() => {
-    const cols = this.currentColumns();
+    const cols = this.boardStore.currentColumns();
     if (!cols || cols.length === 0) return {};
-    return this.taskStore.buildTasksByColumn(cols());
+    return this.taskStore.buildTasksByColumn(cols);
   });
 
   ngOnInit(): void {
@@ -98,9 +91,11 @@ export class BoardDetailPageComponent implements OnInit {
         }
       });
   }
+
   ngOnDestroy(): void {
     this.boardStore.resetBoardState();
   }
+
   onTaskMoved(event: TaskDropEventPayload): void {
     this.dndFacade.handleTaskDrop(event);
   }
@@ -110,52 +105,56 @@ export class BoardDetailPageComponent implements OnInit {
   }
 
   onTaskAdded(event: AddTaskEventPayload): void {
-    const board = this.currentBoard();
-    if (!board()?.id) return;
+    const board = this.boardStore.currentBoard();
+    if (!board?.id) return;
 
-    this.taskStore.addTask(board()!.id, event.columnId, event.title, board()!.workspaceId);
+    this.taskStore.addTask(board.id, event.columnId, event.title, board.workspaceId);
   }
 
   onColumnAdded(event: AddColumnEventPayload): void {
-    const board = this.currentBoard();
-    if (!board()?.id) return;
+    const board = this.boardStore.currentBoard();
+    if (!board?.id) return;
 
-    this.boardStore.createColumn(board()!.id, board()!.workspaceId, event.title);
+    this.boardStore.createColumn(board.id, board.workspaceId, event.title);
   }
 
   onTaskUpdated(event: UpdateTaskEventPayload): void {
-    const board = this.currentBoard();
-    if (!board()?.id) return;
+    const board = this.boardStore.currentBoard();
+    if (!board?.id) return;
 
     this.taskStore.updateTask(event.taskId, { title: event.title });
   }
 
   onTaskCompletionToggled(event: ToggleTaskCompletionEventPayload): void {
-    const board = this.currentBoard();
-    if (!board()?.id) return;
+    const board = this.boardStore.currentBoard();
+    if (!board?.id) return;
 
     this.taskStore.toggleTaskCompletion(event.taskId, event.isCompleted);
   }
+
   onColumnArchived(event: { columnId: string; columnName: string }) {
-    const board = this.currentBoard();
-    if (!board()?.id) return;
+    const board = this.boardStore.currentBoard();
+    if (!board?.id) return;
+    
     this.boardStore.archiveColumn(
       event.columnId,
-      board()!.workspaceId,
+      board.workspaceId,
       event.columnName,
       'Archived from column menu',
     );
   }
+
   toggleVisibility() {
-    const board = this.currentBoard();
-    if (!board()?.id) return;
-    const newVisibility = board()!.visibility === 'private' ? 'workspace' : 'private';
-    this.boardStore.changeBoardVisibility(board()!.id, newVisibility);
+    const board = this.boardStore.currentBoard();
+    if (!board?.id) return;
+    const newVisibility = board.visibility === 'private' ? 'workspace' : 'private';
+    this.boardStore.changeBoardVisibility(board.id, newVisibility);
   }
+
   closeBoard() {
-    const board = this.currentBoard();
-    if (!board()?.id) return;
-    this.boardStore.archiveBoard(board()!.id, board()!.workspaceId, 'Archived from board menu');
+    const board = this.boardStore.currentBoard();
+    if (!board?.id) return;
+    this.boardStore.archiveBoard(board.id, board.workspaceId, 'Archived from board menu');
     this.router.navigate(['/boards']);
   }
 }

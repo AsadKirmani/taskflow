@@ -27,7 +27,7 @@ export const workspaceController = {
     await redisClient.del(`user:${userId}:profile`);
     res.status(201).json({ success: true, data: workspace });
   },
-
+  
   async getWorkspaceDetail(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { workspaceId } = req.params as { workspaceId: string };
@@ -45,7 +45,7 @@ export const workspaceController = {
     });
     res.json({ success: true, data: workspaceDetail });
   },
-
+  
   async updateWorkSpace(req: Request, res: Response) {
     const userId = req.auth!.userId;
     const { workspaceId } = req.params as { workspaceId: string };
@@ -55,8 +55,7 @@ export const workspaceController = {
       req.body,
       userId,
     );
-    await redisClient.del(`workspace:${workspaceId}:detail`);
-    await redisClient.del(`user:${userId}:workspaces`);
+    await redisClient.del(`user:${userId}:profile`);
     res.json({ success: true, data: updatedWorkspace });
   },
 

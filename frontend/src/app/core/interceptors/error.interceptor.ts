@@ -10,8 +10,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       const message =
         error.error?.message || error.message || 'Something went wrong. Please try again.';
-
-      if (!req.headers.has('x-skip-global-error')) {
+      const isAuthCheckEndpoint = req.url.includes('/api/v1/auth/refresh') || req.url.includes('/api/v1/auth/me');
+      if(error.status === 401 && isAuthCheckEndpoint) {
+        return throwError(() => error);
+      }
+      else if (!req.headers.has('x-skip-global-error')) {
         notificationService.error(message);
       }
 

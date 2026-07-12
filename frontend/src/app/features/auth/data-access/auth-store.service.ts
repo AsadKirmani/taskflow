@@ -1,5 +1,4 @@
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { Observable, of, tap, catchError, shareReplay, throwError, finalize } from 'rxjs';
 import { LoginRequest, RegisterRequest } from '../../../core/models/auth.model';
@@ -31,12 +30,12 @@ export const AuthStoreService = signalStore(
       store,
       authApi = inject(AuthApiService),
       tokenService = inject(TokenService),
-      router = inject(Router)
     ) => {
       let refreshRequest$: Observable<any> | null = null;
 
       const clearSession = (navigate = true) => {
         tokenService.setAccessToken(null);
+        localStorage.removeItem("is_logged_in");
         patchState(store, {
           currentUser: null,
           activeToken: null,
@@ -44,13 +43,11 @@ export const AuthStoreService = signalStore(
           isLoading: false,
           isInitialized: true,
         });
-        if (navigate) {
-          router.navigate(['/auth/login']);
-        }
       };
 
       const setSession = (user: any, accessToken: string) => {
         tokenService.setAccessToken(accessToken);
+        localStorage.setItem("is_logged_in", "true");
         patchState(store, {
           currentUser: user,
           activeToken: accessToken,
@@ -97,12 +94,7 @@ export const AuthStoreService = signalStore(
           refreshRequest$ = authApi.refreshToken().pipe(
             tap((response) => {
               const { accessToken, user } = response.data;
-              tokenService.setAccessToken(accessToken);
-              patchState(store, {
-                activeToken: accessToken,
-                currentUser: user,
-                isAuthenticated: true,
-              });
+              setSession(user, accessToken);
             }),
             catchError((err) => throwError(() => err)),
             finalize(() => {
@@ -133,13 +125,16 @@ export const AuthStoreService = signalStore(
           );
         },
 
-        logout(navigate = true): void {
-          authApi.logout().pipe(
-            tap({
-              next: () => clearSession(navigate),
-              error: () => clearSession(navigate),
+        logout(): Observable<any> {
+          return authApi.logout().pipe(
+            tap(() => {
+              clearSession();
+            }),
+            catchError(() => {
+              clearSession();
+              return of(null);
             })
-          ).subscribe();
+          );
         },
 
         updateUserProfile(updatedUser: any): void {

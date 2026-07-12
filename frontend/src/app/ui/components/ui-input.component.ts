@@ -18,7 +18,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
           [id]="inputId"
           [type]="type()"
           [placeholder]="placeholder()"
-          [disabled]="disabled()"
+          [disabled]="disabled() || isDisabled"
           [ngModel]="value"
           (ngModelChange)="onValueChange($event)"
           (blur)="onTouched()"
@@ -52,6 +52,7 @@ export class UiInputComponent implements ControlValueAccessor {
   type = input<'text' | 'password' | 'email' | 'number'>('text');
   error = input<string>();
   disabled = input(false);
+  isDisabled = false;
 
   inputId = `ui-input-${Math.random().toString(36).substring(2, 9)}`;
   value: string = '';
@@ -65,7 +66,9 @@ export class UiInputComponent implements ControlValueAccessor {
   }
 
   writeValue(val: any): void {
-    this.value = val || '';
+    if (val !== this.value) {
+      this.value = val || '';
+    }
   }
   registerOnChange(fn: any): void {
     this.onChange = fn;
@@ -73,5 +76,7 @@ export class UiInputComponent implements ControlValueAccessor {
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
-  setDisabledState?(isDisabled: boolean): void {}
+  setDisabledState?(isDisabled: boolean): void {
+    this.isDisabled = isDisabled;
+  }
 }

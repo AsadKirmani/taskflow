@@ -7,7 +7,7 @@ import {
   input,
   output
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthStoreService } from '../../../features/auth/data-access/auth-store.service';
 import { ThemeService } from '../../services/theme.service';
 import { SearchOverlayComponent } from '../../../shared/components/search/search-overlay.component';
@@ -132,12 +132,15 @@ import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent {
+  private router = inject(Router);
   public themeService = inject(ThemeService);
   authStore = inject(AuthStoreService);
   isMobile = input(false);
   menuToggle = output<void>();
   logout() {
-    this.authStore.logout();
+    this.authStore.logout().subscribe(() => {
+      this.router.navigate(['/']);
+    });
   }
 
   @ViewChild('searchOverlay') searchOverlay!: SearchOverlayComponent;

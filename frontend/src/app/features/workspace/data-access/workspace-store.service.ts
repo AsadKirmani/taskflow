@@ -24,11 +24,9 @@ const initialState: WorkspaceState = {
 export const WorkspaceStoreService = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  
+
   withComputed(({ workspaces, activeWorkspaceId }) => ({
-    activeWorkspace: computed(() => 
-      workspaces().find((w) => w.id === activeWorkspaceId()) || null
-    ),
+    activeWorkspace: computed(() => workspaces().find((w) => w.id === activeWorkspaceId()) || null),
   })),
 
   withMethods(
@@ -36,7 +34,7 @@ export const WorkspaceStoreService = signalStore(
       store,
       authStore = inject(AuthStoreService),
       workspaceApi = inject(WorkspaceApiService),
-      permissionService = inject(PermissionService)
+      permissionService = inject(PermissionService),
     ) => ({
       createWorkspace(name: string, slug: string, description: string): void {
         patchState(store, { isLoading: true, error: null });
@@ -46,7 +44,7 @@ export const WorkspaceStoreService = signalStore(
             const newWorkspace = response?.data;
             if (newWorkspace) {
               const mappedWorkspace: Workspace = {
-                id: newWorkspace.id,
+                id: newWorkspace._id,
                 name: newWorkspace.name,
                 slug: newWorkspace.name.toLowerCase().replace(/\s+/g, '-'),
                 description: '',
@@ -64,6 +62,40 @@ export const WorkspaceStoreService = signalStore(
             patchState(store, {
               isLoading: false,
               error: error?.message || 'Failed to create workspace',
+            });
+          },
+        });
+      },
+      updateWorkspace(workspaceId: string, data: Partial<Workspace>): void {
+        patchState(store, { isLoading: true, error: null });
+
+        workspaceApi.updateWorkspace(workspaceId, data).subscribe({
+          next: (response: any) => {
+            const updatedWorkspace = response?.data;
+            if (updatedWorkspace) {
+              const mappedWorkspace: Workspace = {
+                id: updatedWorkspace._id,
+                name: updatedWorkspace.name,
+                slug: updatedWorkspace.name.toLowerCase().replace(/\s+/g, '-'),
+                description: '',
+                currentUserRole: updatedWorkspace.role,
+              };
+
+              const updatedWorkspaces = store
+                .workspaces()
+                .map((ws) => (ws.id === workspaceId ? mappedWorkspace : ws));
+
+              patchState(store, {
+                workspaces: updatedWorkspaces,
+                isLoading: false,
+                error: null,
+              });
+            }
+          },
+          error: (error: any) => {
+            patchState(store, {
+              isLoading: false,
+              error: error?.message || 'Failed to update workspace',
             });
           },
         });
@@ -116,6 +148,6 @@ export const WorkspaceStoreService = signalStore(
           permissionService.setRole(null);
         }
       },
-    })
-  )
+    }),
+  ),
 );

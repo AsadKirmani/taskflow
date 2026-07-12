@@ -17,6 +17,13 @@ export class WorkspaceApiService {
       { withCredentials: true },
     );
   }
+  updateWorkspace(workspaceId: string, data: Partial<Workspace>): Observable<ApiResponse<Workspace>> {
+    return this.http.patch<ApiResponse<Workspace>>(
+      `${this.baseUrl}/workspaces/${workspaceId}`,
+      data,
+      { withCredentials: true },
+    );
+  }
   getMeContext(): Observable<ApiResponse<Workspace[]>> {
     return this.http.get<ApiResponse<Workspace[]>>(`${this.baseUrl}/auth/me`, {
       withCredentials: true,
