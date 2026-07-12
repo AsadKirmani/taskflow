@@ -26,5 +26,10 @@ router.get(
   authMiddleware,
   asyncHandler(archiveController.listArchived),
 );
+router.get(
+  "/boards/:boardId/archive",
+  authMiddleware,
+  asyncHandler(archiveController.archivedItemsInBoard),
+);
 
 export default router;

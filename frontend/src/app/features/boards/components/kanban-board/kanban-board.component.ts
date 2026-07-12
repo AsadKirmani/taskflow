@@ -9,8 +9,7 @@ import {
   HostListener,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Location } from '@angular/common';
 import { Board } from '../../../../core/models/board.model';
@@ -31,6 +30,7 @@ import type { BoardFilterSelection } from '../filters/filter-selection.model';
 import { TaskComponent } from '../../../task/task.component';
 import { KanbanColumnComponent } from '../kanban-column/kanban-column.component';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
+import { ArchiveItemsComponent } from '../archive-items.component';
 import { UiAvatarStackComponent } from '../../../../ui/components/ui-avatar-stack.component';
 import { UiSkeletonComponent } from '../../../../ui/components/ui-skeleton.component';
 import { APP_ICONS } from '../../../../core/icons/lucide-icons';
@@ -55,6 +55,7 @@ import { User } from '../../../../core/models/user.model';
     AutofocusDirective,
     UiAvatarStackComponent,
     DragDropModule,
+    ArchiveItemsComponent,
     UiSkeletonComponent,
     UiButtonComponent,
     UiDropdownMenuComponent,
@@ -73,6 +74,7 @@ export class KanbanBoardComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly location = inject(Location);
+  isArchiveOpen = signal(false);
 
   constructor() {
     this.shortcuts.createTriggered

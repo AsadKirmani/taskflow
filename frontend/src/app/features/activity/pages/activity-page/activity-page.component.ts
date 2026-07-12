@@ -10,6 +10,7 @@ import { AuthStoreService } from '../../../auth/data-access/auth-store.service';
 import { BoardStore } from '../../../boards/data-access/board-store.service';
 import { WorkspaceStoreService } from '../../../workspace/data-access/workspace-store.service';
 import { UiPageBodyComponent } from '../../../../ui/components/layout/ui-page-body.component';
+import { APP_ICONS } from '../../../../core/icons/lucide-icons';
 
 @Component({
   selector: 'app-activity-page',
@@ -22,6 +23,7 @@ import { UiPageBodyComponent } from '../../../../ui/components/layout/ui-page-bo
     UiPageBodyComponent,
     UiAvatarComponent,
     UiButtonComponent,
+    ...APP_ICONS,
   ],
   template: `
     <section class="rounded-box flex flex-col">
@@ -74,7 +76,7 @@ import { UiPageBodyComponent } from '../../../../ui/components/layout/ui-page-bo
               @for (group of groupedActivities(); track group.date) {
                 <div class="relative">
                   <h4
-                    class="sticky top-0 z-20 w-full px-4 py-2.5 mb-3 bg-base-100/95 backdrop-blur-md text-[11px] font-bold uppercase tracking-widest text-base-content/50 border-y border-base-200 shadow-sm"
+                    class="sticky top-0 z-20 w-full px-4 py-2.5 mb-3 bg-base-content/5 backdrop-blur-md text-[11px] font-bold uppercase tracking-widest text-base-content/50 border-y border-base-300"
                   >
                     {{ group.date }}
                   </h4>
@@ -121,23 +123,7 @@ import { UiPageBodyComponent } from '../../../../ui/components/layout/ui-page-bo
                                 [routerLink]="link.commands"
                                 [queryParams]="link.queryParams"
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                >
-                                  <path
-                                    d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-                                  />
-                                  <polyline points="15 3 21 3 21 9" />
-                                  <line x1="10" y1="14" x2="21" y2="3" />
-                                </svg>
+                                <svg lucideExternalLink class="w-3 h-3"></svg>
                                 {{ link.label }}
                               </a>
                             }

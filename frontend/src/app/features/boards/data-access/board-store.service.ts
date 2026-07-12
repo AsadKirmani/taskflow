@@ -277,14 +277,13 @@ export const BoardStore = signalStore(
         }
       },
 
-      async restoreColumn(columnId: string, workspaceId: string, columnName: string) {
+      async restoreColumn(columnId: string, workspaceId: string) {
         try {
           await firstValueFrom(
             archive.restore({
               workspaceId,
               entityType: 'column',
               entityId: columnId,
-              entityName: columnName,
             }),
           );
           notification.success('Column restored', 'The column has been restored successfully.');
@@ -294,6 +293,15 @@ export const BoardStore = signalStore(
           }
         } catch (err) {
           notification.error('Failed to restore column', 'An error occurred while trying to restore the column.');
+        }
+      },
+      async loadArchivedItemsInBoard(boardId: string) {
+        try {
+          const response = await firstValueFrom(boardApi.getArchivedItemsInBoard(boardId));
+          return response.data.items;
+        } catch (err) {
+          notification.error('Failed to load archived items', 'An error occurred while trying to load archived items for the board.');
+          return [];
         }
       },
       resetBoardState() {

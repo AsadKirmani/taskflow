@@ -7,7 +7,7 @@ export interface ArchivePayload {
   workspaceId: string;
   entityType: 'board' | 'column' | 'task';
   entityId: string;
-  entityName: string;
+  entityName?: string;
   reason?: string;
 }
 

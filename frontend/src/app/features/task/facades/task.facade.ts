@@ -20,6 +20,8 @@ export class TaskFacade {
   selectedTaskId = signal<string | null>(null);
   boardMembers = computed(() => this.boardStore.members() ?? []);
 
+  workspaceId = computed(() => this.boardStore.currentBoard()?.workspaceId ?? '');
+
   currentTask = computed<Task | null>(() => {
     const taskId = this.selectedTaskId();
     if (!taskId) return null;

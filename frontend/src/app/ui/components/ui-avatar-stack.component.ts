@@ -13,7 +13,7 @@ import { UiAvatarComponent } from './ui-avatar.component';
           [name]="user.name"
           [title]="user.name"
           [size]="size()"
-          class="ring-2 ring-base-100"
+          class="ring-2 ring-base-100 rounded-full"
         />
       }
 

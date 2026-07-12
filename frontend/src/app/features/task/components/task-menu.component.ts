@@ -41,7 +41,7 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
               (click)="
                 facade.archiveTask(
                   facade.currentTask()?.id!,
-                  facade.currentTask()?.workspaceId!,
+                  facade.workspaceId(),
                   facade.currentTask()?.title!,
                   'Archived from task menu'
                 )

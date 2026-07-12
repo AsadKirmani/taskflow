@@ -91,4 +91,9 @@ export const archiveController = {
 
     res.json({ success: true, data: { items } });
   },
+  async archivedItemsInBoard(req: Request, res: Response) {
+    const { boardId } = req.params as { boardId: string };
+    const items = await archiveService.archivedItemsInBoard(boardId);
+    res.json({ success: true, data: { items } });
+  },
 };

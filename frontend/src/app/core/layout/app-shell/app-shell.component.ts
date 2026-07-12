@@ -39,12 +39,12 @@ import { filter } from 'rxjs';
         >
         </app-sidebar>
       </aside>
-      <div class="flex-1 flex flex-col h-full min-w-0 relative">
+      <div class="flex-1 flex flex-col h-full min-w-0 relative overflow-y-auto">
       <app-navbar (menuToggle)="toggleSidebar()"
       [isMobile]="isMobile()"
       > </app-navbar>
         <main
-          class="flex-1 overflow-y-auto overflow-x-hidden p-4 scroll-smooth scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-base-200"
+          class="flex-1 overflow-x-hidden p-4 scroll-smooth scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-200"
         >
           <div class="max-w-7xl mx-auto h-full w-full"><router-outlet /></div>
         </main>

@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import authRoutes from "./modules/auth/auth.routes";
 import dashboardRoutes from "./modules/dashboard/dashboard.routes";
@@ -43,6 +44,7 @@ app.use(
   }),
 );
 app.use(express.json());
+app.use(helmet());
 app.use(cookieParser());
 
 app.get("/", (_req, res) => {

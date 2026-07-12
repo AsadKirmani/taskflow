@@ -75,4 +75,7 @@ export const archiveService = {
   ) {
     return archiveRepository.listArchived(workspaceId, options);
   },
+  async archivedItemsInBoard(boardId: string) {
+    return archiveRepository.archivedItemsInBoard(boardId);
+  },
 };

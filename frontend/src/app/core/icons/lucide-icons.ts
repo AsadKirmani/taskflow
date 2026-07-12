@@ -65,6 +65,7 @@ import {
   LucideSquarePen,
   LucideKanban,
   LucideBriefcase,
+  LucideRotateCcw,
 } from '@lucide/angular';
 
 export const APP_ICONS = [
@@ -134,4 +135,5 @@ export const APP_ICONS = [
   LucideSquarePen,
   LucideKanban,
   LucideBriefcase,
+  LucideRotateCcw,
 ];

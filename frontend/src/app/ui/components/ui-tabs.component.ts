@@ -78,7 +78,7 @@ computedTablistClass(): string {
 }
 
 computedTabClass(isActive: boolean, isDisabled: boolean): string {
-  let base = 'whitespace-nowrap font-medium transition-all duration-200 flex items-center justify-center ';
+  let base = 'whitespace-nowrap font-medium transition-all duration-200 flex items-center justify-center text-xs sm:text-sm md:text-base ';
   
   if (this.variant() === 'boxed') {
     base += 'px-4 py-2 rounded-lg text-sm ';

@@ -99,4 +99,26 @@ export const archiveRepository = {
       .sort({ createdAt: -1 })
       .lean();
   },
+  async archivedItemsInBoard(boardId: string) {
+    const [columns, tasks] = await Promise.all([
+      ColumnModel.find({ boardId, archived: true }).select("_id").lean(),
+      TaskModel.find({ boardId, archived: true }).select("_id").lean(),
+    ]);
+
+    const columnIds = columns.map((column) => column._id);
+    const taskIds = tasks.map((task) => task._id);
+
+    return ArchiveModel.find({
+      restoredAt: null,
+      $or: [
+        { entityType: "column", entityId: { $in: columnIds } },
+        { entityType: "task", entityId: { $in: taskIds } },
+      ],
+    })
+      .select(
+        "_id entityType entityId entityName archivedBy reason createdAt restoredAt restoredBy",
+      )
+      .sort({ createdAt: -1 })
+      .lean();
+  },
 };

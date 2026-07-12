@@ -38,8 +38,7 @@ import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
     ...APP_ICONS,
   ],
   template: `
-    <header class="sticky top-0 z-10  bg-base-200/70 p-2 backdrop-blur-lg border-b border-base-300">
-      <div class="flex items-center justify-between w-full gap-4">
+    <header class="sticky top-0 z-10 p-2 bg-base-200 border-b border-base-300 flex items-center justify-between gap-4">
         <div class="flex items-center gap-1 sm:gap-3 flex-shrink-0 md:hidden">
           <ui-button variant="ghost" size="icon" aria-label="Toggle Menu" (click)="menuToggle.emit()" class="text-base-content/70 hover:text-base-content hover:bg-base-200/50 rounded-full transition-colors">
           <svg lucideMenu class="w-5 h-5"></svg>
@@ -126,8 +125,6 @@ import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
             </ui-dropdown-menu>
           </div>
         </div>
-        
-      </div>
     </header>
     <app-search-overlay #searchOverlay></app-search-overlay>
     <app-create-workspace-modal #createWsModal></app-create-workspace-modal>

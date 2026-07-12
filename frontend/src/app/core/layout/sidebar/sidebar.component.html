@@ -1,11 +1,11 @@
 <nav
   aria-label="Main Navigation"
-  class="h-full overflow-y-auto relative bg-base-200 py-4 text-stone-600 transition-all duration-300"
+  class="h-full overflow-y-auto relative bg-base-200 py-4 text-stone-600 transition-all duration-300 scrollbar-thin scroll-smooth scrollbar-thumb-base-300 scrollbar-track-base-200"
   [class.px-4]="!isCollapsed()"
   [class.px-2]="isCollapsed()"
 >
       <button
-        class="absolute top-4 hidden md:flex items-center justify-center w-8 h-8 rounded-lg hover:bg-base-300 text-base-content/50 hover:text-base-content transition-all duration-200 z-20"
+        class="absolute top-4 hidden md:flex items-center justify-center w-8 h-8 rounded-lg hover:bg-base-300 text-base-content/50 hover:text-base-content transition-all duration-200 z-10"
         [class.right-3]="!isCollapsed()"
         [class.left-1/2]="isCollapsed()"
         [class.-translate-x-1/2]="isCollapsed()"

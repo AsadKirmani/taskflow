@@ -86,4 +86,10 @@ export class BoardApiService {
       { withCredentials: true },
     );
   }
+  getArchivedItemsInBoard(boardId: string): Observable<ApiResponse<{ items: any[] }>> {
+    return this.http.get<ApiResponse<{ items: any[] }>>(
+      `${this.baseUrl}/boards/${boardId}/archive`,
+      { withCredentials: true },
+    );
+  }
 }
