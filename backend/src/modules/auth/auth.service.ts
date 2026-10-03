@@ -141,6 +141,18 @@ export const authService = {
     }
     return sanitizeUser(user);
   },
+  async getProfile(userId: string) {
+    const user = await authRepository.findUserById(userId);
+    if (!user) {
+      throw new AppError("User not found", 404, "USER_NOT_FOUND");
+    }
+    return {
+      id: user._id.toString(),
+      name: user.name,
+      avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt,
+    };
+  },
   async updatePassword(
     userId: string,
     currentPassword: string,

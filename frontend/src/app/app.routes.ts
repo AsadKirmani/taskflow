@@ -70,7 +70,7 @@ export const appRoutes: Routes = [
           import('./features/settings/settings.routes').then((m) => m.SETTINGS_ROUTES),
       },
       {
-        path: 'profile',
+        path: 'profile/:userId',
         loadChildren: () =>
           import('./features/user/user.routes').then((m) => m.USER_ROUTES),
       },

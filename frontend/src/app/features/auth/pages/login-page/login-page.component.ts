@@ -43,6 +43,16 @@ export class LoginPageComponent implements OnInit {
       }
     }
   }
+  useSavedAccount(): void {
+  this.authStore.refreshAccessToken().subscribe({
+    next: () => {
+      this.router.navigate(['/dashboard']);
+    },
+    error: () => {
+      this.useAnotherAccount();
+    },
+  });
+}
 
   useAnotherAccount(): void {
     this.savedUser.set(null);

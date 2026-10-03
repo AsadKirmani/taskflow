@@ -6,6 +6,7 @@ import { authService } from "./auth.service";
 import { WorkspaceMemberModel } from "../../models/workspace-member.model";
 import { redisClient } from "../../config/redis";
 import { hashToken } from "../../shared/utils/token";
+import mongoose from "mongoose";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -131,6 +132,22 @@ export const authController = {
 
     return res.status(200).json(responsePayload);
   },
+  async getProfile(req: Request, res: Response) {
+  const { userId } = req.params;
+
+  if (typeof userId !== "string" || !mongoose.isValidObjectId(userId)) {
+    throw new AppError("Invalid user ID", 400, "INVALID_USER_ID");
+  }
+
+  const user = await authService.getProfile(userId);
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      user,
+    },
+  });
+},
   async updateUserPassword(req: Request, res: Response) {
     const { currentPassword, newPassword } = req.body;
     const updatedUser = await authService.updatePassword(

@@ -15,6 +15,11 @@ router.post(
 );
 router.post("/login", validate(loginDto), asyncHandler(authController.login));
 router.get("/me", authMiddleware, asyncHandler(authController.me));
+router.get(
+  "/profile/:userId",
+  authMiddleware,
+  asyncHandler(authController.getProfile),
+);
 router.post("/refresh-token", asyncHandler(authController.refresh));
 router.post("/logout", asyncHandler(authController.logout));
 router.post(

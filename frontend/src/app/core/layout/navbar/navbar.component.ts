@@ -114,7 +114,7 @@ import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
               </ui-dropdown-menu-trigger>
               <ui-dropdown-menu-content>
                 <div class="p-1">
-                  <ui-dropdown-menu-item routerLink="/profile">Profile</ui-dropdown-menu-item>
+                  <ui-dropdown-menu-item [routerLink]="['/profile', authStore.currentUser()?.id]">Profile</ui-dropdown-menu-item>
                   <ui-dropdown-menu-item routerLink="/activity">Activity</ui-dropdown-menu-item>
                   <ui-dropdown-menu-item (onClick)="createWsModal.open()">Create Workspace</ui-dropdown-menu-item>
                   <ui-dropdown-menu-item routerLink="/settings">Settings</ui-dropdown-menu-item>
