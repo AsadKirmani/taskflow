@@ -52,6 +52,7 @@ export const authController = {
       message: "Registration successful",
       data: {
         user: result.user,
+        createdAt: result.user.createdAt,
       },
     });
   },
@@ -114,6 +115,7 @@ export const authController = {
           email: user.email,
           avatarUrl: user.avatarUrl,
           preferences: user.preferences,
+          createdAt: user.createdAt,
         },
         workspaces: memberships.map((m) => ({
           id: m.workspaceId._id,

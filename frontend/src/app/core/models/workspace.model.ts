@@ -5,7 +5,7 @@ export interface Workspace {
   name: string;
   slug: string;
   description: string;
-  memberCount?: number;
-  boardCount?: number;
+  membersCount?: number;
+  boardsCount?: number;
   currentUserRole: WorkspaceRole;
 }

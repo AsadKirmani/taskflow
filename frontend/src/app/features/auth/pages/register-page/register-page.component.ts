@@ -63,11 +63,11 @@ import { UiButtonComponent } from '../../../../ui/components/ui-button.component
             <ui-button
               type="button"
               (click)="togglePasswordVisibility()"
-              variant="ghost"
+              variant="icon"
               size="icon-sm"
-              class="absolute right-2 top-1/2 transform -translate-y-1/2 py-2 text-base-content/70 hover:text-base-content transition-colors"
+              class="absolute right-2 top-[47px] transform -translate-y-1/2 py-2 text-base-content/70 hover:text-base-content transition-colors"
             >
-              @if (hidePassword()) {
+              @if (hidePassword()) {  
                 <svg lucideEyeClosed class="w-5 h-5" stroke-width="1.5"></svg>
               } @else {
                 <svg lucideEye class="w-5 h-5" stroke-width="1.5"></svg>

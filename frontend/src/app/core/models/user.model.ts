@@ -10,4 +10,5 @@ export interface User {
   email: string;
   avatarUrl?: string | null;
   preferences?: UserPreferences;
+  createdAt?: string;
 }

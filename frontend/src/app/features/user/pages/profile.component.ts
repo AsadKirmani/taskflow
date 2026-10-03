@@ -4,11 +4,21 @@ import { APP_ICONS } from '../../../core/icons/lucide-icons';
 import { UiButtonComponent } from '../../../ui/components/ui-button.component';
 import { UiAvatarComponent } from '../../../ui/components/ui-avatar.component';
 import { RouterLink } from '@angular/router';
+import { DashboardStore } from '../../../features/dashboard/data-access/dashboard-store.service';
+import { WorkspaceStoreService } from '../../../features/workspace/data-access/workspace-store.service';
+import { CommonModule, DatePipe } from '@angular/common';
+import {
+  ActivityItem,
+  ActivityRef,
+  formatActivityAction,
+} from '../../activity/models/activity.model';
+import { UiAvatarStackComponent } from '../../../ui/components/ui-avatar-stack.component';
+
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [UiButtonComponent, UiAvatarComponent, RouterLink, ...APP_ICONS],
+  imports: [UiButtonComponent, UiAvatarComponent, UiAvatarStackComponent, RouterLink, ...APP_ICONS, DatePipe, CommonModule],
   template: `
     <div class="min-h-full w-full bg-base-200/50 p-4 md:p-8">
       <div class="max-w-6xl mx-auto">
@@ -61,8 +71,7 @@ import { RouterLink } from '@angular/router';
                   {{ authStore.currentUser()?.email || 'alex@taskflow.com' }}</span
                 >
                 <span class="flex items-center gap-1.5"
-                  ><svg lucideCalendar class="w-4 h-4"></svg> Joined March 2024</span
-                >
+                  ><svg lucideCalendar class="w-4 h-4"></svg> {{ authStore.currentUser()?.createdAt | date:'MMMM yyyy'}}</span>
               </div>
             </div>
           </div>
@@ -81,7 +90,7 @@ import { RouterLink } from '@angular/router';
 
             <div class="bg-base-100 rounded-2xl shadow-sm border border-base-300 p-6">
               <h3 class="font-bold text-base-content mb-4 flex items-center gap-2">
-                <svg lucideBarChart2 class="w-4 h-4 text-primary"></svg> Workload Stats
+                <svg lucideBarChartNoAxesColumn class="w-4 h-4 text-primary"></svg> Workload Stats
               </h3>
               <div class="space-y-4">
                 <div class="flex justify-between items-center">
@@ -89,19 +98,23 @@ import { RouterLink } from '@angular/router';
                     ><svg lucideCheckCircle class="w-4 h-4 text-success"></svg> Tasks
                     Completed</span
                   >
-                  <span class="font-bold text-base-content">142</span>
+                  <span class="font-bold text-base-content">{{
+                    dashboardStore.completedTasks()
+                  }}</span>
                 </div>
                 <div class="flex justify-between items-center">
                   <span class="text-sm text-base-content/70 flex items-center gap-2"
                     ><svg lucideClock class="w-4 h-4 text-warning"></svg> In Progress</span
                   >
-                  <span class="font-bold text-base-content">8</span>
+                  <span class="font-bold text-base-content"></span>
                 </div>
                 <div class="flex justify-between items-center">
                   <span class="text-sm text-base-content/70 flex items-center gap-2"
                     ><svg lucideKanban class="w-4 h-4 text-info"></svg> Active Boards</span
                   >
-                  <span class="font-bold text-base-content">5</span>
+                  <span class="font-bold text-base-content">{{
+                    dashboardStore.activeBoards()
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -148,108 +161,57 @@ import { RouterLink } from '@angular/router';
                 class="bg-base-100 rounded-2xl shadow-sm border border-base-300 p-6 animate-in fade-in duration-300"
               >
                 <ul class="space-y-6">
-                  <li class="flex gap-4">
-                    <div
-                      class="mt-1 w-8 h-8 rounded-full bg-success/10 flex items-center justify-center shrink-0"
+                  @for (
+                    item of dashboardStore.recentActivities();
+                    track item._id ?? item.id ?? item.createdAt
+                  ) {
+                    <li
+                      class="flex items-start justify-between gap-4 p-4 hover:bg-base-200 transition-colors"
                     >
-                      <svg lucideCheckCircle class="w-4 h-4 text-success"></svg>
-                    </div>
-                    <div>
-                      <p class="text-sm text-base-content">
-                        <span class="font-semibold">Alex</span> completed the task
-                        <span class="font-semibold text-primary cursor-pointer hover:underline"
-                          >Implement Sidebar Navigation</span
-                        >
-                      </p>
-                      <p class="text-xs text-base-content/50 mt-1">
-                        2 hours ago • Frontend Project
-                      </p>
-                    </div>
-                  </li>
-                  <li class="flex gap-4">
-                    <div
-                      class="mt-1 w-8 h-8 rounded-full bg-info/10 flex items-center justify-center shrink-0"
-                    >
-                      <svg lucideMessageSquare class="w-4 h-4 text-info"></svg>
-                    </div>
-                    <div>
-                      <p class="text-sm text-base-content">
-                        <span class="font-semibold">Alex</span> commented on
-                        <span class="font-semibold text-primary cursor-pointer hover:underline"
-                          >API Integration Bug</span
-                        >
-                      </p>
-                      <div
-                        class="mt-2 text-sm text-base-content/70 bg-base-200/50 p-3 rounded-lg border border-base-300"
-                      >
-                        "I've checked the payload, the issue seems to be in the auth token format."
+                      <div class="flex items-start gap-3 min-w-0">
+                        <span
+                          class="activity-icon bg-primary w-2 h-2 mt-1.5 rounded-full inline-block shrink-0 shadow-sm"
+                        ></span>
+                        <span class="truncate text-sm font-medium text-base-content">{{
+                          describeActivity(item)
+                        }}</span>
                       </div>
-                      <p class="text-xs text-base-content/50 mt-2">Yesterday • Backend Services</p>
-                    </div>
-                  </li>
-                  <li class="flex gap-4">
-                    <div
-                      class="mt-1 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0"
-                    >
-                      <svg lucideKanban class="w-4 h-4 text-primary"></svg>
-                    </div>
-                    <div>
-                      <p class="text-sm text-base-content">
-                        <span class="font-semibold">Alex</span> created a new board
-                        <span class="font-semibold text-primary cursor-pointer hover:underline"
-                          >Q3 Marketing Site</span
-                        >
-                      </p>
-                      <p class="text-xs text-base-content/50 mt-1">July 8, 2026 • Marketing Team</p>
-                    </div>
-                  </li>
+                      <span class="text-xs font-bold text-base-content/40 shrink-0 mt-0.5">{{
+                        item.createdAt | date: 'short'
+                      }}</span>
+                    </li>
+                  }
                 </ul>
               </div>
             }
 
             @if (activeTab() === 'workspaces') {
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-300">
-                <div
-                  class="bg-base-100 rounded-2xl shadow-sm border border-base-300 p-5 hover:border-primary/50 transition-colors cursor-pointer group"
-                >
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in duration-300">
+              @for (workspace of workspaceStore.workspaces(); track workspace.id) {
                   <div
-                    class="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold mb-4"
+                    class="bg-base-100 rounded-2xl shadow-sm border border-base-300 p-5 hover:border-primary/50 transition-colors cursor-pointer group"
                   >
-                    FE
-                  </div>
-                  <h4
-                    class="font-bold text-base-content group-hover:text-primary transition-colors"
-                  >
-                    Frontend Guild
-                  </h4>
-                  <p class="text-xs text-base-content/60 mt-1">3 Boards • 12 Members</p>
-                  <div class="mt-4 flex -space-x-2">
-                    <div class="w-6 h-6 rounded-full bg-base-300 border-2 border-base-100"></div>
-                    <div class="w-6 h-6 rounded-full bg-base-300 border-2 border-base-100"></div>
-                    <div class="w-6 h-6 rounded-full bg-base-300 border-2 border-base-100"></div>
-                  </div>
+                    <div
+                      class="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold mb-4"
+                    >
+                      {{ workspace.name.charAt(0).toUpperCase() }}
+                    </div>
+                    <h4
+                      class="font-bold text-base-content group-hover:text-primary transition-colors"
+                    >
+                      {{ workspace.name }}
+                    </h4>
+                    <p class="text-xs text-base-content/60 mt-1">{{workspace.boardsCount}} Boards • {{workspace.membersCount}} Members</p>
+                    <ui-avatar-stack
+                    [users]="[
+                      { id: '1', name: 'Dev' },
+                      { id: '2', name: 'Design' },
+                    ]"
+                    size="sm"
+                  />
+                    </div>
+                    }
                 </div>
-
-                <div
-                  class="bg-base-100 rounded-2xl shadow-sm border border-base-300 p-5 hover:border-primary/50 transition-colors cursor-pointer group"
-                >
-                  <div
-                    class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold mb-4"
-                  >
-                    MK
-                  </div>
-                  <h4
-                    class="font-bold text-base-content group-hover:text-primary transition-colors"
-                  >
-                    Marketing Team
-                  </h4>
-                  <p class="text-xs text-base-content/60 mt-1">1 Board • 5 Members</p>
-                  <div class="mt-4 flex -space-x-2">
-                    <div class="w-6 h-6 rounded-full bg-base-300 border-2 border-base-100"></div>
-                    <div class="w-6 h-6 rounded-full bg-base-300 border-2 border-base-100"></div>
-                  </div>
-                </div>
-              </div>
             }
           </div>
         </div>
@@ -260,5 +222,33 @@ import { RouterLink } from '@angular/router';
 })
 export class ProfilePageComponent {
   authStore = inject(AuthStoreService);
+  dashboardStore = inject(DashboardStore);
+  workspaceStore = inject(WorkspaceStoreService);
   activeTab = signal<'activity' | 'workspaces'>('activity');
+  describeActivity(item: ActivityItem): string {
+    const actor = this.getRef(item.userId)?.name || 'Someone';
+    const task = this.getRef(item.taskId)?.title;
+    const board = this.getRef(item.boardId)?.name;
+    const workspace = this.getRef(item.workspaceId)?.name;
+    const action = formatActivityAction(item.actionType);
+
+    if (task) {
+      return `${actor} ${action} "${task}"`;
+    }
+
+    if (board) {
+      return `${actor} ${action} on board "${board}"`;
+    }
+
+    if (workspace) {
+      return `${actor} ${action} in workspace "${workspace}"`;
+    }
+    return `${actor} ${action}`;
+  }
+  private getRef(value: string | ActivityRef | null | undefined): ActivityRef | null {
+    if (!value || typeof value === 'string') {
+      return null;
+    }
+    return value;
+  }
 }

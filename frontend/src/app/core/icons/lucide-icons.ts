@@ -66,6 +66,7 @@ import {
   LucideKanban,
   LucideBriefcase,
   LucideRotateCcw,
+  LucideChartNoAxesColumn
 } from '@lucide/angular';
 
 export const APP_ICONS = [
@@ -136,4 +137,5 @@ export const APP_ICONS = [
   LucideKanban,
   LucideBriefcase,
   LucideRotateCcw,
-];
+  LucideChartNoAxesColumn,
+]

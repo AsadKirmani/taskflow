@@ -138,16 +138,16 @@ import { Router } from '@angular/router';
 
               <div class="space-y-3">
                 <div class="flex items-center justify-between px-1">
-                  <h3 class="text-sm font-semibold">In Progress</h3>
-                  <ui-badge variant="info">1</ui-badge>
+                  <h3 class="text-sm font-semibold">Done</h3>
+                  <ui-badge variant="success">1</ui-badge>
                 </div>
                 <ui-card [interactive]="true" class="ring-1 ring-primary/20">
                   <div class="flex justify-between items-start mb-2">
-                    <ui-badge variant="info">Feature</ui-badge>
-                    <span class="text-xs text-base-content/40">T-102</span>
+                    <ui-badge variant="success">Chore</ui-badge>
+                    <span class="text-xs text-base-content/40">T-103</span>
                   </div>
                   <h4 class="text-sm font-medium mb-4">
-                    Implement real-time collaboration cursors
+                    Refactor authentication module for better maintainability
                   </h4>
                   <ui-avatar-stack
                     [users]="[

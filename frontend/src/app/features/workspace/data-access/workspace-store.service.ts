@@ -116,6 +116,8 @@ export const WorkspaceStoreService = signalStore(
               name: ws.name,
               slug: ws.name.toLowerCase().replace(/\s+/g, '-'),
               description: '',
+              boardsCount: ws.boardsCount || 0,
+              membersCount: ws.membersCount || 0,
               currentUserRole: ws.role,
             }));
 
@@ -131,6 +133,33 @@ export const WorkspaceStoreService = signalStore(
               isLoading: false,
               isLoaded: true,
               error: error?.message || 'Failed to load workspaces',
+            });
+          },
+        });
+      },
+      loadWorkspaceMembers(workspaceId: string): void {
+        if (store.isLoading()) return;
+
+        patchState(store, { isLoading: true, error: null });
+
+        workspaceApi.getWorkspaceMembers(workspaceId).subscribe({
+          next: (response: any) => {
+            const members = response?.data?.members || [];
+
+            const updatedWorkspaces = store
+              .workspaces()
+              .map((ws) => (ws.id === workspaceId ? { ...ws, membersCount: members.length } : ws));
+
+            patchState(store, {
+              workspaces: updatedWorkspaces,
+              isLoading: false,
+              error: null,
+            });
+          },
+          error: (error: any) => {
+            patchState(store, {
+              isLoading: false,
+              error: error?.message || 'Failed to load workspace members',
             });
           },
         });

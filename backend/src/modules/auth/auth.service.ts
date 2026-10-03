@@ -24,6 +24,7 @@ const sanitizeUser = (user: any) => ({
   email: user.email,
   avatarUrl: user.avatarUrl ?? null,
   preferences: user.preferences,
+  createdAt: user.createdAt,
 });
 
 export const authService = {
